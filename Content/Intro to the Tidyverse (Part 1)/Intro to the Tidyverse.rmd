@@ -1,0 +1,584 @@
+---
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    # self_contained: true
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+    seal: false
+editor_options: 
+  chunk_output_type: console
+---
+
+class: center, middle
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_accent(
+  base_color = "#00000e",
+  header_font_google = google_font("Merriweather"),
+  text_font_google   = google_font("Avenir Next"),
+  code_font_google   = google_font("Fira Mono")
+)
+```
+
+```{css, echo=FALSE}
+pre {
+  background: #F8F8F8;
+  max-width: 100%;
+  overflow-x: scroll;
+}
+```
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+# Introduction to the Tidyverse (Part 1)
+
+## by
+
+```{r, echo=FALSE, out.width="50%"}
+knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
+```
+
+##### Author/Presenter: Mathias Steilen
+##### Last updated: _`r Sys.time()`_
+
+---
+
+class: center, middle
+
+```{r, echo=FALSE, out.width="80%"}
+knitr::include_graphics("GraphicsSlides/components.png")
+```
+
+[Source](https://hbctraining.github.io/Intro-to-R/lessons/08_intro_tidyverse.html)
+---
+
+# Goals for this session
+
+- Touch a little bit of everything by working live on a data set
+- Know where to look for an answer if something is not immediately clear
+
+Mastering the packages in the `tidyverse` alone takes years, it's completely normal to spend a large amount of time on stackoverflow looking for answers.
+
+.center[
+```{r, echo=FALSE, out.width="60%"}
+knitr::include_graphics("GraphicsSlides/stackoverflow meme.png")
+```
+]
+
+---
+
+# Let's get settled in
+
+Installing and loading the `tidyverse` which in turn loads all packages contained in it:
+
+```{r, eval=F}
+install.packages("tidyverse")
+```
+
+```{r, warning=F, results=F, message=F}
+library(tidyverse)
+```
+
+Let's get the data and touch one of the first components of the `tidyverse` at the same time:
+
+```{r, eval=F}
+install.packages("palmerpenguins")
+```
+
+```{r, warning=F, message=F, results=F}
+penguins <- palmerpenguins::penguins
+```
+
+---
+
+# The Pipe: `%>%`
+
+The pipe from the package `magrittr` can be translated into "take the thing from before and pipe it (put it) into what's coming after".
+
+```{r}
+penguins %>% summary()
+```
+
+---
+
+# The Pipe: `%>%`
+
+When working with many variables:
+
+```{r}
+penguins %>% glimpse()
+```
+
+---
+
+# The Pipe: `%>%`
+
+The pipe can make nested functions look much nicer and easier to read with the human eye. It will save you many headaches and is a major selling point.
+
+Code summarising the mean body weight for the species _Adelie_ by island without the pipe ([Source](https://cfss.uchicago.edu/notes/pipes/)):
+
+```{r}
+summarize(group_by(filter(penguins, species == "Adelie"), island), body_mass = mean(body_mass_g, na.rm = TRUE))
+```
+
+---
+
+# The Pipe: `%>%`
+
+The same code using the pipe can be read and produced line by line:
+
+```{r}
+penguins %>%
+  filter(species == "Adelie") %>%
+  group_by(island) %>%
+  summarize(body_mass = mean(body_mass_g, na.rm = TRUE))
+```
+
+Much simpler.
+
+---
+
+# Let's deconstruct that: `filter`
+
+The `filter` function will give you back what you ask it for. You can think about it as "including" the observations matching your criterion. Note the lack of dollar signs.
+
+```{r, eval=FALSE}
+penguins %>% 
+  filter(species == "Adelie")
+```
+
+```{r, echo=FALSE}
+penguins %>% 
+  filter(species == "Adelie") %>% 
+  print(n = 5)
+```
+---
+
+# Let's deconstruct that: `filter`
+
+`filter` replaces the native R equivalent...
+
+```{r, eval=FALSE}
+penguins[penguins$species == "Adelie",]
+```
+
+...and makes it part of pipe chain.
+
+```{r, eval=FALSE}
+penguins %>% 
+  filter(species == "Adelie")
+```
+
+---
+
+# Let's deconstruct that: `filter`
+
+Another neat trick: `%in%`. You can give the criterion more species.
+
+It's your go, please filter this data set. We only want to see the species:
+
+- Adelie
+- Gentoo
+
+Some guidance:
+
+```{r, eval=FALSE}
+penguins %>% 
+  filter(species %in% c("Species 1 here", "Species 2 here"))
+```
+
+--
+
+Solution:
+
+```{r, eval=FALSE}
+penguins %>% 
+  filter(species %in% c("Adelie", "Gentoo"))
+```
+
+---
+
+# Let's deconstruct that: `filter`
+
+How did I know which species are in the data set?
+
+--
+
+Using the `count` function, which is really useful for categorical variables:
+
+```{r}
+penguins %>% 
+  count(species, sort = T)
+```
+
+---
+
+# Let's deconstruct that: `filter`
+
+It's your go, please filter this data set. We only want to see the species:
+
+- Adelie
+- Gentoo
+
+```{r, eval=FALSE}
+penguins %>% 
+  filter(species %in% c("Species 1 here", "Species 2 here"))
+```
+
+Solution:
+
+```{r, eval=FALSE}
+penguins %>% 
+  filter(species %in% c("Adelie", "Gentoo"))
+```
+
+There is actually another way here. We now know there are only three species in there.
+
+---
+
+# Let's deconstruct that: `filter`
+
+So we could also frame it as: Filter for anything **but** Chinstrap. That's where the exclamation mark comes in, which is the `NOT` operator.
+
+```{r}
+TRUE
+!TRUE
+```
+
+---
+
+# Let's deconstruct that: `filter`
+
+Just put it before your condition:
+
+```{r, eval=F}
+penguins %>% 
+  filter(!species %in% c("Chinstrap"))
+```
+
+```{r, echo=F}
+penguins %>% 
+  filter(!species %in% c("Chinstrap")) %>% 
+  print(n = 5)
+```
+
+---
+
+# Coming back to the example
+
+The goal is to calculate mean body mass for the species Adelie by island.
+
+```{r, eval = F}
+penguins %>%
+  filter(species == "Adelie") %>%
+  group_by(island) %>%
+  summarize(body_mass = mean(body_mass_g, na.rm = TRUE))
+```
+
+---
+
+# What's `group_by`?
+
+It unlocks the ability to calculate a number for different categories:
+
+```{r}
+penguins %>% count(island, sort = T)
+```
+
+We have three islands. Just summarising without grouping gives the mean just for the species Adelie.
+
+---
+
+# `group_by` and `summarise/summarize`
+
+Just summarising without grouping gives the mean just for the species Adelie.
+
+```{r}
+penguins %>% 
+  filter(species == "Adelie") %>%
+  summarize(body_mass = mean(body_mass_g, na.rm = TRUE))
+```
+
+---
+
+# `group_by` and `summarise/summarize`
+
+Note that adding `na.rm = TRUE` is necessary to avoid running into errors. Observations with `NA` as values are discarded for the calculation, if `na.rm = TRUE` is specified.
+
+```{r}
+penguins %>% 
+  filter(species == "Adelie") %>%
+  summarize(body_mass = mean(body_mass_g))
+```
+
+---
+
+# `group_by` and `summarise/summarize`
+
+So let's add it again. Now comes the magic. By adding the `group_by` argument, the value is calculated across all different islands.
+
+```{r}
+penguins %>% 
+  filter(species == "Adelie") %>%
+  group_by(island) %>% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+`summarise` collapses all observations by group to calculate our values.
+
+---
+
+# `mutate`
+
+Summarise collapsed the observations to enable our calculation. If we want to preserve the same number of observations and add a new column containing a value for each existing value, we have to use `mutate`.
+
+```{r}
+penguins %>% 
+  filter(species == "Adelie") %>%
+  group_by(island) %>% 
+  summarize(body_mass = mean(body_mass_g, na.rm = T)) %>% 
+  mutate(species = "Adelie")
+```
+
+---
+
+# It's your go
+
+Please calculate the mean for each species and each island. Tip: You can add more than one variable to the `group_by` argument.
+
+<br>
+
+.center[
+
+```{r, echo=FALSE, out.width="50%"}
+knitr::include_graphics("GraphicsSlides/programmer.png")
+```
+
+]
+
+---
+
+# It's your go
+
+Please calculate the mean for each species and each island. Tip: You can add more than one variable to the `group_by` argument.
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  group_by(island, species) %>% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+---
+
+# It's your go
+
+Please calculate the mean for each species and each sex.
+
+<br>
+
+.center[
+
+```{r, echo=FALSE, out.width="50%"}
+knitr::include_graphics("GraphicsSlides/programmer.png")
+```
+
+]
+
+---
+
+# It's your go
+
+Please calculate the mean for each species and each sex.
+
+What is this? The NAs come from the `sex` variable.
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  group_by(species, sex) %>% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+---
+
+# `drop_na` and `select`
+
+To solve this task, we need to take care of the `NA` values in both the `sex` and `species` columns. If we drop all NA values, we will delete too many rows, as other columns also have missing values.
+
+```{r, warning=FALSE}
+colSums(is.na(penguins)) %>% 
+  broom::tidy() %>% 
+  rename(missing = x)
+```
+
+---
+
+# `drop_na` and `select`
+
+So we need to select the columns we need first:
+
+```{r}
+penguins %>% 
+  select(species, sex, body_mass_g)
+```
+
+---
+
+# `drop_na` and `select`
+
+So we need to select the columns we need first. Then drop.
+
+```{r}
+penguins %>% 
+  select(species, sex, body_mass_g) %>% 
+  drop_na()
+```
+
+---
+
+# So let's try again
+
+Please calculate the mean for each species and each sex, dropping missing data in the necessary columns first.
+
+--
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  select(species, sex, body_mass_g) %>% 
+  drop_na() %>% 
+  group_by(species, sex) %>% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+---
+
+# Note: If you continue, ungroup:
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  select(species, sex, body_mass_g) %>% 
+  drop_na() %>% 
+  group_by(species, sex) %>% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T)) %>% 
+  ungroup()
+```
+
+---
+
+# It's your go
+
+Please calculate the mean bill length and depth over the available three years for the Chintoo species.
+
+<br>
+
+.center[
+
+```{r, echo=FALSE, out.width="50%"}
+knitr::include_graphics("GraphicsSlides/programmer.png")
+```
+
+]
+
+---
+
+#### Solution:
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  group_by(year, species) %>% 
+  summarise(mean_body_mass = mean(body_mass_g, na.rm = T))
+```
+
+Now it would be really nice to be able to compare from left to right, over time.
+
+---
+
+# Enter: `pivot_wider`
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  group_by(year, species) %>% 
+  summarise(mean_body_mass = mean(body_mass_g, na.rm = T)) %>% 
+  ungroup() %>% 
+  pivot_wider(names_from = year, 
+              values_from = mean_body_mass)
+```
+
+---
+
+#### The opposite: `pivot_longer`
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  group_by(year, species) %>% 
+  summarise(mean_body_mass = mean(body_mass_g, na.rm = T)) %>% 
+  ungroup() %>% 
+  pivot_wider(names_from = year, 
+              values_from = mean_body_mass) %>% 
+  pivot_longer(- species,
+               names_to = "year",
+               values_to = "mean_body_mass") %>% 
+  arrange(species) # sort descending: desc(species)
+```
+
+---
+
+# It's your go
+
+We want to see the percentage of male and female penguins for each species. Here, pivoting wider will come in handy.
+
+Please `count` the numbers of penguins for each sex and species. Then, pivot wider to have sex as the column headers. Make sure to drop missing values in the two variables. Tip: No grouping is necessary for `count`, just pass the two variables to the function.
+
+With `mutate`, you will be able to calculate the percentage. Then use `select` to remove unnecessary information. (If you know it, you can use `transmute` as well.)
+
+<br>
+
+.center[
+
+```{r, echo=FALSE, out.width="30%"}
+knitr::include_graphics("GraphicsSlides/programmer.png")
+```
+
+]
+
+---
+
+#### Solution:
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  select(sex, species) %>% 
+  drop_na() %>% 
+  count(sex, species) %>% 
+  pivot_wider(names_from = sex, values_from = n) %>% 
+  transmute(species,
+            pct_male = male/(male + female))
+```
+
+Note: Using `transmute` does the same as first mutating and then selecting. It is a `mutate` and a `select` in one single step.
+
+---
+
+# That's it for today!
+
+There will be more advanced demos around the `tidyverse` which will enable you to work with larger data sets and more complicated operations. Make sure to stay updated on our socials and via our website, where all resources and dates are also published.
+
+[Website](https://rusergroupstgallen.github.io/) | [Instagram](https://www.instagram.com/rusergroupstgallen/?hl=en) | [Twitter](https://twitter.com/rusergroupsg)
+
+.center[
+```{r, echo=FALSE, out.width="70%"}
+knitr::include_graphics("GraphicsSlides/palmer.png")
+```
+]
+
+---
+
+class: center, middle, inverse
+
+# Thank you for attending!
