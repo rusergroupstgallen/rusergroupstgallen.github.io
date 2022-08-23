@@ -56,7 +56,7 @@ class: center, middle
 knitr::include_graphics("GraphicsSlides/components.png")
 ```
 
-[Source](https://hbctraining.github.io/Intro-to-R/lessons/08_intro_tidyverse.html)
+_[(Source)](https://hbctraining.github.io/Intro-to-R/lessons/08_intro_tidyverse.html)_
 ---
 
 # Goals for this session
@@ -145,7 +145,7 @@ Much simpler.
 
 ---
 
-# Let's deconstruct that: `filter`
+# Let's deconstruct that: `filter()`
 
 The `filter` function will give you back what you ask it for. You can think about it as "including" the observations matching your criterion. Note the lack of dollar signs.
 
@@ -161,7 +161,7 @@ penguins %>%
 ```
 ---
 
-# Let's deconstruct that: `filter`
+# Let's deconstruct that: `filter()`
 
 `filter` replaces the native R equivalent...
 
@@ -178,7 +178,7 @@ penguins %>%
 
 ---
 
-# Let's deconstruct that: `filter`
+# Let's deconstruct that: `filter()`
 
 Another neat trick: `%in%`. You can give the criterion more species.
 
@@ -205,7 +205,7 @@ penguins %>%
 
 ---
 
-# Let's deconstruct that: `filter`
+# Let's deconstruct that: `filter()`
 
 How did I know which species are in the data set?
 
@@ -220,7 +220,7 @@ penguins %>%
 
 ---
 
-# Let's deconstruct that: `filter`
+# Let's deconstruct that: `filter()`
 
 It's your go, please filter this data set. We only want to see the species:
 
@@ -243,7 +243,7 @@ There is actually another way here. We now know there are only three species in 
 
 ---
 
-# Let's deconstruct that: `filter`
+# Let's deconstruct that: `filter()`
 
 So we could also frame it as: Filter for anything **but** Chinstrap. That's where the exclamation mark comes in, which is the `NOT` operator.
 
@@ -254,7 +254,7 @@ TRUE
 
 ---
 
-# Let's deconstruct that: `filter`
+# Let's deconstruct that: `filter()`
 
 Just put it before your condition:
 
@@ -284,19 +284,19 @@ penguins %>%
 
 ---
 
-# What's `group_by`?
+# What's `group_by()`?
 
 It unlocks the ability to calculate a number for different categories:
+
+We have three islands. 
 
 ```{r}
 penguins %>% count(island, sort = T)
 ```
 
-We have three islands. Just summarising without grouping gives the mean just for the species Adelie.
-
 ---
 
-# `group_by` and `summarise/summarize`
+# `group_by()` and `summarise()`
 
 Just summarising without grouping gives the mean just for the species Adelie.
 
@@ -308,9 +308,9 @@ penguins %>%
 
 ---
 
-# `group_by` and `summarise/summarize`
+# `group_by()` and `summarise()`
 
-Note that adding `na.rm = TRUE` is necessary to avoid running into errors. Observations with `NA` as values are discarded for the calculation, if `na.rm = TRUE` is specified.
+Note that adding `na.rm = TRUE` is necessary to avoid running into errors when missing values are present. Observations with `NA` as values are discarded for the calculation, if `na.rm = TRUE` is specified.
 
 ```{r}
 penguins %>% 
@@ -320,7 +320,7 @@ penguins %>%
 
 ---
 
-# `group_by` and `summarise/summarize`
+# `group_by()` and `summarise()`
 
 So let's add it again. Now comes the magic. By adding the `group_by` argument, the value is calculated across all different islands.
 
@@ -331,13 +331,13 @@ penguins %>%
   summarise(body_mass = mean(body_mass_g, na.rm = T))
 ```
 
-`summarise` collapses all observations by group to calculate our values.
+`summarise` reduces the number of rows.
 
 ---
 
-# `mutate`
+# `mutate()`
 
-Summarise collapsed the observations to enable our calculation. If we want to preserve the same number of observations and add a new column containing a value for each existing value, we have to use `mutate`.
+Summarise collapsed the observations in each group for our calculations. If we want to preserve the same number of observations and add a new column containing a value for each existing value, we have to use `mutate`.
 
 ```{r}
 penguins %>% 
@@ -351,7 +351,7 @@ penguins %>%
 
 # It's your go
 
-Please calculate the mean for each species and each island. Tip: You can add more than one variable to the `group_by` argument.
+Please calculate the mean for each species and each island (as a combination). Tip: You can add more than one variable to the `group_by()` argument.
 
 <br>
 
@@ -365,9 +365,9 @@ knitr::include_graphics("GraphicsSlides/programmer.png")
 
 ---
 
-# It's your go
+#### Solution:
 
-Please calculate the mean for each species and each island. Tip: You can add more than one variable to the `group_by` argument.
+Please calculate the mean for each species and each island. Tip: You can add more than one variable to the `group_by()` argument.
 
 ```{r, warning=FALSE, message=FALSE}
 penguins %>% 
@@ -393,11 +393,11 @@ knitr::include_graphics("GraphicsSlides/programmer.png")
 
 ---
 
-# It's your go
+# Hold on
 
-Please calculate the mean for each species and each sex.
+.pull-left[
 
-What is this? The NAs come from the `sex` variable.
+What is this?
 
 ```{r, warning=FALSE, message=FALSE}
 penguins %>% 
@@ -405,16 +405,63 @@ penguins %>%
   summarise(body_mass = mean(body_mass_g, na.rm = T))
 ```
 
+]
+
+.center[.pull-right[
+
+```{r, echo=FALSE, out.width="90%"}
+knitr::include_graphics("GraphicsSlides/afraid.png")
+```
+
+
+]]
+
+---
+
+# Hold on
+
+.pull-left[
+
+What is this?
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  group_by(species, sex) %>% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+]
+
+.pull-right[
+
+The NAs come from the `sex` variable.
+
+```{r}
+penguins %>% 
+  count(sex)
+```
+
+
+]
+
 ---
 
 # `drop_na` and `select`
 
-To solve this task, we need to take care of the `NA` values in both the `sex` and `species` columns. If we drop all NA values, we will delete too many rows, as other columns also have missing values.
+To solve this task, we need to take care of the `NA` values in the columns we are working with.
 
-```{r, warning=FALSE}
+However, there is one problem:
+
+_If we drop all rows with NA values in the whole data frame, we will delete too many rows!_
+
+```{r, warning=FALSE, echo=FALSE, fig.height=3, fig.width=7, out.width="100%", dpi=300}
 colSums(is.na(penguins)) %>% 
   broom::tidy() %>% 
-  rename(missing = x)
+  rename(missing = x) %>% 
+  ggplot(aes(missing, names %>% reorder(missing))) +
+  geom_col() +
+  labs(y = "Variable",
+       x = "# of NAs")
 ```
 
 ---
@@ -432,7 +479,7 @@ penguins %>%
 
 # `drop_na` and `select`
 
-So we need to select the columns we need first. Then drop.
+**Then** drop.
 
 ```{r}
 penguins %>% 
@@ -466,14 +513,14 @@ penguins %>%
   drop_na() %>% 
   group_by(species, sex) %>% 
   summarise(body_mass = mean(body_mass_g, na.rm = T)) %>% 
-  ungroup()
+  ungroup() #<<
 ```
 
 ---
 
 # It's your go
 
-Please calculate the mean bill length and depth over the available three years for the Chintoo species.
+Please calculate the mean bill length and depth over the available three years for all species.
 
 <br>
 
@@ -499,20 +546,20 @@ Now it would be really nice to be able to compare from left to right, over time.
 
 ---
 
-# Enter: `pivot_wider`
+# Enter: `pivot_wider()`
 
 ```{r, warning=FALSE, message=FALSE}
 penguins %>% 
   group_by(year, species) %>% 
   summarise(mean_body_mass = mean(body_mass_g, na.rm = T)) %>% 
   ungroup() %>% 
-  pivot_wider(names_from = year, 
-              values_from = mean_body_mass)
+  pivot_wider(names_from = year,#<<
+              values_from = mean_body_mass)#<<
 ```
 
 ---
 
-#### The opposite: `pivot_longer`
+#### The opposite: `pivot_longer()`
 
 ```{r, warning=FALSE, message=FALSE}
 penguins %>% 
@@ -521,17 +568,17 @@ penguins %>%
   ungroup() %>% 
   pivot_wider(names_from = year, 
               values_from = mean_body_mass) %>% 
-  pivot_longer(- species,
-               names_to = "year",
-               values_to = "mean_body_mass") %>% 
+  pivot_longer(- species,#<<
+               names_to = "year",#<<
+               values_to = "mean_body_mass") %>% #<<
   arrange(species) # sort descending: desc(species)
 ```
 
 ---
 
-# It's your go
+# One last time
 
-We want to see the percentage of male and female penguins for each species. Here, pivoting wider will come in handy.
+We want to see the **percentage** of male or percentage of female penguins **for each species**. Here, pivoting wider will come in handy.
 
 Please `count` the numbers of penguins for each sex and species. Then, pivot wider to have sex as the column headers. Make sure to drop missing values in the two variables. Tip: No grouping is necessary for `count`, just pass the two variables to the function.
 
@@ -569,7 +616,7 @@ Note: Using `transmute` does the same as first mutating and then selecting. It i
 
 There will be more advanced demos around the `tidyverse` which will enable you to work with larger data sets and more complicated operations. Make sure to stay updated on our socials and via our website, where all resources and dates are also published.
 
-[Website](https://rusergroupstgallen.github.io/) | [Instagram](https://www.instagram.com/rusergroupstgallen/?hl=en) | [Twitter](https://twitter.com/rusergroupsg)
+**[Website](https://rusergroupstgallen.github.io/) | [Instagram](https://www.instagram.com/rusergroupstgallen/?hl=en) | [Twitter](https://twitter.com/rusergroupsg)**
 
 .center[
 ```{r, echo=FALSE, out.width="70%"}
