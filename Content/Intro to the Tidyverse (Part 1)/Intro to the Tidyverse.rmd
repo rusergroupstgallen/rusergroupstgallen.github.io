@@ -1,8 +1,11 @@
 ---
 output:
   xaringan::moon_reader:
-    css: xaringan-themer.css
-    # self_contained: true
+    css: 
+      - xaringan-themer.css
+      - center2.css
+    includes:
+      after_body: insert-logo.html
     lib_dir: libs
     nature:
       highlightStyle: github
@@ -13,7 +16,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-class: center, middle
+class: center, middle, hide-logo
 
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer)
@@ -30,6 +33,24 @@ pre {
   background: #F8F8F8;
   max-width: 100%;
   overflow-x: scroll;
+}
+```
+
+```{css, echo=FALSE}
+.center2 {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+```
+
+```{css, echo=FALSE}
+.scroll-output {
+  height: 80%;
+  overflow-y: scroll;
 }
 ```
 
@@ -97,6 +118,8 @@ penguins <- palmerpenguins::penguins
 ```
 
 ---
+
+class: hide-logo
 
 # The Pipe: `%>%`
 
@@ -626,6 +649,6 @@ knitr::include_graphics("GraphicsSlides/palmer.png")
 
 ---
 
-class: center, middle, inverse
+class: center, middle, inverse, hide-logo
 
 # Thank you for attending!

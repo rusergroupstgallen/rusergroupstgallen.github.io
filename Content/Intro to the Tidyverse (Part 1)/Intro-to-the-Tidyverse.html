@@ -5,12 +5,13 @@
     <meta charset="utf-8" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="center2.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 
 
-class: center, middle
+class: center, middle, hide-logo
 
 
 
@@ -19,6 +20,24 @@ pre {
   background: #F8F8F8;
   max-width: 100%;
   overflow-x: scroll;
+}
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+.center2 {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+.scroll-output {
+  height: 80%;
+  overflow-y: scroll;
 }
 &lt;/style&gt;
 
@@ -31,7 +50,7 @@ pre {
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Mathias Steilen
-##### Last updated: _2022-08-23 17:57:34_
+##### Last updated: _2022-08-26 22:45:56_
 
 ---
 
@@ -85,6 +104,8 @@ penguins &lt;- palmerpenguins::penguins
 
 # The Pipe: `%&gt;%`
 
+.scroll-output[
+
 The pipe from the package `magrittr` can be translated into "take the thing from before and pipe it (put it) into what's coming after".
 
 
@@ -110,6 +131,7 @@ penguins %&gt;% summary()
 ##  Max.   :231.0     Max.   :6300                Max.   :2009  
 ##  NA's   :2         NA's   :2
 ```
+]
 
 ---
 
@@ -633,7 +655,7 @@ However, there is one problem:
 
 _If we drop all rows with NA values in the whole data frame, we will delete too many rows!_
 
-&lt;img src="Intro-to-the-Tidyverse_files/figure-html/unnamed-chunk-38-1.png" width="100%" /&gt;
+&lt;img src="Intro-to-the-Tidyverse_files/figure-html/unnamed-chunk-40-1.png" width="100%" /&gt;
 
 ---
 
@@ -907,7 +929,7 @@ There will be more advanced demos around the `tidyverse` which will enable you t
 
 ---
 
-class: center, middle, inverse
+class: center, middle, inverse, hide-logo
 
 # Thank you for attending!
     </textarea>
@@ -1013,6 +1035,33 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
+<style>
+.logo {
+  background-image: url(GraphicsSlides/Logo\ RUG\ hell.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: -85px;
+  left: 1em;
+  width: 80px;
+  height: 128px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
 
 <script>
 slideshow._releaseMath = function(el) {
