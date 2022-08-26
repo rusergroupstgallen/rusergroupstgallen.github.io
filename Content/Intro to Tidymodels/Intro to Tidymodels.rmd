@@ -1,8 +1,11 @@
 ---
 output:
   xaringan::moon_reader:
-    css: xaringan-themer.css
-    # self_contained: true
+    css: 
+      - xaringan-themer.css
+      - center2.css
+    includes:
+      after_body: insert-logo.html
     lib_dir: libs
     nature:
       highlightStyle: github
@@ -13,7 +16,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-class: center, middle
+class: center, middle, hide-logo
 
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer)
@@ -137,6 +140,8 @@ The target and many other numeric values are still categorical.
 
 ### Recoding variables
 
+.scroll-output[
+
 ```{r, warning=FALSE, message=FALSE}
 pumpkins <- pumpkins %>% 
   mutate(across(c(place, weight_lbs, ott, est_weight, pct_chart),
@@ -144,6 +149,7 @@ pumpkins <- pumpkins %>%
 
 glimpse(pumpkins)
 ```
+]
 
 ---
 
@@ -622,9 +628,6 @@ That's the recipe done! The recipe allows to
 - no manual column indexing, subsetting, and whatever shenanigans Python requires you to do
 
 <br>
-<br>
-<br>
-<br>
 
 <blockquote class="twitter-tweet"><p lang="en" dir="ltr">Silly complaint: &quot;this tool keeps you from thinking.&quot; No one stops thinking when they use good tools. They think about more important things</p>&mdash; David Robinson (@drob) <a href="https://twitter.com/drob/status/769161059743756289?ref_src=twsrc%5Etfw">August 26, 2016</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
@@ -782,22 +785,24 @@ With this, we can make a useful plot.
 
 ### Inspecting our final fit
 
-```{r, fig.width=8, fig.height=3, dpi=300}
+.scroll-output[
+
+```{r, out.width="100%", fig.height=4, dpi=300}
 xg_final_fit %>% 
   collect_predictions() %>% 
   ggplot(aes(weight_kg, .pred)) +
   geom_point(alpha = 0.5, colour = "midnightblue") +
   geom_abline(lty = "dashed", colour = "grey50", size = 0.75) +
-  coord_equal() +
   labs(title = "Predictions vs. Actuals of Holdout")
 ```
+]
 
 ---
 
 ### Variable Importance Plot
 
 .scroll-output[
-```{r, fig.width=8, fig.height=5, dpi=300}
+```{r, out.width="100%", fig.height=4, dpi=300}
 xg_final_fit %>%
   extract_workflow() %>% 
   extract_fit_parsnip() %>% 
@@ -903,6 +908,6 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 ---
 
-class: center, middle, inverse
+class: center, middle, inverse, hide-logo
 
 # Thank you for attending!

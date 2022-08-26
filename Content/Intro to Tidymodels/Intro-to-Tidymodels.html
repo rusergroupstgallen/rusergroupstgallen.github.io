@@ -5,12 +5,13 @@
     <meta charset="utf-8" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="center2.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
 
 
-class: center, middle
+class: center, middle, hide-logo
 
 
 
@@ -49,7 +50,7 @@ pre {
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Mathias Steilen
-##### Last updated: _2022-08-26 00:20:46_
+##### Last updated: _2022-08-26 22:42:58_
 
 ---
 
@@ -148,6 +149,8 @@ The target and many other numeric values are still categorical.
 
 ### Recoding variables
 
+.scroll-output[
+
 
 ```r
 pumpkins &lt;- pumpkins %&gt;% 
@@ -175,6 +178,7 @@ glimpse(pumpkins)
 ## $ pct_chart         &lt;dbl&gt; 20, -3, 26, -7, 0, -1, -4, 10, 0, 0, 0, 14, 4, 8, 14…
 ## $ variety           &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …
 ```
+]
 
 ---
 
@@ -709,9 +713,9 @@ folds
 ##   splits              id   
 ##   &lt;list&gt;              &lt;chr&gt;
 ## 1 &lt;split [5110/1280]&gt; Fold1
-## 2 &lt;split [5111/1279]&gt; Fold2
+## 2 &lt;split [5110/1280]&gt; Fold2
 ## 3 &lt;split [5112/1278]&gt; Fold3
-## 4 &lt;split [5113/1277]&gt; Fold4
+## 4 &lt;split [5114/1276]&gt; Fold4
 ## 5 &lt;split [5114/1276]&gt; Fold5
 ```
 
@@ -817,10 +821,10 @@ xg_rec %&gt;% prep() %&gt;% juice() %&gt;% head(5)
 ##   year  place grower_name     city  state_prov country gpc_site   ott est_weight
 ##   &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt;           &lt;fct&gt; &lt;fct&gt;      &lt;fct&gt;   &lt;fct&gt;    &lt;dbl&gt;      &lt;dbl&gt;
 ## 1 2013   1175 Caleb, Dillion  Arva… Colorado   United… The Flo…  655.       175.
-## 2 2013   1177 Gienger, Perry  &lt;NA&gt;  Minnesota  United… Stillwa…  615.       145.
-## 3 2013   1179 Carlson, Ken    Danb… Connectic… United… Ridgefi…  610.       141.
-## 4 2013   1180 Klug, Christian Berl… Other      Germany Wiegeme…  658.       178.
-## 5 2013   1182 Mullen, Rich    Taun… Massachus… United… SNGPG F…  612.       143.
+## 2 2013   1179 Carlson, Ken    Danb… Connectic… United… Ridgefi…  610.       141.
+## 3 2013   1180 Klug, Christian Berl… Other      Germany Wiegeme…  658.       178.
+## 4 2013   1187 Mike Rohrdiek   Brot… Other      Germany Tharing…  625.       151.
+## 5 2013   1188 Vanderpool, To… Fran… Ohio       United… Operati…  582.       122.
 ## # … with 1 more variable: weight_kg &lt;dbl&gt;
 ```
 
@@ -875,14 +879,14 @@ xg_rec %&gt;% prep() %&gt;% juice() %&gt;% head()
 
 ```
 ## # A tibble: 6 × 10
-##   year  place grower_name city    state_prov   country gpc_site   ott est_weight
-##   &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;   &lt;fct&gt;        &lt;fct&gt;   &lt;fct&gt;    &lt;dbl&gt;      &lt;dbl&gt;
-## 1 2013   1175 Other       Other   Colorado     United… Other     655.       175.
-## 2 2013   1177 Other       Paredes Minnesota    United… Stillwa…  615.       145.
-## 3 2013   1179 Other       Other   Connecticut  United… Other     610.       141.
-## 4 2013   1180 Other       Other   Other        Germany Wiegeme…  658.       178.
-## 5 2013   1182 Other       Other   Massachuset… United… SNGPG F…  612.       143.
-## 6 2013   1185 Other       Paredes Wisconsin    United… Stillwa…  625.       152.
+##   year  place grower_name city  state_prov  country    gpc_site   ott est_weight
+##   &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt; &lt;fct&gt;       &lt;fct&gt;      &lt;fct&gt;    &lt;dbl&gt;      &lt;dbl&gt;
+## 1 2013   1175 Other       Other Colorado    United St… Other     655.       175.
+## 2 2013   1179 Other       Other Connecticut United St… Other     610.       141.
+## 3 2013   1180 Other       Other Other       Germany    Wiegeme…  658.       178.
+## 4 2013   1187 Other       Other Other       Germany    Other     625.       151.
+## 5 2013   1188 Other       Other Ohio        United St… Operati…  582.       122.
+## 6 2013   1189 Other       Other Other       Canada     Vermont…  615.       145.
 ## # … with 1 more variable: weight_kg &lt;dbl&gt;
 ```
 ]
@@ -915,14 +919,14 @@ xg_rec %&gt;% prep() %&gt;% juice() %&gt;% head()
 
 ```
 ## # A tibble: 6 × 10
-##   year  place grower_name city    state_prov  country gpc_site    ott est_weight
-##   &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;   &lt;fct&gt;       &lt;fct&gt;   &lt;fct&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1 2013  0.467 Other       Other   Colorado    United… Other    -0.334     -0.559
-## 2 2013  0.474 Other       Paredes Minnesota   United… Stillwa… -0.601     -0.822
-## 3 2013  0.480 Other       Other   Connecticut United… Other    -0.634     -0.850
-## 4 2013  0.483 Other       Other   Other       Germany Wiegeme… -0.317     -0.535
-## 5 2013  0.490 Other       Other   Massachuse… United… SNGPG F… -0.617     -0.838
-## 6 2013  0.499 Other       Paredes Wisconsin   United… Stillwa… -0.534     -0.759
+##   year  place grower_name city  state_prov  country   gpc_site    ott est_weight
+##   &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt; &lt;fct&gt;       &lt;fct&gt;     &lt;fct&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1 2013  0.468 Other       Other Colorado    United S… Other    -0.343     -0.564
+## 2 2013  0.481 Other       Other Connecticut United S… Other    -0.647     -0.857
+## 3 2013  0.484 Other       Other Other       Germany   Wiegeme… -0.326     -0.540
+## 4 2013  0.507 Other       Other Other       Germany   Other    -0.546     -0.770
+## 5 2013  0.510 Other       Other Ohio        United S… Operati… -0.833     -1.02 
+## 6 2013  0.513 Other       Other Other       Canada    Vermont… -0.613     -0.829
 ## # … with 1 more variable: weight_kg &lt;dbl&gt;
 ```
 
@@ -966,16 +970,16 @@ xg_rec %&gt;% prep() %&gt;% bake(dt_train) %&gt;% head()
 ```
 
 ```
-## # A tibble: 6 × 104
+## # A tibble: 6 × 100
 ##   place    ott est_weight weight_kg year_X2013 year_X2014 year_X2015 year_X2016
 ##   &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
-## 1 0.467 -0.334     -0.559      146.          1          0          0          0
-## 2 0.474 -0.601     -0.822      146.          1          0          0          0
-## 3 0.480 -0.634     -0.850      145.          1          0          0          0
-## 4 0.483 -0.317     -0.535      145.          1          0          0          0
-## 5 0.490 -0.617     -0.838      143.          1          0          0          0
-## 6 0.499 -0.534     -0.759      142.          1          0          0          0
-## # … with 96 more variables: year_X2017 &lt;dbl&gt;, year_X2018 &lt;dbl&gt;,
+## 1 0.468 -0.343     -0.564      146.          1          0          0          0
+## 2 0.481 -0.647     -0.857      145.          1          0          0          0
+## 3 0.484 -0.326     -0.540      145.          1          0          0          0
+## 4 0.507 -0.546     -0.770      142.          1          0          0          0
+## 5 0.510 -0.833     -1.02       142.          1          0          0          0
+## 6 0.513 -0.613     -0.829      142.          1          0          0          0
+## # … with 92 more variables: year_X2017 &lt;dbl&gt;, year_X2018 &lt;dbl&gt;,
 ## #   year_X2019 &lt;dbl&gt;, year_X2020 &lt;dbl&gt;, year_X2021 &lt;dbl&gt;, year_new &lt;dbl&gt;,
 ## #   grower_name_Karkos..Udo &lt;dbl&gt;, grower_name_Other &lt;dbl&gt;,
 ## #   grower_name_new &lt;dbl&gt;, city_Paredes &lt;dbl&gt;, city_Other &lt;dbl&gt;,
@@ -1117,16 +1121,16 @@ xg_grid
 ## # A tibble: 10 × 6
 ##    tree_depth min_n loss_reduction sample_size  mtry learn_rate
 ##         &lt;int&gt; &lt;int&gt;          &lt;dbl&gt;       &lt;dbl&gt; &lt;int&gt;      &lt;dbl&gt;
-##  1          6    26       3.31e- 8       0.610     1   9.86e- 7
-##  2          3    22       3.81e+ 0       0.313     5   1.14e- 9
-##  3         11    14       1.98e- 5       0.414     7   5.76e- 8
-##  4          7    35       8.54e- 9       0.924     8   2.29e-10
-##  5         12    18       3.22e-10       0.645    10   6.88e- 9
-##  6         15    30       1.06e- 1       0.223     5   5.14e- 4
-##  7          9    12       9.25e- 4       0.529     3   1.23e- 2
-##  8         11     5       1.79e+ 0       0.734     4   1.91e- 2
-##  9          2    39       3.72e- 7       0.878     6   1.04e- 5
-## 10          5     6       1.98e- 4       0.157     9   6.92e- 5
+##  1          4    37       6.79e- 7       0.155     2   1.93e- 3
+##  2          2    26       1.83e+ 1       0.197    10   9.66e- 2
+##  3          3    33       4.39e- 3       0.772    10   2.47e- 8
+##  4          5    18       1.17e- 8       0.526     7   4.77e- 9
+##  5         12    15       3.02e- 5       0.425     5   1.75e- 4
+##  6         12    10       8.11e- 2       0.997     6   7.04e- 7
+##  7          8    32       3.58e- 4       0.581     1   8.24e- 4
+##  8          9     6       5.14e- 1       0.858     4   1.31e-10
+##  9          7     5       2.45e- 8       0.305     8   1.04e- 5
+## 10         14    24       1.12e-10       0.669     8   5.91e- 8
 ```
 ]
 
@@ -1321,6 +1325,8 @@ With this, we can make a useful plot.
 
 ### Inspecting our final fit
 
+.scroll-output[
+
 
 ```r
 xg_final_fit %&gt;% 
@@ -1328,11 +1334,11 @@ xg_final_fit %&gt;%
   ggplot(aes(weight_kg, .pred)) +
   geom_point(alpha = 0.5, colour = "midnightblue") +
   geom_abline(lty = "dashed", colour = "grey50", size = 0.75) +
-  coord_equal() +
   labs(title = "Predictions vs. Actuals of Holdout")
 ```
 
-![](Intro-to-Tidymodels_files/figure-html/unnamed-chunk-58-1.png)&lt;!-- --&gt;
+&lt;img src="Intro-to-Tidymodels_files/figure-html/unnamed-chunk-58-1.png" width="100%" /&gt;
+]
 
 ---
 
@@ -1357,7 +1363,7 @@ xg_final_fit %&gt;%
         plot.subtitle = element_text(face = "italic", colour = "grey50"))
 ```
 
-![](Intro-to-Tidymodels_files/figure-html/unnamed-chunk-59-1.png)&lt;!-- --&gt;
+&lt;img src="Intro-to-Tidymodels_files/figure-html/unnamed-chunk-59-1.png" width="100%" /&gt;
 ]
 ---
 
@@ -1379,14 +1385,14 @@ one_pumpkin %&gt;% glimpse()
 ## Columns: 10
 ## $ year        &lt;fct&gt; 2016
 ## $ type        &lt;fct&gt; Giant Pumpkin
-## $ place       &lt;dbl&gt; 931
-## $ grower_name &lt;fct&gt; "Turmolli, Andrea"
-## $ city        &lt;fct&gt; "Calcio"
-## $ state_prov  &lt;fct&gt; Lombardy
-## $ country     &lt;fct&gt; Italy
-## $ gpc_site    &lt;fct&gt; Festa della zucca di sale
-## $ ott         &lt;dbl&gt; 787.4
-## $ est_weight  &lt;dbl&gt; 302.0408
+## $ place       &lt;dbl&gt; 892
+## $ grower_name &lt;fct&gt; "Denison, Sadie"
+## $ city        &lt;fct&gt; "Hayman"
+## $ state_prov  &lt;fct&gt; New York
+## $ country     &lt;fct&gt; United States
+## $ gpc_site    &lt;fct&gt; Saratoga Giant Pumpkin Fest
+## $ ott         &lt;dbl&gt; 807.72
+## $ est_weight  &lt;dbl&gt; 324.7166
 ```
 
 ]
@@ -1407,7 +1413,7 @@ xg_final_fit %&gt;%
 ## # A tibble: 1 × 1
 ##   .pred
 ##   &lt;dbl&gt;
-## 1  299.
+## 1  329.
 ```
 
 ---
@@ -1431,15 +1437,15 @@ xg_final_fit %&gt;%
 ## Columns: 11
 ## $ year        &lt;fct&gt; 2016
 ## $ type        &lt;fct&gt; Giant Pumpkin
-## $ place       &lt;dbl&gt; 931
-## $ grower_name &lt;fct&gt; "Turmolli, Andrea"
-## $ city        &lt;fct&gt; "Calcio"
-## $ state_prov  &lt;fct&gt; Lombardy
-## $ country     &lt;fct&gt; Italy
-## $ gpc_site    &lt;fct&gt; Festa della zucca di sale
-## $ ott         &lt;dbl&gt; 787.4
-## $ est_weight  &lt;dbl&gt; 302.0408
-## $ .pred       &lt;dbl&gt; 299.2589
+## $ place       &lt;dbl&gt; 892
+## $ grower_name &lt;fct&gt; "Denison, Sadie"
+## $ city        &lt;fct&gt; "Hayman"
+## $ state_prov  &lt;fct&gt; New York
+## $ country     &lt;fct&gt; United States
+## $ gpc_site    &lt;fct&gt; Saratoga Giant Pumpkin Fest
+## $ ott         &lt;dbl&gt; 807.72
+## $ est_weight  &lt;dbl&gt; 324.7166
+## $ .pred       &lt;dbl&gt; 329.4181
 ```
 
 ]
@@ -1488,7 +1494,7 @@ We hope this tutorial was useful! Feel free to make use of the code and don't de
 
 ---
 
-class: center, middle, inverse
+class: center, middle, inverse, hide-logo
 
 # Thank you for attending!
     </textarea>
@@ -1594,6 +1600,33 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
+<style>
+.logo {
+  background-image: url(GraphicsSlides/Logo\ RUG\ hell.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: -85px;
+  left: 1em;
+  width: 80px;
+  height: 128px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
 
 <script>
 slideshow._releaseMath = function(el) {
