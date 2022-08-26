@@ -11,7 +11,7 @@
     <textarea id="source">
 
 
-class: center, middle
+class: center, middle, hide-logo
 
 
 
@@ -36,7 +36,6 @@ pre {
 
 
 
-
 # Writing your Thesis in RMarkdown
 
 ## by
@@ -44,7 +43,7 @@ pre {
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Mathias Steilen
-##### Last updated: _2022-08-24 17:43:10_
+##### Last updated: _2022-08-26 22:33:18_
 
 ---
 
@@ -331,7 +330,7 @@ We hope this tutorial was useful! Feel free to make use of the template and don'
 
 ---
 
-class: center, middle, inverse
+class: center, middle, inverse, hide-logo
 
 # Thank you for attending!
     </textarea>
@@ -437,6 +436,33 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
+<style>
+.logo {
+  background-image: url(GraphicsSlides/Logo\ RUG\ hell.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: -85px;
+  left: 1em;
+  width: 80px;
+  height: 128px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
 
 <script>
 slideshow._releaseMath = function(el) {

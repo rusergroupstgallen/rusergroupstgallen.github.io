@@ -1,7 +1,11 @@
 ---
 output:
   xaringan::moon_reader:
-    css: ["xaringan-themer.css", "center2.css"]
+    css:
+      - xaringan-themer.css
+      - center2.css
+    includes:
+      after_body: insert-logo.html
     lib_dir: libs
     nature:
       highlightStyle: github
@@ -12,7 +16,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-class: center, middle
+class: center, middle, hide-logo
 
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer)
@@ -42,7 +46,6 @@ pre {
   transform: translate(-50%, -50%);
 }
 ```
-
 
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
@@ -373,6 +376,6 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 ---
 
-class: center, middle, inverse
+class: center, middle, inverse, hide-logo
 
 # Thank you for attending!
