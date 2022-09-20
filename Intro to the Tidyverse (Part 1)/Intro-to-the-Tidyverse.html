@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Intro-to-the-Tidyverse.knit</title>
+    <meta charset="utf-8" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+    <link rel="stylesheet" href="center2.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+class: center, middle, hide-logo
+
+
+
+&lt;style type="text/css"&gt;
+pre {
+  background: #F8F8F8;
+  max-width: 100%;
+  overflow-x: scroll;
+}
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+.center2 {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+&lt;/style&gt;
+
+&lt;style type="text/css"&gt;
+.scroll-output {
+  height: 80%;
+  overflow-y: scroll;
+}
+&lt;/style&gt;
+
+
+
+# Introduction to the Tidyverse (Part 1)
+
+## by
+
+&lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
+
+##### Author/Presenter: Mathias Steilen
+##### Last updated: _2022-08-26 22:45:56_
+
+---
+
+class: center, middle
+
+&lt;img src="GraphicsSlides/components.png" width="80%" /&gt;
+
+_[(Source)](https://hbctraining.github.io/Intro-to-R/lessons/08_intro_tidyverse.html)_
+---
+
+# Goals for this session
+
+- Touch a little bit of everything by working live on a data set
+- Know where to look for an answer if something is not immediately clear
+
+Mastering the packages in the `tidyverse` alone takes years, it's completely normal to spend a large amount of time on stackoverflow looking for answers.
+
+.center[
+&lt;img src="GraphicsSlides/stackoverflow meme.png" width="60%" /&gt;
+]
+
+---
+
+# Let's get settled in
+
+Installing and loading the `tidyverse` which in turn loads all packages contained in it:
+
+
+```r
+install.packages("tidyverse")
+```
+
+
+```r
+library(tidyverse)
+```
+
+Let's get the data and touch one of the first components of the `tidyverse` at the same time:
+
+
+```r
+install.packages("palmerpenguins")
+```
+
+
+```r
+penguins &lt;- palmerpenguins::penguins
+```
+
+---
+
+# The Pipe: `%&gt;%`
+
+.scroll-output[
+
+The pipe from the package `magrittr` can be translated into "take the thing from before and pipe it (put it) into what's coming after".
+
+
+```r
+penguins %&gt;% summary()
+```
+
+```
+##       species          island    bill_length_mm  bill_depth_mm  
+##  Adelie   :152   Biscoe   :168   Min.   :32.10   Min.   :13.10  
+##  Chinstrap: 68   Dream    :124   1st Qu.:39.23   1st Qu.:15.60  
+##  Gentoo   :124   Torgersen: 52   Median :44.45   Median :17.30  
+##                                  Mean   :43.92   Mean   :17.15  
+##                                  3rd Qu.:48.50   3rd Qu.:18.70  
+##                                  Max.   :59.60   Max.   :21.50  
+##                                  NA's   :2       NA's   :2      
+##  flipper_length_mm  body_mass_g       sex           year     
+##  Min.   :172.0     Min.   :2700   female:165   Min.   :2007  
+##  1st Qu.:190.0     1st Qu.:3550   male  :168   1st Qu.:2007  
+##  Median :197.0     Median :4050   NA's  : 11   Median :2008  
+##  Mean   :200.9     Mean   :4202                Mean   :2008  
+##  3rd Qu.:213.0     3rd Qu.:4750                3rd Qu.:2009  
+##  Max.   :231.0     Max.   :6300                Max.   :2009  
+##  NA's   :2         NA's   :2
+```
+]
+
+---
+
+# The Pipe: `%&gt;%`
+
+When working with many variables:
+
+
+```r
+penguins %&gt;% glimpse()
+```
+
+```
+## Rows: 344
+## Columns: 8
+## $ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Adelie, Adel…
+## $ island            &lt;fct&gt; Torgersen, Torgersen, Torgersen, Torgersen, Torgerse…
+## $ bill_length_mm    &lt;dbl&gt; 39.1, 39.5, 40.3, NA, 36.7, 39.3, 38.9, 39.2, 34.1, …
+## $ bill_depth_mm     &lt;dbl&gt; 18.7, 17.4, 18.0, NA, 19.3, 20.6, 17.8, 19.6, 18.1, …
+## $ flipper_length_mm &lt;int&gt; 181, 186, 195, NA, 193, 190, 181, 195, 193, 190, 186…
+## $ body_mass_g       &lt;int&gt; 3750, 3800, 3250, NA, 3450, 3650, 3625, 4675, 3475, …
+## $ sex               &lt;fct&gt; male, female, female, NA, female, male, female, male…
+## $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007…
+```
+
+---
+
+# The Pipe: `%&gt;%`
+
+The pipe can make nested functions look much nicer and easier to read with the human eye. It will save you many headaches and is a major selling point.
+
+Code summarising the mean body weight for the species _Adelie_ by island without the pipe ([Source](https://cfss.uchicago.edu/notes/pipes/)):
+
+
+```r
+summarize(group_by(filter(penguins, species == "Adelie"), island), body_mass = mean(body_mass_g, na.rm = TRUE))
+```
+
+```
+## # A tibble: 3 × 2
+##   island    body_mass
+##   &lt;fct&gt;         &lt;dbl&gt;
+## 1 Biscoe        3710.
+## 2 Dream         3688.
+## 3 Torgersen     3706.
+```
+
+---
+
+# The Pipe: `%&gt;%`
+
+The same code using the pipe can be read and produced line by line:
+
+
+```r
+penguins %&gt;%
+  filter(species == "Adelie") %&gt;%
+  group_by(island) %&gt;%
+  summarize(body_mass = mean(body_mass_g, na.rm = TRUE))
+```
+
+```
+## # A tibble: 3 × 2
+##   island    body_mass
+##   &lt;fct&gt;         &lt;dbl&gt;
+## 1 Biscoe        3710.
+## 2 Dream         3688.
+## 3 Torgersen     3706.
+```
+
+Much simpler.
+
+---
+
+# Let's deconstruct that: `filter()`
+
+The `filter` function will give you back what you ask it for. You can think about it as "including" the observations matching your criterion. Note the lack of dollar signs.
+
+
+```r
+penguins %&gt;% 
+  filter(species == "Adelie")
+```
+
+
+```
+## # A tibble: 152 × 8
+##   species island bill_length_mm bill_depth_mm flipper_length_… body_mass_g sex  
+##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt; &lt;fct&gt;
+## 1 Adelie  Torge…           39.1          18.7              181        3750 male 
+## 2 Adelie  Torge…           39.5          17.4              186        3800 fema…
+## 3 Adelie  Torge…           40.3          18                195        3250 fema…
+## 4 Adelie  Torge…           NA            NA                 NA          NA &lt;NA&gt; 
+## 5 Adelie  Torge…           36.7          19.3              193        3450 fema…
+## # … with 147 more rows, and 1 more variable: year &lt;int&gt;
+```
+---
+
+# Let's deconstruct that: `filter()`
+
+`filter` replaces the native R equivalent...
+
+
+```r
+penguins[penguins$species == "Adelie",]
+```
+
+...and makes it part of pipe chain.
+
+
+```r
+penguins %&gt;% 
+  filter(species == "Adelie")
+```
+
+---
+
+# Let's deconstruct that: `filter()`
+
+Another neat trick: `%in%`. You can give the criterion more species.
+
+It's your go, please filter this data set. We only want to see the species:
+
+- Adelie
+- Gentoo
+
+Some guidance:
+
+
+```r
+penguins %&gt;% 
+  filter(species %in% c("Species 1 here", "Species 2 here"))
+```
+
+--
+
+Solution:
+
+
+```r
+penguins %&gt;% 
+  filter(species %in% c("Adelie", "Gentoo"))
+```
+
+---
+
+# Let's deconstruct that: `filter()`
+
+How did I know which species are in the data set?
+
+--
+
+Using the `count` function, which is really useful for categorical variables:
+
+
+```r
+penguins %&gt;% 
+  count(species, sort = T)
+```
+
+```
+## # A tibble: 3 × 2
+##   species       n
+##   &lt;fct&gt;     &lt;int&gt;
+## 1 Adelie      152
+## 2 Gentoo      124
+## 3 Chinstrap    68
+```
+
+---
+
+# Let's deconstruct that: `filter()`
+
+It's your go, please filter this data set. We only want to see the species:
+
+- Adelie
+- Gentoo
+
+
+```r
+penguins %&gt;% 
+  filter(species %in% c("Species 1 here", "Species 2 here"))
+```
+
+Solution:
+
+
+```r
+penguins %&gt;% 
+  filter(species %in% c("Adelie", "Gentoo"))
+```
+
+There is actually another way here. We now know there are only three species in there.
+
+---
+
+# Let's deconstruct that: `filter()`
+
+So we could also frame it as: Filter for anything **but** Chinstrap. That's where the exclamation mark comes in, which is the `NOT` operator.
+
+
+```r
+TRUE
+```
+
+```
+## [1] TRUE
+```
+
+```r
+!TRUE
+```
+
+```
+## [1] FALSE
+```
+
+---
+
+# Let's deconstruct that: `filter()`
+
+Just put it before your condition:
+
+
+```r
+penguins %&gt;% 
+  filter(!species %in% c("Chinstrap"))
+```
+
+
+```
+## # A tibble: 276 × 8
+##   species island bill_length_mm bill_depth_mm flipper_length_… body_mass_g sex  
+##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt; &lt;fct&gt;
+## 1 Adelie  Torge…           39.1          18.7              181        3750 male 
+## 2 Adelie  Torge…           39.5          17.4              186        3800 fema…
+## 3 Adelie  Torge…           40.3          18                195        3250 fema…
+## 4 Adelie  Torge…           NA            NA                 NA          NA &lt;NA&gt; 
+## 5 Adelie  Torge…           36.7          19.3              193        3450 fema…
+## # … with 271 more rows, and 1 more variable: year &lt;int&gt;
+```
+
+---
+
+# Coming back to the example
+
+The goal is to calculate mean body mass for the species Adelie by island.
+
+
+```r
+penguins %&gt;%
+  filter(species == "Adelie") %&gt;%
+  group_by(island) %&gt;%
+  summarize(body_mass = mean(body_mass_g, na.rm = TRUE))
+```
+
+---
+
+# What's `group_by()`?
+
+It unlocks the ability to calculate a number for different categories:
+
+We have three islands. 
+
+
+```r
+penguins %&gt;% count(island, sort = T)
+```
+
+```
+## # A tibble: 3 × 2
+##   island        n
+##   &lt;fct&gt;     &lt;int&gt;
+## 1 Biscoe      168
+## 2 Dream       124
+## 3 Torgersen    52
+```
+
+---
+
+# `group_by()` and `summarise()`
+
+Just summarising without grouping gives the mean just for the species Adelie.
+
+
+```r
+penguins %&gt;% 
+  filter(species == "Adelie") %&gt;%
+  summarize(body_mass = mean(body_mass_g, na.rm = TRUE))
+```
+
+```
+## # A tibble: 1 × 1
+##   body_mass
+##       &lt;dbl&gt;
+## 1     3701.
+```
+
+---
+
+# `group_by()` and `summarise()`
+
+Note that adding `na.rm = TRUE` is necessary to avoid running into errors when missing values are present. Observations with `NA` as values are discarded for the calculation, if `na.rm = TRUE` is specified.
+
+
+```r
+penguins %&gt;% 
+  filter(species == "Adelie") %&gt;%
+  summarize(body_mass = mean(body_mass_g))
+```
+
+```
+## # A tibble: 1 × 1
+##   body_mass
+##       &lt;dbl&gt;
+## 1        NA
+```
+
+---
+
+# `group_by()` and `summarise()`
+
+So let's add it again. Now comes the magic. By adding the `group_by` argument, the value is calculated across all different islands.
+
+
+```r
+penguins %&gt;% 
+  filter(species == "Adelie") %&gt;%
+  group_by(island) %&gt;% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+```
+## # A tibble: 3 × 2
+##   island    body_mass
+##   &lt;fct&gt;         &lt;dbl&gt;
+## 1 Biscoe        3710.
+## 2 Dream         3688.
+## 3 Torgersen     3706.
+```
+
+`summarise` reduces the number of rows.
+
+---
+
+# `mutate()`
+
+Summarise collapsed the observations in each group for our calculations. If we want to preserve the same number of observations and add a new column containing a value for each existing value, we have to use `mutate`.
+
+
+```r
+penguins %&gt;% 
+  filter(species == "Adelie") %&gt;%
+  group_by(island) %&gt;% 
+  summarize(body_mass = mean(body_mass_g, na.rm = T)) %&gt;% 
+  mutate(species = "Adelie")
+```
+
+```
+## # A tibble: 3 × 3
+##   island    body_mass species
+##   &lt;fct&gt;         &lt;dbl&gt; &lt;chr&gt;  
+## 1 Biscoe        3710. Adelie 
+## 2 Dream         3688. Adelie 
+## 3 Torgersen     3706. Adelie
+```
+
+---
+
+# It's your go
+
+Please calculate the mean for each species and each island (as a combination). Tip: You can add more than one variable to the `group_by()` argument.
+
+&lt;br&gt;
+
+.center[
+
+&lt;img src="GraphicsSlides/programmer.png" width="50%" /&gt;
+
+]
+
+---
+
+#### Solution:
+
+Please calculate the mean for each species and each island. Tip: You can add more than one variable to the `group_by()` argument.
+
+
+```r
+penguins %&gt;% 
+  group_by(island, species) %&gt;% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+```
+## # A tibble: 5 × 3
+## # Groups:   island [3]
+##   island    species   body_mass
+##   &lt;fct&gt;     &lt;fct&gt;         &lt;dbl&gt;
+## 1 Biscoe    Adelie        3710.
+## 2 Biscoe    Gentoo        5076.
+## 3 Dream     Adelie        3688.
+## 4 Dream     Chinstrap     3733.
+## 5 Torgersen Adelie        3706.
+```
+
+---
+
+# It's your go
+
+Please calculate the mean for each species and each sex.
+
+&lt;br&gt;
+
+.center[
+
+&lt;img src="GraphicsSlides/programmer.png" width="50%" /&gt;
+
+]
+
+---
+
+# Hold on
+
+.pull-left[
+
+What is this?
+
+
+```r
+penguins %&gt;% 
+  group_by(species, sex) %&gt;% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+```
+## # A tibble: 8 × 3
+## # Groups:   species [3]
+##   species   sex    body_mass
+##   &lt;fct&gt;     &lt;fct&gt;      &lt;dbl&gt;
+## 1 Adelie    female     3369.
+## 2 Adelie    male       4043.
+## 3 Adelie    &lt;NA&gt;       3540 
+## 4 Chinstrap female     3527.
+## 5 Chinstrap male       3939.
+## 6 Gentoo    female     4680.
+## 7 Gentoo    male       5485.
+## 8 Gentoo    &lt;NA&gt;       4588.
+```
+
+]
+
+.center[.pull-right[
+
+&lt;img src="GraphicsSlides/afraid.png" width="90%" /&gt;
+
+
+]]
+
+---
+
+# Hold on
+
+.pull-left[
+
+What is this?
+
+
+```r
+penguins %&gt;% 
+  group_by(species, sex) %&gt;% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+```
+## # A tibble: 8 × 3
+## # Groups:   species [3]
+##   species   sex    body_mass
+##   &lt;fct&gt;     &lt;fct&gt;      &lt;dbl&gt;
+## 1 Adelie    female     3369.
+## 2 Adelie    male       4043.
+## 3 Adelie    &lt;NA&gt;       3540 
+## 4 Chinstrap female     3527.
+## 5 Chinstrap male       3939.
+## 6 Gentoo    female     4680.
+## 7 Gentoo    male       5485.
+## 8 Gentoo    &lt;NA&gt;       4588.
+```
+
+]
+
+.pull-right[
+
+The NAs come from the `sex` variable.
+
+
+```r
+penguins %&gt;% 
+  count(sex)
+```
+
+```
+## # A tibble: 3 × 2
+##   sex        n
+##   &lt;fct&gt;  &lt;int&gt;
+## 1 female   165
+## 2 male     168
+## 3 &lt;NA&gt;      11
+```
+
+
+]
+
+---
+
+# `drop_na` and `select`
+
+To solve this task, we need to take care of the `NA` values in the columns we are working with.
+
+However, there is one problem:
+
+_If we drop all rows with NA values in the whole data frame, we will delete too many rows!_
+
+&lt;img src="Intro-to-the-Tidyverse_files/figure-html/unnamed-chunk-40-1.png" width="100%" /&gt;
+
+---
+
+# `drop_na` and `select`
+
+So we need to select the columns we need first:
+
+
+```r
+penguins %&gt;% 
+  select(species, sex, body_mass_g)
+```
+
+```
+## # A tibble: 344 × 3
+##    species sex    body_mass_g
+##    &lt;fct&gt;   &lt;fct&gt;        &lt;int&gt;
+##  1 Adelie  male          3750
+##  2 Adelie  female        3800
+##  3 Adelie  female        3250
+##  4 Adelie  &lt;NA&gt;            NA
+##  5 Adelie  female        3450
+##  6 Adelie  male          3650
+##  7 Adelie  female        3625
+##  8 Adelie  male          4675
+##  9 Adelie  &lt;NA&gt;          3475
+## 10 Adelie  &lt;NA&gt;          4250
+## # … with 334 more rows
+```
+
+---
+
+# `drop_na` and `select`
+
+**Then** drop.
+
+
+```r
+penguins %&gt;% 
+  select(species, sex, body_mass_g) %&gt;% 
+  drop_na()
+```
+
+```
+## # A tibble: 333 × 3
+##    species sex    body_mass_g
+##    &lt;fct&gt;   &lt;fct&gt;        &lt;int&gt;
+##  1 Adelie  male          3750
+##  2 Adelie  female        3800
+##  3 Adelie  female        3250
+##  4 Adelie  female        3450
+##  5 Adelie  male          3650
+##  6 Adelie  female        3625
+##  7 Adelie  male          4675
+##  8 Adelie  female        3200
+##  9 Adelie  male          3800
+## 10 Adelie  male          4400
+## # … with 323 more rows
+```
+
+---
+
+# So let's try again
+
+Please calculate the mean for each species and each sex, dropping missing data in the necessary columns first.
+
+--
+
+
+```r
+penguins %&gt;% 
+  select(species, sex, body_mass_g) %&gt;% 
+  drop_na() %&gt;% 
+  group_by(species, sex) %&gt;% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+```
+## # A tibble: 6 × 3
+## # Groups:   species [3]
+##   species   sex    body_mass
+##   &lt;fct&gt;     &lt;fct&gt;      &lt;dbl&gt;
+## 1 Adelie    female     3369.
+## 2 Adelie    male       4043.
+## 3 Chinstrap female     3527.
+## 4 Chinstrap male       3939.
+## 5 Gentoo    female     4680.
+## 6 Gentoo    male       5485.
+```
+
+---
+
+# Note: If you continue, ungroup:
+
+
+```r
+penguins %&gt;% 
+  select(species, sex, body_mass_g) %&gt;% 
+  drop_na() %&gt;% 
+  group_by(species, sex) %&gt;% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T)) %&gt;% 
+* ungroup()
+```
+
+```
+## # A tibble: 6 × 3
+##   species   sex    body_mass
+##   &lt;fct&gt;     &lt;fct&gt;      &lt;dbl&gt;
+## 1 Adelie    female     3369.
+## 2 Adelie    male       4043.
+## 3 Chinstrap female     3527.
+## 4 Chinstrap male       3939.
+## 5 Gentoo    female     4680.
+## 6 Gentoo    male       5485.
+```
+
+---
+
+# It's your go
+
+Please calculate the mean bill length and depth over the available three years for all species.
+
+&lt;br&gt;
+
+.center[
+
+&lt;img src="GraphicsSlides/programmer.png" width="50%" /&gt;
+
+]
+
+---
+
+#### Solution:
+
+
+```r
+penguins %&gt;% 
+  group_by(year, species) %&gt;% 
+  summarise(mean_body_mass = mean(body_mass_g, na.rm = T))
+```
+
+```
+## # A tibble: 9 × 3
+## # Groups:   year [3]
+##    year species   mean_body_mass
+##   &lt;int&gt; &lt;fct&gt;              &lt;dbl&gt;
+## 1  2007 Adelie             3696.
+## 2  2007 Chinstrap          3694.
+## 3  2007 Gentoo             5071.
+## 4  2008 Adelie             3742 
+## 5  2008 Chinstrap          3800 
+## 6  2008 Gentoo             5020.
+## 7  2009 Adelie             3665.
+## 8  2009 Chinstrap          3725 
+## 9  2009 Gentoo             5141.
+```
+
+Now it would be really nice to be able to compare from left to right, over time.
+
+---
+
+# Enter: `pivot_wider()`
+
+
+```r
+penguins %&gt;% 
+  group_by(year, species) %&gt;% 
+  summarise(mean_body_mass = mean(body_mass_g, na.rm = T)) %&gt;% 
+  ungroup() %&gt;% 
+* pivot_wider(names_from = year,
+*             values_from = mean_body_mass)
+```
+
+```
+## # A tibble: 3 × 4
+##   species   `2007` `2008` `2009`
+##   &lt;fct&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 Adelie     3696.  3742   3665.
+## 2 Chinstrap  3694.  3800   3725 
+## 3 Gentoo     5071.  5020.  5141.
+```
+
+---
+
+#### The opposite: `pivot_longer()`
+
+
+```r
+penguins %&gt;% 
+  group_by(year, species) %&gt;% 
+  summarise(mean_body_mass = mean(body_mass_g, na.rm = T)) %&gt;% 
+  ungroup() %&gt;% 
+  pivot_wider(names_from = year, 
+              values_from = mean_body_mass) %&gt;% 
+* pivot_longer(- species,
+*              names_to = "year",
+*              values_to = "mean_body_mass") %&gt;%
+  arrange(species) # sort descending: desc(species)
+```
+
+```
+## # A tibble: 9 × 3
+##   species   year  mean_body_mass
+##   &lt;fct&gt;     &lt;chr&gt;          &lt;dbl&gt;
+## 1 Adelie    2007           3696.
+## 2 Adelie    2008           3742 
+## 3 Adelie    2009           3665.
+## 4 Chinstrap 2007           3694.
+## 5 Chinstrap 2008           3800 
+## 6 Chinstrap 2009           3725 
+## 7 Gentoo    2007           5071.
+## 8 Gentoo    2008           5020.
+## 9 Gentoo    2009           5141.
+```
+
+---
+
+# One last time
+
+We want to see the **percentage** of male or percentage of female penguins **for each species**. Here, pivoting wider will come in handy.
+
+Please `count` the numbers of penguins for each sex and species. Then, pivot wider to have sex as the column headers. Make sure to drop missing values in the two variables. Tip: No grouping is necessary for `count`, just pass the two variables to the function.
+
+With `mutate`, you will be able to calculate the percentage. Then use `select` to remove unnecessary information. (If you know it, you can use `transmute` as well.)
+
+&lt;br&gt;
+
+.center[
+
+&lt;img src="GraphicsSlides/programmer.png" width="30%" /&gt;
+
+]
+
+---
+
+#### Solution:
+
+
+```r
+penguins %&gt;% 
+  select(sex, species) %&gt;% 
+  drop_na() %&gt;% 
+  count(sex, species) %&gt;% 
+  pivot_wider(names_from = sex, values_from = n) %&gt;% 
+  transmute(species,
+            pct_male = male/(male + female))
+```
+
+```
+## # A tibble: 3 × 2
+##   species   pct_male
+##   &lt;fct&gt;        &lt;dbl&gt;
+## 1 Adelie       0.5  
+## 2 Chinstrap    0.5  
+## 3 Gentoo       0.513
+```
+
+Note: Using `transmute` does the same as first mutating and then selecting. It is a `mutate` and a `select` in one single step.
+
+---
+
+# That's it for today!
+
+There will be more advanced demos around the `tidyverse` which will enable you to work with larger data sets and more complicated operations. Make sure to stay updated on our socials and via our website, where all resources and dates are also published.
+
+**[Website](https://rusergroupstgallen.github.io/) | [Instagram](https://www.instagram.com/rusergroupstgallen/?hl=en) | [Twitter](https://twitter.com/rusergroupsg)**
+
+.center[
+&lt;img src="GraphicsSlides/palmer.png" width="70%" /&gt;
+]
+
+---
+
+class: center, middle, inverse, hide-logo
+
+# Thank you for attending!
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(GraphicsSlides/Logo\ RUG\ hell.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  bottom: -85px;
+  left: 1em;
+  width: 80px;
+  height: 128px;
+  z-index: 0;
+}
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
