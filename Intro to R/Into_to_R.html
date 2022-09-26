@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Intro_to_R.knit</title>
+    <title>Into_to_R.knit</title>
     <meta charset="utf-8" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link href="libs/panelset/panelset.css" rel="stylesheet" />
@@ -35,14 +35,14 @@ pre {
 
 
 
-# Introduction to R
+# Presentation Title
 
 ## by
 
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
-##### Author/Presenter: Nina &amp; Sven
-##### Last updated: _2022-09-27 00:22:27_
+##### Author/Presenter: TBD
+##### Last updated: _2022-09-27 00:11:05_
 
 ---
 
@@ -54,13 +54,6 @@ class: hide-logo, center, middle
 
 ### Goals for today's session
 
-- Introduction / Welcome
-- Why should you learn R
-- Installing R and R Studio on your Machine 
-- Getting a first overview over R Studio 
-- Getting to know Base R commands 
-- Load excel and CSV files into R
-
 **Show outlook on knowledge will have been acquired.**
 
 ---
@@ -68,169 +61,6 @@ class: hide-logo, center, middle
 ### Content
 
 **Show how you are going to take them there.**
-
----
-## Why should you learn R? 
-
-.scroll-output[
-
-```r
-#setwd("./Introduction to R")
-
-trade_data &lt;- read_csv("trade_data.csv", col_types = cols(`Period 1,2` = "d"))
-
-plot &lt;- trade_data |&gt;
-  rename(Country = `Commercial partner`, Period = `Period 1,2`, Tariff = `Kind of rate`,
-         CHF_Value = `Value (CHF)`, Duties_CHF = `Amount of customs duties (CHF)`) |&gt; 
-  select(Country, Period, Tariff, Duties_CHF, Product) |&gt; 
-    mutate(
-    Tariff = case_when(Tariff == "Total trade" ~ "Total_Trade",
-                    Tariff == "10 - Normal rate" ~ "Normal_Rate",
-                    Tariff == "20 - Reduced rate" ~ "Reduced_Rate",
-                    Tariff == "30 - Exemption" ~ "Exemption",
-                    TRUE ~ "Other")) |&gt; 
-  group_by(Country, Period, Tariff, Product) |&gt; 
-  summarize(Duties_CHF = max(Duties_CHF)) |&gt; 
-  pivot_wider(names_from = Tariff, values_from = Duties_CHF) |&gt; 
-  ungroup() |&gt; 
-  replace_na(list(Normal_Rate = 0,
-                  Total_Trade = 0,
-                  Reduced_Rate = 0,
-                  Exemption = 0)) |&gt; 
-  mutate(Util_Rate = (Exemption + Reduced_Rate) / Total_Trade) |&gt; 
-  filter(Country == "India") |&gt; 
-  ggplot(aes(x = Period, y = Util_Rate, color = as_factor(Product)))+
-  geom_point(size = 3)+
-  geom_line(size = 0.8)+
-  scale_y_continuous(breaks = seq(0,1.2, by = 0.2), labels = percent_format())+
-  scale_x_continuous(breaks = seq(2000,2018, by = 1))+
-  expand_limits(y = c(0, 1))+
-  theme_minimal()+
-  labs(title = "Adjusted Utilization Rate 2000 - 2018")+
-  theme(plot.title  = element_text(size = 22, hjust = 0.5, face = "bold"),
-        axis.title  = element_blank(), 
-        axis.text = element_text(size = 14),
-        panel.grid.minor.x = element_blank(),
-        panel.grid.major.x = element_blank(),
-        legend.position = "bottom",
-        legend.title = element_blank(),
-        legend.text = element_text(size = 12))
-```
-]
----
-
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-6-1.png" width="100%" /&gt;
-
----
-Basic Concepts - Strings, Vectors, Integers
-
-In our R environment, we can store all sorts of objects and data.
-
-
-```r
-first_number &lt;- 100
-second_number &lt;- 200
-first_number + second_number
-```
-
-```
-## [1] 300
-```
-
-
-```r
-#other data types
-first_string &lt;- "this is a string"
-second_string &lt;- "this is another string"
-
-#first_string + second_string
-nchar(first_string)
-```
-
-```
-## [1] 16
-```
-
-
-```r
-typeof(first_string)
-```
-
-```
-## [1] "character"
-```
-
-```r
-typeof(first_number)
-```
-
-```
-## [1] "double"
-```
-
-
-```r
-first_vector &lt;- c(1,2,3,4)
-second_vector &lt;- c(5,6,7,8)
-
-first_vector + second_vector
-```
-
-```
-## [1]  6  8 10 12
-```
-
-Data Frames or Tibbles are a very important concept and will be used a lot when working with data!
-
-```r
-a &lt;- tibble(x = first_vector, y = second_vector)
-print(a)
-```
-
-```
-## # A tibble: 4 × 2
-##       x     y
-##   &lt;dbl&gt; &lt;dbl&gt;
-## 1     1     5
-## 2     2     6
-## 3     3     7
-## 4     4     8
-```
-
-```r
-plot(a)
-```
-
-![](Intro_to_R_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
-
-install.packages("palmerpenguins")
----
-
-# Bullet Point Slide
-
-.pull-left[
-
-- these
-
-- are
-
-- bullet
-
-- points
-
-]
-
-.pull-right[
-
-
-```
-## `geom_smooth()` using formula 'y ~ x'
-```
-
-![](Intro_to_R_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
-
-
-]
 
 ---
 

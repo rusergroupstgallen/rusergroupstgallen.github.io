@@ -51,6 +51,7 @@ options(htmltools.dir.version = FALSE)
 # Load packages for entire presentation here
 library(tidyverse)
 library(lubridate)
+library(scales)
 ```
 
 # Introduction to R
@@ -76,6 +77,13 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 ### Goals for today's session
 
+- Introduction / Welcome
+- Why should you learn R
+- Installing R and R Studio on your Machine 
+- Getting a first overview over R Studio 
+- Getting to know Base R commands 
+- Load excel and CSV files into R
+
 **Show outlook on knowledge will have been acquired.**
 
 ---
@@ -84,6 +92,99 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 **Show how you are going to take them there.**
 
+---
+## Why should you learn R? 
+
+.scroll-output[
+```{r, warning = F, message = F}
+#setwd("./Introduction to R")
+
+trade_data <- read_csv("trade_data.csv", col_types = cols(`Period 1,2` = "d"))
+
+plot <- trade_data |>
+  rename(Country = `Commercial partner`, Period = `Period 1,2`, Tariff = `Kind of rate`,
+         CHF_Value = `Value (CHF)`, Duties_CHF = `Amount of customs duties (CHF)`) |> 
+  select(Country, Period, Tariff, Duties_CHF, Product) |> 
+    mutate(
+    Tariff = case_when(Tariff == "Total trade" ~ "Total_Trade",
+                    Tariff == "10 - Normal rate" ~ "Normal_Rate",
+                    Tariff == "20 - Reduced rate" ~ "Reduced_Rate",
+                    Tariff == "30 - Exemption" ~ "Exemption",
+                    TRUE ~ "Other")) |> 
+  group_by(Country, Period, Tariff, Product) |> 
+  summarize(Duties_CHF = max(Duties_CHF)) |> 
+  pivot_wider(names_from = Tariff, values_from = Duties_CHF) |> 
+  ungroup() |> 
+  replace_na(list(Normal_Rate = 0,
+                  Total_Trade = 0,
+                  Reduced_Rate = 0,
+                  Exemption = 0)) |> 
+  mutate(Util_Rate = (Exemption + Reduced_Rate) / Total_Trade) |> 
+  filter(Country == "India") |> 
+  ggplot(aes(x = Period, y = Util_Rate, color = as_factor(Product)))+
+  geom_point(size = 3)+
+  geom_line(size = 0.8)+
+  scale_y_continuous(breaks = seq(0,1.2, by = 0.2), labels = percent_format())+
+  scale_x_continuous(breaks = seq(2000,2018, by = 1))+
+  expand_limits(y = c(0, 1))+
+  theme_minimal()+
+  labs(title = "Adjusted Utilization Rate 2000 - 2018")+
+  theme(plot.title  = element_text(size = 22, hjust = 0.5, face = "bold"),
+        axis.title  = element_blank(), 
+        axis.text = element_text(size = 14),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.x = element_blank(),
+        legend.position = "bottom",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 12))
+```
+]
+---
+
+```{r, echo = F, message = F, dpi = 300, out.width = "100%", warning = F}
+plot
+```
+
+---
+Basic Concepts - Strings, Vectors, Integers
+
+In our R environment, we can store all sorts of objects and data.
+
+```{r}
+first_number <- 100
+second_number <- 200
+first_number + second_number
+```
+
+```{r}
+#other data types
+first_string <- "this is a string"
+second_string <- "this is another string"
+
+#first_string + second_string
+nchar(first_string)
+```
+
+```{r}
+typeof(first_string)
+typeof(first_number)
+```
+
+```{r}
+first_vector <- c(1,2,3,4)
+second_vector <- c(5,6,7,8)
+
+first_vector + second_vector
+```
+
+Data Frames or Tibbles are a very important concept and will be used a lot when working with data!
+```{r}
+a <- tibble(x = first_vector, y = second_vector)
+print(a)
+plot(a)
+```
+
+install.packages("palmerpenguins")
 ---
 
 # Bullet Point Slide
