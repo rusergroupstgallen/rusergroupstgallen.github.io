@@ -41,7 +41,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Authors/Presenters: Nina, Sven, Mathias
-##### Last updated: _2022-09-27 15:13:58_
+##### Last updated: _2022-09-27 15:20:44_
 
 ---
 
@@ -76,6 +76,15 @@ class: hide-logo, center, middle
 
 &lt;img src="GraphicsSlides/excel_mess.png" width="110%" /&gt;
 ---
+.pull-left[
+&lt;img src="GraphicsSlides/plot_paper.png" width="100%" /&gt;
+]
+
+.pull-right[
+&lt;img src="GraphicsSlides/excel_data.png" width="100%" /&gt;
+]
+---
+
 .scroll-output[
 
 ```r
@@ -118,9 +127,9 @@ plot &lt;- trade_data |&gt;
         legend.title = element_blank(),
         legend.text = element_text(size = 12))
 ```
-]
 ---
-
+plot
+---
 &lt;div&gt;
 &lt;center&gt;
 &lt;iframe src="https://svenglinz.shinyapps.io/InteractivePlot/?showcase=0" width="900px" height="610px" frameBorder="0"&gt;
@@ -874,7 +883,7 @@ penguins[, c("body_mass_g", "bill_length_mm")]
 plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-44-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-46-1.png" width="75%" /&gt;
 
 ---
 
@@ -887,7 +896,7 @@ plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 *      col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-45-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-47-1.png" width="75%" /&gt;
 
 
 ---
@@ -905,7 +914,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-46-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-48-1.png" width="75%" /&gt;
 
 ---
 
@@ -918,7 +927,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-47-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-49-1.png" width="75%" /&gt;
 
 ---
 
@@ -932,7 +941,7 @@ penguins %&gt;%
   geom_smooth(method = "lm", se = F, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-48-1.png" width="90%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-50-1.png" width="90%" /&gt;
 
 ---
 

@@ -108,6 +108,19 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 knitr::include_graphics("GraphicsSlides/excel_mess.png")
 ```
 ---
+.pull-left[
+```{r, echo = F, out.width= "100%"}
+knitr::include_graphics("GraphicsSlides/plot_paper.png")
+```
+]
+
+.pull-right[
+```{r, echo = F, out.width= "100%"}
+knitr::include_graphics("GraphicsSlides/excel_data.png")
+```
+]
+---
+
 .scroll-output[
 ```{r, warning = F, message = F}
 
@@ -152,7 +165,8 @@ plot <- trade_data |>
 ```
 ]
 ---
-
+plot
+---
 <div>
 <center>
 <iframe src="https://svenglinz.shinyapps.io/InteractivePlot/?showcase=0" width="900px" height="610px" frameBorder="0">
