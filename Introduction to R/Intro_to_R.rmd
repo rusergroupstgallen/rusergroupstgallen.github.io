@@ -211,7 +211,7 @@ Vectors contain multiple numbers, strings, logical values etc.
 However, they can only contain data of one type, so you cannot put a number and a string into the same vector!
 
 .pull-left[
-```{r, echo = F, out.width= "90%"}
+```{r, echo = F, out.width= "140%"}
   knitr::include_graphics("GraphicsSlides/vectors.png")
 ```
 ]
