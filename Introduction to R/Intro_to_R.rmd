@@ -157,19 +157,38 @@ Basic Concepts - Strings, Vectors, Integers
 
 In our R environment, we can store all sorts of objects and data.
 
+The are various objects such as vectors, matrices, lists and data frames. 
+
+All objects are of a certain type (for example Integer, Double, Character, Logical)
+
+Example Integer: 
 
 ```{r}
 first_number <- 100
 second_number <- 200
 first_number + second_number
+typeof(first_number)
 ```
 
+Example Logical
+
 ```{r}
+a <- TRUE
+c <- T
+b <- FALSE 
+
+#True = 1, False = 0!!!
+a+b
+
+isTRUE(c)
+```
+
+```{r, error = T}
 #other data types
 first_string <- "this is a string"
 second_string <- "this is another string"
 
-#first_string + second_string
+first_string + second_string
 nchar(first_string)
 ```
 
@@ -186,10 +205,28 @@ first_vector + second_vector
 ```
 
 Data Frames or Tibbles are a very important concept and will be used a lot when working with data!
+
+a Tibble is a two dimensional frame which is made of of diferent colums whereby each column is a distinct vector. 
+
+
 ```{r}
-a <- tibble(x = first_vector, y = second_vector)
+tibble_test <- tibble(x = first_vector, y = second_vector)
 print(a)
 plot(a)
+```
+
+A list is like a vector but can contain different data types!
+
+```{r}
+list_test <- list(vector = first_vector,
+                  tibble = tibble_test, 
+                  string = first_string, 
+                  number = first_number
+                  )
+
+list_test
+
+#how to subset tibbles etc.
 ```
 
 ---
@@ -201,6 +238,7 @@ plot(a)
 
 ```{r, echo = F, out.width= "60%"}
 knitr::include_graphics("GraphicsSlides/palmerpenguins_package.png")
+
 ```
 ]
 
@@ -622,6 +660,8 @@ penguins[penguins$species == "Adelie" & penguins$bill_length_mm < 35, c("island"
 
 replace data within a Tibble
 
+-> Merge data frames
+
 run this -> what happens
 ```{r, error=TRUE}
 penguins[is.na(penguins$sex), "sex"] <- "undefined"
@@ -630,32 +670,6 @@ penguins[penguins$species == "Adelie",]
 ---
 
 means averages etc... difference of weights in penguins what is the heaviest species etc...
-
-# Bullet Point Slide
-
-.pull-left[
-
-- these
-
-- are
-
-- bullet
-
-- points
-
-]
-
-.pull-right[
-
-```{r, echo=FALSE}
-mtcars %>%
-  ggplot(aes(disp, mpg)) +
-  geom_point() +
-  geom_smooth(method = "lm")
-```
-
-
-]
 
 ---
 
