@@ -18,16 +18,16 @@ class: center, middle, hide-logo
 
 &lt;style type="text/css"&gt;
 pre {
-  background: #F8F8F8;
-  max-width: 100%;
-  overflow-x: scroll;
+background: #F8F8F8;
+max-width: 100%;
+overflow-x: scroll;
 }
 &lt;/style&gt;
 
 &lt;style type="text/css"&gt;
 .scroll-output {
-  height: 80%;
-  overflow-y: scroll;
+height: 80%;
+overflow-y: scroll;
 }
 &lt;/style&gt;
 
@@ -41,8 +41,8 @@ pre {
 
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
-##### Author/Presenter: Nina &amp; Sven
-##### Last updated: _2022-09-27 11:39:45_
+##### Authors/Presenters: Nina, Sven, Mathias
+##### Last updated: _2022-09-27 12:43:18_
 
 ---
 
@@ -79,12 +79,12 @@ plot &lt;- trade_data |&gt;
   rename(Country = `Commercial partner`, Period = `Period 1,2`, Tariff = `Kind of rate`,
          CHF_Value = `Value (CHF)`, Duties_CHF = `Amount of customs duties (CHF)`) |&gt; 
   select(Country, Period, Tariff, Duties_CHF, Product) |&gt; 
-    mutate(
+  mutate(
     Tariff = case_when(Tariff == "Total trade" ~ "Total_Trade",
-                    Tariff == "10 - Normal rate" ~ "Normal_Rate",
-                    Tariff == "20 - Reduced rate" ~ "Reduced_Rate",
-                    Tariff == "30 - Exemption" ~ "Exemption",
-                    TRUE ~ "Other")) |&gt; 
+                       Tariff == "10 - Normal rate" ~ "Normal_Rate",
+                       Tariff == "20 - Reduced rate" ~ "Reduced_Rate",
+                       Tariff == "30 - Exemption" ~ "Exemption",
+                       TRUE ~ "Other")) |&gt; 
   group_by(Country, Period, Tariff, Product) |&gt; 
   summarize(Duties_CHF = max(Duties_CHF)) |&gt; 
   pivot_wider(names_from = Tariff, values_from = Duties_CHF) |&gt; 
@@ -245,13 +245,13 @@ Simple Subsetting
 You can subset every tibble as follows: 
 
 - row and column: 
-  `tibble_name[row_index, column_index/name] `
+`tibble_name[row_index, column_index/name] `
 - row only 
-  tibble_name[row_index,]
+tibble_name[row_index,]
 - column only 
-  `tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
-  
-  
+`tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
+
+
 Lets get the second row and third Column of the penguins data 
 
 
@@ -430,6 +430,480 @@ mean(penguins[penguins$sex == "male",]$body_mass_g,
 
 .center[
 &lt;img src="GraphicsSlides/flex tape.png" width="40%" /&gt;
+]
+
+---
+
+### Step 4: Compare male and female penguins
+
+
+```r
+tibble(
+  mean_g = c(mean(penguins[penguins$sex == "male",]$body_mass_g,
+                  na.rm = T),
+             mean(penguins[penguins$sex == "female",]$body_mass_g, 
+                  na.rm = T)),
+  sex = c("male",
+          "female")
+)
+```
+
+```
+## # A tibble: 2 × 2
+##   mean_g sex   
+##    &lt;dbl&gt; &lt;chr&gt; 
+## 1  4546. male  
+## 2  3862. female
+```
+
+---
+
+### Task 2: How many penguins live on each island?
+
+- Also: How many islands are there?
+
+
+```r
+library(dplyr)
+
+glimpse(penguins)
+```
+
+```
+## Rows: 344
+## Columns: 8
+## $ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Adelie, Adel…
+## $ island            &lt;fct&gt; Torgersen, Torgersen, Torgersen, Torgersen, Torgerse…
+## $ bill_length_mm    &lt;dbl&gt; 39.1, 39.5, 40.3, NA, 36.7, 39.3, 38.9, 39.2, 34.1, …
+## $ bill_depth_mm     &lt;dbl&gt; 18.7, 17.4, 18.0, NA, 19.3, 20.6, 17.8, 19.6, 18.1, …
+## $ flipper_length_mm &lt;int&gt; 181, 186, 195, NA, 193, 190, 181, 195, 193, 190, 186…
+## $ body_mass_g       &lt;int&gt; 3750, 3800, 3250, NA, 3450, 3650, 3625, 4675, 3475, …
+## $ sex               &lt;fct&gt; male, female, female, NA, female, male, female, male…
+## $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007…
+```
+
+---
+
+### Step 1: Do we have 1 observation per penguin?
+
+.scroll-output[
+- Look at documentation or know from data (in obvious cases like this)
+- Here: counting islands will be sufficient
+
+
+```r
+penguins$island
+```
+
+```
+##   [1] Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen
+##   [8] Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen
+##  [15] Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen Biscoe   
+##  [22] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+##  [29] Biscoe    Biscoe    Dream     Dream     Dream     Dream     Dream    
+##  [36] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+##  [43] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+##  [50] Dream     Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+##  [57] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+##  [64] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Torgersen Torgersen
+##  [71] Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen
+##  [78] Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen
+##  [85] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+##  [92] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+##  [99] Dream     Dream     Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [106] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [113] Biscoe    Biscoe    Biscoe    Biscoe    Torgersen Torgersen Torgersen
+## [120] Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen
+## [127] Torgersen Torgersen Torgersen Torgersen Torgersen Torgersen Dream    
+## [134] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+## [141] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+## [148] Dream     Dream     Dream     Dream     Dream     Biscoe    Biscoe   
+## [155] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [162] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [169] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [176] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [183] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [190] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [197] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [204] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [211] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [218] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [225] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [232] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [239] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [246] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [253] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [260] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [267] Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe    Biscoe   
+## [274] Biscoe    Biscoe    Biscoe    Dream     Dream     Dream     Dream    
+## [281] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+## [288] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+## [295] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+## [302] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+## [309] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+## [316] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+## [323] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+## [330] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+## [337] Dream     Dream     Dream     Dream     Dream     Dream     Dream    
+## [344] Dream    
+## Levels: Biscoe Dream Torgersen
+```
+]
+
+---
+
+### Step 2: Use `table()`
+
+
+```r
+table(penguins$island)
+```
+
+```
+## 
+##    Biscoe     Dream Torgersen 
+##       168       124        52
+```
+
+--
+
+- Quick outlook on `tidyverse` alternative
+
+
+```r
+penguins %&gt;% 
+* count(island)
+```
+
+```
+## # A tibble: 3 × 2
+##   island        n
+##   &lt;fct&gt;     &lt;int&gt;
+## 1 Biscoe      168
+## 2 Dream       124
+## 3 Torgersen    52
+```
+
+---
+
+### Task 3: What species live on island "Biscoe"?
+
+- Eventually: Calculate a percentage for each species on island Biscoe
+
+
+```r
+glimpse(penguins)
+```
+
+```
+## Rows: 344
+## Columns: 8
+## $ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Adelie, Adel…
+## $ island            &lt;fct&gt; Torgersen, Torgersen, Torgersen, Torgersen, Torgerse…
+## $ bill_length_mm    &lt;dbl&gt; 39.1, 39.5, 40.3, NA, 36.7, 39.3, 38.9, 39.2, 34.1, …
+## $ bill_depth_mm     &lt;dbl&gt; 18.7, 17.4, 18.0, NA, 19.3, 20.6, 17.8, 19.6, 18.1, …
+## $ flipper_length_mm &lt;int&gt; 181, 186, 195, NA, 193, 190, 181, 195, 193, 190, 186…
+## $ body_mass_g       &lt;int&gt; 3750, 3800, 3250, NA, 3450, 3650, 3625, 4675, 3475, …
+## $ sex               &lt;fct&gt; male, female, female, NA, female, male, female, male…
+## $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007…
+```
+
+---
+
+### Step 1: Subset for island
+
+
+```r
+penguins[penguins$island == "Biscoe",]
+```
+
+```
+## # A tibble: 168 × 8
+##    species island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##    &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+##  1 Adelie  Biscoe           37.8          18.3               174        3400
+##  2 Adelie  Biscoe           37.7          18.7               180        3600
+##  3 Adelie  Biscoe           35.9          19.2               189        3800
+##  4 Adelie  Biscoe           38.2          18.1               185        3950
+##  5 Adelie  Biscoe           38.8          17.2               180        3800
+##  6 Adelie  Biscoe           35.3          18.9               187        3800
+##  7 Adelie  Biscoe           40.6          18.6               183        3550
+##  8 Adelie  Biscoe           40.5          17.9               187        3200
+##  9 Adelie  Biscoe           37.9          18.6               172        3150
+## 10 Adelie  Biscoe           40.5          18.9               180        3950
+## # … with 158 more rows, and 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
+```
+
+---
+
+### Step 2: Get species vector
+
+
+```r
+penguins[penguins$island == "Biscoe",]$species
+```
+
+```
+##   [1] Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie
+##  [11] Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie
+##  [21] Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie
+##  [31] Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie Adelie
+##  [41] Adelie Adelie Adelie Adelie Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+##  [51] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+##  [61] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+##  [71] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+##  [81] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+##  [91] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+## [101] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+## [111] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+## [121] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+## [131] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+## [141] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+## [151] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+## [161] Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo Gentoo
+## Levels: Adelie Chinstrap Gentoo
+```
+
+---
+
+### Step 3: Ol' reliable `table()`
+
+
+```r
+table(penguins[penguins$island == "Biscoe",]$species)
+```
+
+```
+## 
+##    Adelie Chinstrap    Gentoo 
+##        44         0       124
+```
+
+- Can you calculate a percentage from this?
+
+--
+
+- The answer is: No, convert to data frame first.
+
+
+```r
+table(penguins[penguins$island == "Biscoe",]$species) %&gt;% 
+* as.data.frame()
+```
+
+```
+##        Var1 Freq
+## 1    Adelie   44
+## 2 Chinstrap    0
+## 3    Gentoo  124
+```
+
+---
+
+### Step 4: Create a percentage column
+
+
+```r
+freq_table &lt;- 
+  table(penguins[penguins$island == "Biscoe",]$species) %&gt;% 
+  as.data.frame()
+```
+
+- Create a new column to the right dividing the observation by the sum of `Freq`
+
+--
+
+
+```r
+freq_table[, "Percentage"] &lt;- freq_table[,"Freq"]/sum(freq_table$Freq)
+
+freq_table
+```
+
+```
+##        Var1 Freq Percentage
+## 1    Adelie   44  0.2619048
+## 2 Chinstrap    0  0.0000000
+## 3    Gentoo  124  0.7380952
+```
+
+---
+
+### Outlook on `Tidyverse`: Join us in one of the next sessions
+
+- Not only faster to calculate percentages for one island...
+
+
+```r
+penguins %&gt;% 
+  filter(island == "Biscoe") %&gt;% 
+  count(species) %&gt;% 
+  mutate(percentage = n/sum(n))
+```
+
+```
+## # A tibble: 2 × 3
+##   species     n percentage
+##   &lt;fct&gt;   &lt;int&gt;      &lt;dbl&gt;
+## 1 Adelie     44      0.262
+## 2 Gentoo    124      0.738
+```
+
+---
+
+### Outlook on `Tidyverse`: Join us in one of the next sessions
+
+- ...but for all combinations as well.
+
+
+```r
+penguins %&gt;% 
+  group_by(island) %&gt;% 
+  count(species) %&gt;% 
+  transmute(island, species,
+            percentage = n/sum(n)) %&gt;% 
+  pivot_wider(names_from = species, values_from = percentage)
+```
+
+```
+## # A tibble: 3 × 4
+## # Groups:   island [3]
+##   island    Adelie Gentoo Chinstrap
+##   &lt;fct&gt;      &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
+## 1 Biscoe     0.262  0.738    NA    
+## 2 Dream      0.452 NA         0.548
+## 3 Torgersen  1     NA        NA
+```
+
+---
+
+### Task 4: Linear relationship between bill length and body mass
+
+.scroll-output[
+
+- Console output is boring to look at: Plot the linear relationship between bill length and body mass with base R
+
+
+```r
+penguins[, c("body_mass_g", "bill_length_mm")]
+```
+
+
+```
+## # A tibble: 6 × 2
+##   body_mass_g bill_length_mm
+##         &lt;int&gt;          &lt;dbl&gt;
+## 1        3750           39.1
+## 2        3800           39.5
+## 3        3250           40.3
+## 4          NA           NA  
+## 5        3450           36.7
+## 6        3650           39.3
+```
+]
+
+---
+
+### Step 1: Which chart type?
+
+- for linear relationships, we can plot a regression line in a scatter plot
+- independent (predictor) variable on the x-axis
+- dependent (response) variable on the y-axis
+
+.center[
+&lt;img src="GraphicsSlides/scatter.png" width="45%" /&gt;
+]
+
+---
+
+### Step 2: Use `plot()`
+
+
+```r
+plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
+```
+
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-42-1.png" width="75%" /&gt;
+
+---
+
+### Step 3: Add a regression line
+
+
+```r
+plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
+*abline(lm(penguins$body_mass_g ~ penguins$bill_length_mm),
+*      col = "blue", lwd = 2, lty = 2)
+```
+
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-43-1.png" width="75%" /&gt;
+
+
+---
+
+### Step 4: Your Go
+
+- Try it again for bill_depth_mm (predictor) on the same y variable
+
+--
+
+
+```r
+plot(x = penguins$bill_depth_mm, y = penguins$body_mass_g)
+abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
+       col = "blue", lwd = 2, lty = 2)
+```
+
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-44-1.png" width="75%" /&gt;
+
+---
+
+### Are these two different species?
+
+
+```r
+plot(x = penguins$bill_depth_mm, y = penguins$body_mass_g)
+abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
+       col = "blue", lwd = 2, lty = 2)
+```
+
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-45-1.png" width="75%" /&gt;
+
+---
+
+### Outlook on `Tidyverse`
+
+
+```r
+penguins %&gt;% 
+  ggplot(aes(x = bill_depth_mm, y = body_mass_g, colour = species)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = F, lty = 2)
+```
+
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-46-1.png" width="90%" /&gt;
+
+---
+
+# More Tasks
+
+.scroll-output[
+- summary statistics by group "species"
+
+
+```r
+lapply(penguins[, c("bill_length_mm", "bill_depth_mm")] %&gt;% 
+         na.omit(),
+       mean)
+```
+
+```
+## $bill_length_mm
+## [1] 43.92193
+## 
+## $bill_depth_mm
+## [1] 17.15117
+```
 ]
 
 ---
@@ -682,7 +1156,7 @@ means averages etc... difference of weights in penguins what is the heaviest spe
 ## `geom_smooth()` using formula 'y ~ x'
 ```
 
-![](Intro_to_R_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
+![](Intro_to_R_files/figure-html/unnamed-chunk-51-1.png)&lt;!-- --&gt;
 
 
 ]

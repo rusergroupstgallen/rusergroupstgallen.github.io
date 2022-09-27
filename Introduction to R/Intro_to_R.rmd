@@ -28,16 +28,16 @@ style_mono_accent(
 
 ```{css, echo=FALSE}
 pre {
-  background: #F8F8F8;
-  max-width: 100%;
-  overflow-x: scroll;
+background: #F8F8F8;
+max-width: 100%;
+overflow-x: scroll;
 }
 ```
 
 ```{css, echo=FALSE}
 .scroll-output {
-  height: 80%;
-  overflow-y: scroll;
+height: 80%;
+overflow-y: scroll;
 }
 ```
 
@@ -69,7 +69,7 @@ library(rstudioapi)
 knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 ```
 
-##### Author/Presenter: Nina & Sven
+##### Authors/Presenters: Nina, Sven, Mathias
 ##### Last updated: _`r Sys.time()`_
 
 ---
@@ -110,12 +110,12 @@ plot <- trade_data |>
   rename(Country = `Commercial partner`, Period = `Period 1,2`, Tariff = `Kind of rate`,
          CHF_Value = `Value (CHF)`, Duties_CHF = `Amount of customs duties (CHF)`) |> 
   select(Country, Period, Tariff, Duties_CHF, Product) |> 
-    mutate(
+  mutate(
     Tariff = case_when(Tariff == "Total trade" ~ "Total_Trade",
-                    Tariff == "10 - Normal rate" ~ "Normal_Rate",
-                    Tariff == "20 - Reduced rate" ~ "Reduced_Rate",
-                    Tariff == "30 - Exemption" ~ "Exemption",
-                    TRUE ~ "Other")) |> 
+                       Tariff == "10 - Normal rate" ~ "Normal_Rate",
+                       Tariff == "20 - Reduced rate" ~ "Reduced_Rate",
+                       Tariff == "30 - Exemption" ~ "Exemption",
+                       TRUE ~ "Other")) |> 
   group_by(Country, Period, Tariff, Product) |> 
   summarize(Duties_CHF = max(Duties_CHF)) |> 
   pivot_wider(names_from = Tariff, values_from = Duties_CHF) |> 
@@ -223,13 +223,13 @@ Simple Subsetting
 You can subset every tibble as follows: 
 
 - row and column: 
-  `tibble_name[row_index, column_index/name] `
+`tibble_name[row_index, column_index/name] `
 - row only 
-  tibble_name[row_index,]
+tibble_name[row_index,]
 - column only 
-  `tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
-  
-  
+`tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
+
+
 Lets get the second row and third Column of the penguins data 
 
 ```{r}
@@ -327,25 +327,245 @@ knitr::include_graphics("GraphicsSlides/flex tape.png")
 
 ---
 
-# More Tasks
+### Step 4: Compare male and female penguins
+
+```{r}
+tibble(
+  mean_g = c(mean(penguins[penguins$sex == "male",]$body_mass_g,
+                  na.rm = T),
+             mean(penguins[penguins$sex == "female",]$body_mass_g, 
+                  na.rm = T)),
+  sex = c("male",
+          "female")
+)
+```
+
+---
+
+### Task 2: How many penguins live on each island?
+
+- Also: How many islands are there?
+
+```{r}
+library(dplyr)
+
+glimpse(penguins)
+```
+
+---
+
+### Step 1: Do we have 1 observation per penguin?
 
 .scroll-output[
-- how many penguins on each island?
-- what % of species on island "Biscoe"
-- summary statistics by group "species"
-- plot linear relationship between bill length and body mass
+- Look at documentation or know from data (in obvious cases like this)
+- Here: counting islands will be sufficient
+
+```{r}
+penguins$island
+```
+]
+
+---
+
+### Step 2: Use `table()`
+
+```{r}
+table(penguins$island)
+```
+
+--
+
+- Quick outlook on `tidyverse` alternative
 
 ```{r}
 penguins %>% 
-  ggplot(aes(bill_length_mm, body_mass_g)) +
-  geom_point() +
-  geom_smooth(method = "lm")
-
-plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
-abline(lm(penguins$body_mass_g ~ penguins$bill_length_mm),
-       col = "red", lwd = 4)
+  count(island) #<<
 ```
 
+---
+
+### Task 3: What species live on island "Biscoe"?
+
+- Eventually: Calculate a percentage for each species on island Biscoe
+
+```{r}
+glimpse(penguins)
+```
+
+---
+
+### Step 1: Subset for island
+
+```{r}
+penguins[penguins$island == "Biscoe",]
+```
+
+---
+
+### Step 2: Get species vector
+
+```{r}
+penguins[penguins$island == "Biscoe",]$species
+```
+
+---
+
+### Step 3: Ol' reliable `table()`
+
+```{r}
+table(penguins[penguins$island == "Biscoe",]$species)
+```
+
+- Can you calculate a percentage from this?
+
+--
+
+- The answer is: No, convert to data frame first.
+
+```{r}
+table(penguins[penguins$island == "Biscoe",]$species) %>% 
+  as.data.frame() #<<
+```
+
+---
+
+### Step 4: Create a percentage column
+
+```{r}
+freq_table <- 
+  table(penguins[penguins$island == "Biscoe",]$species) %>% 
+  as.data.frame()
+```
+
+- Create a new column to the right dividing the observation by the sum of `Freq`
+
+--
+
+```{r}
+freq_table[, "Percentage"] <- freq_table[,"Freq"]/sum(freq_table$Freq)
+
+freq_table
+```
+
+---
+
+### Outlook on `Tidyverse`: Join us in one of the next sessions
+
+- Not only faster to calculate percentages for one island...
+
+```{r}
+penguins %>% 
+  filter(island == "Biscoe") %>% 
+  count(species) %>% 
+  mutate(percentage = n/sum(n))
+```
+
+---
+
+### Outlook on `Tidyverse`: Join us in one of the next sessions
+
+- ...but for all combinations as well.
+
+```{r}
+penguins %>% 
+  group_by(island) %>% 
+  count(species) %>% 
+  transmute(island, species,
+            percentage = n/sum(n)) %>% 
+  pivot_wider(names_from = species, values_from = percentage)
+```
+
+---
+
+### Task 4: Linear relationship between bill length and body mass
+
+.scroll-output[
+
+- Console output is boring to look at: Plot the linear relationship between bill length and body mass with base R
+
+```{r, eval=FALSE}
+penguins[, c("body_mass_g", "bill_length_mm")]
+```
+
+```{r, echo=FALSE}
+head(penguins[, c("body_mass_g", "bill_length_mm")])
+```
+]
+
+---
+
+### Step 1: Which chart type?
+
+- for linear relationships, we can plot a regression line in a scatter plot
+- independent (predictor) variable on the x-axis
+- dependent (response) variable on the y-axis
+
+.center[
+```{r, echo=FALSE, out.width="45%"}
+knitr::include_graphics("GraphicsSlides/scatter.png")
+```
+]
+
+---
+
+### Step 2: Use `plot()`
+
+```{r, out.width="75%", fig.height=5, dpi=300}
+plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
+```
+
+---
+
+### Step 3: Add a regression line
+
+```{r, out.width="75%", fig.height=5, dpi=300}
+plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
+abline(lm(penguins$body_mass_g ~ penguins$bill_length_mm),#<<
+       col = "blue", lwd = 2, lty = 2)#<<
+```
+
+
+---
+
+### Step 4: Your Go
+
+- Try it again for bill_depth_mm (predictor) on the same y variable
+
+--
+
+```{r, out.width="75%", fig.height=4, dpi=300}
+plot(x = penguins$bill_depth_mm, y = penguins$body_mass_g)
+abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
+       col = "blue", lwd = 2, lty = 2)
+```
+
+---
+
+### Are these two different species?
+
+```{r, out.width="75%", fig.height=4, dpi=300}
+plot(x = penguins$bill_depth_mm, y = penguins$body_mass_g)
+abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
+       col = "blue", lwd = 2, lty = 2)
+```
+
+---
+
+### Outlook on `Tidyverse`
+
+```{r, out.width="90%", fig.height=3.5, dpi=300, warning=FALSE, message=FALSE}
+penguins %>% 
+  ggplot(aes(x = bill_depth_mm, y = body_mass_g, colour = species)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = F, lty = 2)
+```
+
+---
+
+# More Tasks
+
+.scroll-output[
+- summary statistics by group "species"
 
 ```{r}
 lapply(penguins[, c("bill_length_mm", "bill_depth_mm")] %>% 
