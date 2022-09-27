@@ -34,6 +34,7 @@ overflow-y: scroll;
 
 
 
+
 # Introduction to R
 
 ## by
@@ -41,6 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Authors/Presenters: Nina, Sven, Mathias
+<<<<<<< HEAD
 ##### Last updated: _2022-09-27 19:41:27_
 
 ---
@@ -48,31 +50,55 @@ overflow-y: scroll;
 class: hide-logo, center, middle
 
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
+=======
+##### Last updated: _2022-09-27 19:45:03_
+
+---
+
+### Welcome to our first Meeting
+
+- Picture, Presentation etc. 
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 ---
 
 ### Goals for today's session
 
 - Introduction / Welcome
+
 - Why should you learn R
+
 - Installing R and R Studio on your Machine 
+
 - Getting a first overview over R Studio 
+
 - Getting to know Base R commands 
+
 - Load excel and CSV files into R
 
 ---
 
-### Content
+### Why should you learn R? 
 
----
-## Why should you learn R? 
+- Excel can be extremely messy, especially when working with multiple data sheets
 
-### Excel can be extremely messy, especially when working with multiple data sheets
+&lt;br&gt;
 
 &lt;img src="GraphicsSlides/excel_mess.png" width="110%" /&gt;
+
 ---
+<<<<<<< HEAD
 .center[
 &lt;img src="GraphicsSlides/plot_paper.png" width="90%" /&gt;
+=======
+
+### Why should you learn R? 
+
+- **TBD:  description of the below?**
+
+.pull-left[
+&lt;img src="GraphicsSlides/plot_paper.png" width="100%" /&gt;
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 ]
 
 .center[
@@ -80,10 +106,12 @@ class: hide-logo, center, middle
 ]
 ---
 
+### Why should you learn R? 
+
 .scroll-output[
 
 ```r
-trade_data &lt;- read_csv("trade_data.csv", col_types = cols(`Period 1,2` = "d"))
+trade_data &lt;- read_csv("DataSets/trade_data.csv", col_types = cols(`Period 1,2` = "d"))
 
 out_plot &lt;- trade_data |&gt;
   rename(Country = `Commercial partner`, Period = `Period 1,2`, Tariff = `Kind of rate`,
@@ -125,9 +153,35 @@ out_plot &lt;- trade_data |&gt;
 ]
 ---
 
+<<<<<<< HEAD
 ![](Intro_to_R_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
 ---
 
+=======
+### Why should you learn R? 
+
+.pull-left[
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-8-1.png" width="100%" /&gt;
+]
+
+.pull-right[
+
+- **TBD: Advantages here**
+- Most of all: Reproducible!
+
+&lt;br&gt;
+
+--
+
+&lt;img src="GraphicsSlides/strong v weak.png" width="100%" /&gt;
+
+]
+
+---
+
+### Shiny Apps: Host your work online for external users
+
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 &lt;div&gt;
 &lt;center&gt;
 &lt;iframe src="https://svenglinz.shinyapps.io/InteractivePlot/?showcase=0" width="900px" height="610px" frameBorder="0"&gt;
@@ -135,9 +189,15 @@ out_plot &lt;- trade_data |&gt;
 &lt;/center&gt;
 &lt;/div&gt;
 
+**TBD: Error in der Shiny app**
+
+<<<<<<< HEAD
+### Basic Concepts - Data Types and Objects
+=======
 ---
 
-### Basic Concepts - Data Types and Objects
+### Just shortly: Data Types and Objects
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 In our R environment, we can store all sorts of objects and data.
 The are various objects such as *vectors*, *matrices*, *lists* and *tibbles*.
@@ -146,8 +206,15 @@ All objects are of a certain type (for example Integer, Double, Character, Logic
 and it is important to always make sure that your data is formatted as the right type.
 
 .pull-left[
+<<<<<<< HEAD
 &lt;img src="GraphicsSlides/wrong_data_type.png" width="75%" /&gt;
+=======
+.center[
+&lt;img src="GraphicsSlides/wrong_data_type.png" width="65%" /&gt;
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 ]
+]
+
 .pull-right[
 Example Integers and Strings
 
@@ -165,15 +232,23 @@ first_number + second_number
 
 ---
 
-### Basic Concepts - Data Types and Objects
+### Data Types and Objects
 
+<<<<<<< HEAD
 Logical Values can be represented by TRUE/FALSE as well as T/F
 --&gt; When performing mathematical operations, TRUE = 1, and FALSE = 0
+=======
+- Logical Values can be represented by:
+  - TRUE/FALSE (alternatively: T/F)
+
+- When performing mathematical operations, TRUE = 1, and FALSE = 0:
+
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 ```r
 a &lt;- TRUE
-c &lt;- T
-b &lt;- FALSE
+b &lt;- T
+c &lt;- FALSE
 
 sum(a,b,c)
 ```
@@ -181,23 +256,21 @@ sum(a,b,c)
 ```
 ## [1] 2
 ```
+
 ---
 
-### Basic Concepts - Data Types and Objects
+### Data Types and Objects
 
-Vectors contain multiple numbers, strings, logical values etc. 
-However, they can only contain data of one type, so you cannot put a number and a string into the same vector!
+- Vectors contain multiple numbers, strings, logical values etc.
+- They can only contain data of **one type**, so you cannot put a number and a string into the same vector!
 
 .pull-left[
-&lt;img src="GraphicsSlides/vectors.png" width="140%" /&gt;
-]
-
-.pull-right[
 
 ```r
 first_vector &lt;- c(1,2,3,4)
 second_vector &lt;- c(5,6,7,8)
-third_vector &lt;- c("hello", 100, "test", FALSE)
+third_vector &lt;- c("hello", 100,
+                  "test", FALSE)
 
 first_vector + second_vector
 ```
@@ -215,46 +288,86 @@ third_vector
 ```
 ]
 
+.pull-right[
+
+&lt;br&gt;
+
+&lt;img src="GraphicsSlides/vectors.png" width="140%" /&gt;
+]
+
 ---
 
-### Basic Concepts - Data Types and Objects
+### Data Types and Objects
 
-Data Frames or Tibbles are a very important concept and will be used a lot when working with data!
+.scroll-output[
 
-a Tibble is a two dimensional frame which is made of of different colums whereby each column is a distinct vector.
+- Usually, you will work with rectangular data in `tibbles` or `data frames`
+- `tibble`: two dimensional frame made of different columns
+  - each column is a distinct vector (i.e. different data types possible)
 
 
 ```r
-tibble_test &lt;- tibble(x = first_vector, y = second_vector)
-print(tibble_test)
+tibble_test &lt;- tibble(x = first_vector, 
+                      y = second_vector,
+                      z = third_vector)
+tibble_test
 ```
 
 ```
-## # A tibble: 4 × 2
-##       x     y
-##   &lt;dbl&gt; &lt;dbl&gt;
-## 1     1     5
-## 2     2     6
-## 3     3     7
-## 4     4     8
+## # A tibble: 4 × 3
+##       x     y z    
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
+## 1     1     5 hello
+## 2     2     6 100  
+## 3     3     7 test 
+## 4     4     8 FALSE
 ```
 
-A list is like a vector but can contain different data types!
+A list is like a vector but can contain different data types:
 
 
 ```r
 list_test &lt;- list(vector = first_vector,
                   tibble = tibble_test,
                   string = first_number,
-                  number = first_number)
+                  number = as.numeric(first_number))
+
+list_test
 ```
+
+```
+## $vector
+## [1] 1 2 3 4
+## 
+## $tibble
+## # A tibble: 4 × 3
+##       x     y z    
+##   &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
+## 1     1     5 hello
+## 2     2     6 100  
+## 3     3     7 test 
+## 4     4     8 FALSE
+## 
+## $string
+## [1] "100"
+## 
+## $number
+## [1] 100
+```
+
+]
+
 ---
 
 ## Working with Tibbles
 
 .pull-left[
 
+<<<<<<< HEAD
 &lt;img src="GraphicsSlides/palmerpenguins_package.png" width="70%" /&gt;
+=======
+&lt;img src="GraphicsSlides/palmerpenguins_package.png" width="50%" /&gt;
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 ]
 
 .pull-right[
@@ -915,7 +1028,11 @@ penguins[, c("body_mass_g", "bill_length_mm")]
 plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 ```
 
+<<<<<<< HEAD
 &lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-53-1.png" width="75%" /&gt;
+=======
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-47-1.png" width="75%" /&gt;
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 ---
 
@@ -928,7 +1045,11 @@ plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 *      col = "blue", lwd = 2, lty = 2)
 ```
 
+<<<<<<< HEAD
 &lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-54-1.png" width="75%" /&gt;
+=======
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-48-1.png" width="75%" /&gt;
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 
 ---
@@ -946,7 +1067,11 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
+<<<<<<< HEAD
 &lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-55-1.png" width="75%" /&gt;
+=======
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-49-1.png" width="75%" /&gt;
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 ---
 
@@ -959,7 +1084,11 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
+<<<<<<< HEAD
 &lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-56-1.png" width="75%" /&gt;
+=======
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-50-1.png" width="75%" /&gt;
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 ---
 
@@ -973,7 +1102,11 @@ penguins %&gt;%
   geom_smooth(method = "lm", se = F, lty = 2)
 ```
 
+<<<<<<< HEAD
 &lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-57-1.png" width="90%" /&gt;
+=======
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-51-1.png" width="90%" /&gt;
+>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 ---
 
