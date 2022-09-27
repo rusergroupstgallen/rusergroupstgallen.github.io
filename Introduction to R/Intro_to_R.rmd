@@ -78,11 +78,6 @@ class: hide-logo, center, middle
 ```{r, echo=FALSE, out.width="50%"}
 knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 ```
----
-
-## Welcome to our first Meeting
-
-- Picture, Presentation etc. 
 
 ---
 
@@ -108,14 +103,14 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 knitr::include_graphics("GraphicsSlides/excel_mess.png")
 ```
 ---
-.pull-left[
-```{r, echo = F, out.width= "100%"}
+.center[
+```{r, echo = F, out.width= "90%"}
 knitr::include_graphics("GraphicsSlides/plot_paper.png")
 ```
 ]
 
-.pull-right[
-```{r, echo = F, out.width= "100%"}
+.center[
+```{r, echo = F, out.width= "120%"}
 knitr::include_graphics("GraphicsSlides/excel_data.png")
 ```
 ]
@@ -126,7 +121,7 @@ knitr::include_graphics("GraphicsSlides/excel_data.png")
 
 trade_data <- read_csv("trade_data.csv", col_types = cols(`Period 1,2` = "d"))
 
-plot <- trade_data |>
+out_plot <- trade_data |>
   rename(Country = `Commercial partner`, Period = `Period 1,2`, Tariff = `Kind of rate`,
          CHF_Value = `Value (CHF)`, Duties_CHF = `Amount of customs duties (CHF)`) |>
   select(Country, Period, Tariff, Duties_CHF, Product) |>
@@ -165,16 +160,18 @@ plot <- trade_data |>
 ```
 ]
 ---
-plot
+
+```{r, warning=FALSE, echo = F}
+out_plot
+```
 ---
+
 <div>
 <center>
 <iframe src="https://svenglinz.shinyapps.io/InteractivePlot/?showcase=0" width="900px" height="610px" frameBorder="0">
 </iframe>
 </center>
 </div>
-
----
 
 ---
 
@@ -187,7 +184,7 @@ All objects are of a certain type (for example Integer, Double, Character, Logic
 and it is important to always make sure that your data is formatted as the right type.
 
 .pull-left[
-```{r, echo = F, out.width= "90%"}
+```{r, echo = F, out.width= "75%"}
   knitr::include_graphics("GraphicsSlides/wrong_data_type.png")
 ```
 ]
@@ -198,15 +195,12 @@ Example Integers and Strings
 first_number <- "100"
 second_number <- 200
 first_number + second_number
-typeof(second_number)
 ```
 ]
 
 ---
 
 ### Basic Concepts - Data Types and Objects
-
-Example Logical
 
 Logical Values can be represented by TRUE/FALSE as well as T/F
 --> When performing mathematical operations, TRUE = 1, and FALSE = 0
@@ -266,10 +260,9 @@ list_test <- list(vector = first_vector,
 
 ## Working with Tibbles
 
-
 .pull-left[
 
-```{r, echo = F, out.width= "60%"}
+```{r, echo = F, out.width= "70%"}
 knitr::include_graphics("GraphicsSlides/palmerpenguins_package.png")
 ```
 ]
@@ -282,45 +275,97 @@ penguins <- palmerpenguins::penguins
 ]
 
 ```{r}
-head(penguins, 5)
+head(penguins, 4)
 ```
 
 ---
 
-Working with Tibbles
-Simple Subsetting
+### Working with Tibbles - Simple Subsetting
 
 You can subset every tibble as follows:
 
 - row and column:
 `tibble_name[row_index, column_index/name] `
 - row only
-tibble_name[row_index,]
+`tibble_name[row_index,]`
 - column only
 `tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
 
+Now Lets get the second row and third Column of the penguins data
 
-Lets get the second row and third Column of the penguins data
+-- 
 
-```{r}
+```{r, eval = FALSE}
 penguins[2,3]
 penguins[2, "bill_length_mm"]
 ```
+What if we want multiple rows/ columns or if we want to delete an entry?
 
-We can see, the result is again a tibble
-
-The tibble consists of vectors
-If we want to extract the vector
-penguins[2][[1]]
-
+```{r, eval=FALSE}
+penguins[c(1:5, 200:202), c(2,5)]
+penguins[-c(1:4),1]
+```
 
 ---
 
-### Task 1: How would we see the difference in body mass between female and male penguins?
+### Subsetting with Logical Conditions
+
+If we look for a specific value within our data set (column, row or both), we can 
+subset the data frame by logical conditions (==, &, |, >, >= etc...)
+
+.center[
+```{r, echo=FALSE, out.width="40%"}
+knitr::include_graphics("GraphicsSlides/spongebob_search.gif")
+```
+]
+
+```{r}
+head(penguins[penguins$sex == "male" & penguins$island == "Biscoe",],2)
+```
+
+---
+
+### Task 1: Replace all observations of island = "Dream" with "Unknown"
+
+Tip: First filter out the column Island and within this column, all Values which are Dream
+Then: Assign a new value to these values with <-
+
+--
+
+```{r, error = TRUE}
+penguins[penguins$island == "Dream", "island"] <- "Unknown"
+```
+
+---
+
+Lets first convert the data type from factor to string!
+
+```{r}
+penguins$island <- as.character(penguins$island)
+```
+
+--
+
+Now lets do it again 
+
+```{r, error = TRUE}
+penguins[penguins$island == "Dream", "island"] <- "Unknown"
+head(penguins)
+```
+
+--
+
+And if needed, lets reformat back to factor 
+
+```{r}
+penguins$island <- as.factor(penguins$island)
+```
+
+---
+### Task 2: How would we see the difference in body mass between female and male penguins?
 
 ```{r}
 library(dplyr)
-
 glimpse(penguins)
 ```
 
@@ -333,7 +378,6 @@ glimpse(penguins)
 ```{r}
 penguins[penguins$sex == "male",]
 ```
-
 ---
 
 ### Step 2: Get body mass
@@ -458,12 +502,6 @@ penguins %>%
 
 - Eventually: Calculate a percentage for each species on island Biscoe
 
-```{r}
-glimpse(penguins)
-```
-
----
-
 ### Step 1: Subset for island
 
 ```{r}
@@ -493,7 +531,7 @@ table(penguins[penguins$island == "Biscoe",]$species)
 - The answer is: No, convert to data frame first.
 
 ```{r}
-table(penguins[penguins$island == "Biscoe",]$species) %>%
+table(penguins[penguins$island == "Biscoe",]$species) |> 
   as.data.frame() #<<
 ```
 
@@ -505,6 +543,7 @@ table(penguins[penguins$island == "Biscoe",]$species) %>%
 freq_table <-
   table(penguins[penguins$island == "Biscoe",]$species) %>%
   as.data.frame()
+
 ```
 
 - Create a new column to the right dividing the observation by the sum of `Freq`
@@ -643,65 +682,6 @@ lapply(penguins[, c("bill_length_mm", "bill_depth_mm")] %>%
        mean)
 ```
 ]
-
----
-
-difference male vs female penguins
-male vs female body mass, bill length etc.
-```{r}
-
-#generate summary table
-glimpse(penguins)
-
-#solution
-weight_male <- mean(penguins[penguins$sex == "male", "body_mass_g"][[1]], na.rm = T)
-weight_female <- mean(penguins[penguins$sex == "female", "body_mass_g"][[1]], na.rm = T)
-
-body_mass <- c(weight_male, weight_female)
-gender <- c("male", "female")
-
-comparison <- tibble(gender = gender, body_mass = body_mass)
-
-#next lecture!
-penguins |> filter(sex == "male") |> summarize(mean = mean(body_mass_g, na.rm = T))
-penguins |> group_by(sex) |> summarize(weight = mean(body_mass_g, na.rm = T),
-                                       bill_length = mean(bill_length_mm, na.rm = T))
-
-penguins |>
-  drop_na() |>
-  group_by(sex) |>
-  summarize(across(where(is.numeric),
-                   mean))
-
-penguins |>
-  select(where(is.numeric))
-```
-
-Working with Tibbles
-Search for Values
-
-Logical Operations
-
-```{r}
-table(penguins$species == "Adelie")
-penguins$bill_length_mm < 35
-
-penguins[penguins$species == "Adelie" & penguins$bill_length_mm < 35, ]
-penguins[penguins$species == "Adelie" & penguins$bill_length_mm < 35, c("island", "sex", "year")]
-```
-
-replace data within a Tibble
-
--> Merge data frames
-
-run this -> what happens
-```{r, error=TRUE}
-penguins[is.na(penguins$sex), "sex"] <- "undefined"
-penguins[penguins$species == "Adelie",]
-```
----
-
-means averages etc... difference of weights in penguins what is the heaviest species etc...
 
 ---
 
