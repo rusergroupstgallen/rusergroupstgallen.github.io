@@ -60,6 +60,7 @@ library(rstudioapi)
 #setwd(dirname(getActiveDocumentContext()$path))
 
 ```
+
 # Introduction to R
 
 ## by
@@ -73,14 +74,7 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 ---
 
-class: hide-logo, center, middle
-
-```{r, echo=FALSE, out.width="50%"}
-knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
-```
----
-
-## Welcome to our first Meeting
+### Welcome to our first Meeting
 
 - Picture, Presentation etc. 
 
@@ -89,25 +83,35 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 ### Goals for today's session
 
 - Introduction / Welcome
+
 - Why should you learn R
+
 - Installing R and R Studio on your Machine 
+
 - Getting a first overview over R Studio 
+
 - Getting to know Base R commands 
+
 - Load excel and CSV files into R
 
 ---
 
-### Content
+### Why should you learn R? 
 
----
-## Why should you learn R? 
+- Excel can be extremely messy, especially when working with multiple data sheets
 
-### Excel can be extremely messy, especially when working with multiple data sheets
+<br>
 
 ```{r, echo = F, out.width= "110%"}
 knitr::include_graphics("GraphicsSlides/excel_mess.png")
 ```
+
 ---
+
+### Why should you learn R? 
+
+- **TBD:  description of the below?**
+
 .pull-left[
 ```{r, echo = F, out.width= "100%"}
 knitr::include_graphics("GraphicsSlides/plot_paper.png")
@@ -121,10 +125,11 @@ knitr::include_graphics("GraphicsSlides/excel_data.png")
 ]
 ---
 
+### Why should you learn R? 
+
 .scroll-output[
 ```{r, warning = F, message = F}
-
-trade_data <- read_csv("trade_data.csv", col_types = cols(`Period 1,2` = "d"))
+trade_data <- read_csv("DataSets/trade_data.csv", col_types = cols(`Period 1,2` = "d"))
 
 plot <- trade_data |>
   rename(Country = `Commercial partner`, Period = `Period 1,2`, Tariff = `Kind of rate`,
@@ -165,8 +170,34 @@ plot <- trade_data |>
 ```
 ]
 ---
+
+### Why should you learn R? 
+
+.pull-left[
+```{r, out.width="100%", fig.height=9, echo=FALSE, message=FALSE, warning=FALSE, dpi=300}
 plot
+```
+]
+
+.pull-right[
+
+- **TBD: Advantages here**
+- Most of all: Reproducible!
+
+<br>
+
+--
+
+```{r, echo=FALSE, out.width="100%"}
+knitr::include_graphics("GraphicsSlides/strong v weak.png")
+```
+
+]
+
 ---
+
+### Shiny Apps: Host your work online for external users
+
 <div>
 <center>
 <iframe src="https://svenglinz.shinyapps.io/InteractivePlot/?showcase=0" width="900px" height="610px" frameBorder="0">
@@ -174,11 +205,11 @@ plot
 </center>
 </div>
 
----
+**TBD: Error in der Shiny app**
 
 ---
 
-### Basic Concepts - Data Types and Objects
+### Just shortly: Data Types and Objects
 
 In our R environment, we can store all sorts of objects and data.
 The are various objects such as *vectors*, *matrices*, *lists* and *tibbles*.
@@ -187,10 +218,13 @@ All objects are of a certain type (for example Integer, Double, Character, Logic
 and it is important to always make sure that your data is formatted as the right type.
 
 .pull-left[
-```{r, echo = F, out.width= "90%"}
+.center[
+```{r, echo = F, out.width= "65%"}
   knitr::include_graphics("GraphicsSlides/wrong_data_type.png")
 ```
 ]
+]
+
 .pull-right[
 Example Integers and Strings
 
@@ -204,72 +238,86 @@ typeof(second_number)
 
 ---
 
-### Basic Concepts - Data Types and Objects
+### Data Types and Objects
 
-Example Logical
+- Logical Values can be represented by:
+  - TRUE/FALSE (alternatively: T/F)
 
-Logical Values can be represented by TRUE/FALSE as well as T/F
---> When performing mathematical operations, TRUE = 1, and FALSE = 0
+- When performing mathematical operations, TRUE = 1, and FALSE = 0:
+
 ```{r}
 a <- TRUE
-c <- T
-b <- FALSE
+b <- T
+c <- FALSE
 
 sum(a,b,c)
 ```
+
 ---
 
-### Basic Concepts - Data Types and Objects
+### Data Types and Objects
 
-Vectors contain multiple numbers, strings, logical values etc. 
-However, they can only contain data of one type, so you cannot put a number and a string into the same vector!
+- Vectors contain multiple numbers, strings, logical values etc.
+- They can only contain data of **one type**, so you cannot put a number and a string into the same vector!
 
 .pull-left[
-```{r, echo = F, out.width= "140%"}
-  knitr::include_graphics("GraphicsSlides/vectors.png")
-```
-]
-
-.pull-right[
 ```{r}
 first_vector <- c(1,2,3,4)
 second_vector <- c(5,6,7,8)
-third_vector <- c("hello", 100, "test", FALSE)
+third_vector <- c("hello", 100,
+                  "test", FALSE)
 
 first_vector + second_vector
 third_vector
 ```
 ]
 
+.pull-right[
+
+<br>
+
+```{r, echo = F, out.width= "140%"}
+  knitr::include_graphics("GraphicsSlides/vectors.png")
+```
+]
+
 ---
 
-### Basic Concepts - Data Types and Objects
+### Data Types and Objects
 
-Data Frames or Tibbles are a very important concept and will be used a lot when working with data!
+.scroll-output[
 
-a Tibble is a two dimensional frame which is made of of different colums whereby each column is a distinct vector.
+- Usually, you will work with rectangular data in `tibbles` or `data frames`
+- `tibble`: two dimensional frame made of different columns
+  - each column is a distinct vector (i.e. different data types possible)
 
 ```{r}
-tibble_test <- tibble(x = first_vector, y = second_vector)
-print(tibble_test)
+tibble_test <- tibble(x = first_vector, 
+                      y = second_vector,
+                      z = third_vector)
+tibble_test
 ```
 
-A list is like a vector but can contain different data types!
+A list is like a vector but can contain different data types:
 
 ```{r}
 list_test <- list(vector = first_vector,
                   tibble = tibble_test,
                   string = first_number,
-                  number = first_number)
+                  number = as.numeric(first_number))
+
+list_test
 ```
+
+]
+
 ---
 
 ## Working with Tibbles
 
-
 .pull-left[
 
-```{r, echo = F, out.width= "60%"}
+```{r, echo = F, out.width= "50%"}
 knitr::include_graphics("GraphicsSlides/palmerpenguins_package.png")
 ```
 ]
