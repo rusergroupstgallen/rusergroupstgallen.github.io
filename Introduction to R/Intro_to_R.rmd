@@ -91,13 +91,11 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 - Getting to know Base R commands 
 - Load excel and CSV files into R
 
-**Show outlook on knowledge will have been acquired.**
-
 ---
 
 ### Content
 
-**Show how you are going to take them there.**
+
 
 ---
 ## Why should you learn R? 
@@ -225,11 +223,11 @@ Simple Subsetting
 You can subset every tibble as follows: 
 
 - row and column: 
-  tibble_name[row_index, column_index/name] 
+  `tibble_name[row_index, column_index/name] `
 - row only 
   tibble_name[row_index,]
 - column only 
-  tibble_name[column_index/name] OR tibble_name[,column_index/name]
+  `tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
   
   
 Lets get the second row and third Column of the penguins data 
@@ -244,6 +242,117 @@ We can see, the result is again a tibble
 The tibble consists of vectors 
 If we want to extract the vector 
 penguins[2][[1]]
+
+
+---
+
+### Task 1: How would we see the difference in body mass between female and male penguins?
+
+```{r}
+library(dplyr)
+
+glimpse(penguins)
+```
+
+---
+
+### Step 1: Subsetting
+
+- Subset the data frame for one sex
+
+```{r}
+penguins[penguins$sex == "male",]
+```
+
+---
+
+### Step 2: Get body mass
+
+- Extract the vector you are interested in with the $ sign
+
+```{r}
+penguins[penguins$sex == "male",]$body_mass_g
+```
+
+---
+
+### Step 3: Calculate the mean
+
+- use the native `mean()` function to calculate the mean body mass
+
+--
+
+```{r, eval=FALSE}
+mean(penguins[penguins$sex == "male",]$body_mass_g)
+```
+
+--
+
+```{r, echo=FALSE}
+mean(penguins[penguins$sex == "male",]$body_mass_g)
+```
+
+What is this?
+
+.center[
+```{r, echo=FALSE, out.width="40%"}
+knitr::include_graphics("GraphicsSlides/shock.jpg")
+```
+]
+
+---
+
+### Back to Step 2: Get body mass
+
+There are `NA` in the data!
+
+```{r}
+penguins[penguins$sex == "male",]$body_mass_g
+```
+
+---
+
+### Back to Step 3: Calculate the mean
+
+```{r}
+mean(penguins[penguins$sex == "male",]$body_mass_g,
+     na.rm = T) #<<
+```
+
+.center[
+```{r, echo=FALSE, out.width="40%"}
+knitr::include_graphics("GraphicsSlides/flex tape.png")
+```
+]
+
+---
+
+# More Tasks
+
+.scroll-output[
+- how many penguins on each island?
+- what % of species on island "Biscoe"
+- summary statistics by group "species"
+- plot linear relationship between bill length and body mass
+
+```{r}
+penguins %>% 
+  ggplot(aes(bill_length_mm, body_mass_g)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+
+plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
+abline(lm(penguins$body_mass_g ~ penguins$bill_length_mm),
+       col = "red", lwd = 4)
+```
+
+
+```{r}
+lapply(penguins[, c("bill_length_mm", "bill_depth_mm")] %>% 
+         na.omit(),
+       mean)
+```
+]
 
 ---
 
@@ -263,23 +372,23 @@ gender <- c("male", "female")
 
 comparison <- tibble(gender = gender, body_mass = body_mass)
 
-#next lecture! --> Tidyverse 
+#next lecture!
 penguins |> filter(sex == "male") |> summarize(mean = mean(body_mass_g, na.rm = T))
 penguins |> group_by(sex) |> summarize(weight = mean(body_mass_g, na.rm = T),
                                        bill_length = mean(bill_length_mm, na.rm = T))
 
-penguins |> 
-  drop_na() |> 
-  group_by(sex) |> 
+penguins |>
+  drop_na() |>
+  group_by(sex) |>
   summarize(across(where(is.numeric),
                    mean))
 
-penguins |> 
+penguins |>
   select(where(is.numeric))
 ```
 
-Working with Tibbles 
-Search for Values 
+Working with Tibbles
+Search for Values
 
 Logical Operations
 
@@ -294,7 +403,7 @@ penguins[penguins$species == "Adelie" & penguins$bill_length_mm < 35, c("island"
 replace data within a Tibble
 
 run this -> what happens
-```{r}
+```{r, error=TRUE}
 penguins[is.na(penguins$sex), "sex"] <- "undefined"
 penguins[penguins$species == "Adelie",]
 ```
@@ -319,7 +428,7 @@ means averages etc... difference of weights in penguins what is the heaviest spe
 .pull-right[
 
 ```{r, echo=FALSE}
-mtcars %>% 
+mtcars %>%
   ggplot(aes(disp, mpg)) +
   geom_point() +
   geom_smooth(method = "lm")

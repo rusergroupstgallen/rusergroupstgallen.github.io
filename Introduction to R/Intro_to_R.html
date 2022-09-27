@@ -42,7 +42,7 @@ pre {
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Nina &amp; Sven
-##### Last updated: _2022-09-27 10:29:45_
+##### Last updated: _2022-09-27 11:39:45_
 
 ---
 
@@ -61,17 +61,14 @@ class: hide-logo, center, middle
 - Getting to know Base R commands 
 - Load excel and CSV files into R
 
-**Show outlook on knowledge will have been acquired.**
-
 ---
 
 ### Content
 
-**Show how you are going to take them there.**
+
 
 ---
 ## Why should you learn R? 
-
 
 .scroll-output[
 
@@ -248,11 +245,11 @@ Simple Subsetting
 You can subset every tibble as follows: 
 
 - row and column: 
-  tibble_name[row_index, column_index/name] 
+  `tibble_name[row_index, column_index/name] `
 - row only 
   tibble_name[row_index,]
 - column only 
-  tibble_name[column_index/name] OR tibble_name[,column_index/name]
+  `tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
   
   
 Lets get the second row and third Column of the penguins data 
@@ -286,15 +283,383 @@ The tibble consists of vectors
 If we want to extract the vector 
 penguins[2][[1]]
 
----
-
-Working with Tibbles 
-Search for Values 
-
-
-
 
 ---
+
+### Task 1: How would we see the difference in body mass between female and male penguins?
+
+
+```r
+library(dplyr)
+
+glimpse(penguins)
+```
+
+```
+## Rows: 344
+## Columns: 8
+## $ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Adelie, Adel…
+## $ island            &lt;fct&gt; Torgersen, Torgersen, Torgersen, Torgersen, Torgerse…
+## $ bill_length_mm    &lt;dbl&gt; 39.1, 39.5, 40.3, NA, 36.7, 39.3, 38.9, 39.2, 34.1, …
+## $ bill_depth_mm     &lt;dbl&gt; 18.7, 17.4, 18.0, NA, 19.3, 20.6, 17.8, 19.6, 18.1, …
+## $ flipper_length_mm &lt;int&gt; 181, 186, 195, NA, 193, 190, 181, 195, 193, 190, 186…
+## $ body_mass_g       &lt;int&gt; 3750, 3800, 3250, NA, 3450, 3650, 3625, 4675, 3475, …
+## $ sex               &lt;fct&gt; male, female, female, NA, female, male, female, male…
+## $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007…
+```
+
+---
+
+### Step 1: Subsetting
+
+- Subset the data frame for one sex
+
+
+```r
+penguins[penguins$sex == "male",]
+```
+
+```
+## # A tibble: 179 × 8
+##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+##  1 Adelie  Torgersen           39.1          18.7               181        3750
+##  2 &lt;NA&gt;    &lt;NA&gt;                NA            NA                  NA          NA
+##  3 Adelie  Torgersen           39.3          20.6               190        3650
+##  4 Adelie  Torgersen           39.2          19.6               195        4675
+##  5 &lt;NA&gt;    &lt;NA&gt;                NA            NA                  NA          NA
+##  6 &lt;NA&gt;    &lt;NA&gt;                NA            NA                  NA          NA
+##  7 &lt;NA&gt;    &lt;NA&gt;                NA            NA                  NA          NA
+##  8 &lt;NA&gt;    &lt;NA&gt;                NA            NA                  NA          NA
+##  9 Adelie  Torgersen           38.6          21.2               191        3800
+## 10 Adelie  Torgersen           34.6          21.1               198        4400
+## # … with 169 more rows, and 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
+```
+
+---
+
+### Step 2: Get body mass
+
+- Extract the vector you are interested in with the $ sign
+
+
+```r
+penguins[penguins$sex == "male",]$body_mass_g
+```
+
+```
+##   [1] 3750   NA 3650 4675   NA   NA   NA   NA 3800 4400 4500 4200 3600 3950 3800
+##  [16] 3550 3950 3900 3900 4150 3950 4650 3900 4400 4600 3425   NA 4150 4300 4050
+##  [31] 3700 3800 3750 4400 4050 3950 4100 4450 3900 4150 4250 3900 4000 4700 4200
+##  [46] 3550 3800 3950 4300 4450 4300 4350 4100 4725 4250 3550 3900 4775 4600 4275
+##  [61] 4075 3775 3325 3500 3875 4000 4300 4000 3500 4475 3900 3975 4250 3475 3725
+##  [76] 3650 4250 3750 4000 5700 5700 5400 5200 5150 5550 5850 5850 6300 5350 5700
+##  [91] 5050 5100   NA 5650 5550 5250 6050 5400 5250 5350 5700 4750 5550 5400 5300
+## [106] 5300 5000 5050 5000 5550 5300 5650 5700   NA 5800 5550 5000 5100 5800 6000
+## [121] 5950 5450 5350 5600 5300 5550 5400 5650 5200 4925 5250 5600 5500   NA 5500
+## [136] 5500 5500 5950 5500 5850   NA 6000   NA 5750 5400 3900 3650 3725 3750 3700
+## [151] 3775 4050 4050 3300 4400 3400 3800 4150 3800 4550 4300 4100 3600 4800 4500
+## [166] 3950 3550 4450 4300 3250 3950 4050 3450 4050 3800 3950 4000 3775 4100
+```
+
+---
+
+### Step 3: Calculate the mean
+
+- use the native `mean()` function to calculate the mean body mass
+
+--
+
+
+```r
+mean(penguins[penguins$sex == "male",]$body_mass_g)
+```
+
+--
+
+
+```
+## [1] NA
+```
+
+What is this?
+
+.center[
+&lt;img src="GraphicsSlides/shock.jpg" width="40%" /&gt;
+]
+
+---
+
+### Back to Step 2: Get body mass
+
+There are `NA` in the data!
+
+
+```r
+penguins[penguins$sex == "male",]$body_mass_g
+```
+
+```
+##   [1] 3750   NA 3650 4675   NA   NA   NA   NA 3800 4400 4500 4200 3600 3950 3800
+##  [16] 3550 3950 3900 3900 4150 3950 4650 3900 4400 4600 3425   NA 4150 4300 4050
+##  [31] 3700 3800 3750 4400 4050 3950 4100 4450 3900 4150 4250 3900 4000 4700 4200
+##  [46] 3550 3800 3950 4300 4450 4300 4350 4100 4725 4250 3550 3900 4775 4600 4275
+##  [61] 4075 3775 3325 3500 3875 4000 4300 4000 3500 4475 3900 3975 4250 3475 3725
+##  [76] 3650 4250 3750 4000 5700 5700 5400 5200 5150 5550 5850 5850 6300 5350 5700
+##  [91] 5050 5100   NA 5650 5550 5250 6050 5400 5250 5350 5700 4750 5550 5400 5300
+## [106] 5300 5000 5050 5000 5550 5300 5650 5700   NA 5800 5550 5000 5100 5800 6000
+## [121] 5950 5450 5350 5600 5300 5550 5400 5650 5200 4925 5250 5600 5500   NA 5500
+## [136] 5500 5500 5950 5500 5850   NA 6000   NA 5750 5400 3900 3650 3725 3750 3700
+## [151] 3775 4050 4050 3300 4400 3400 3800 4150 3800 4550 4300 4100 3600 4800 4500
+## [166] 3950 3550 4450 4300 3250 3950 4050 3450 4050 3800 3950 4000 3775 4100
+```
+
+---
+
+### Back to Step 3: Calculate the mean
+
+
+```r
+mean(penguins[penguins$sex == "male",]$body_mass_g,
+*    na.rm = T)
+```
+
+```
+## [1] 4545.685
+```
+
+.center[
+&lt;img src="GraphicsSlides/flex tape.png" width="40%" /&gt;
+]
+
+---
+
+difference male vs female penguins
+male vs female body mass, bill length etc.
+
+```r
+#generate summary table
+glimpse(penguins)
+```
+
+```
+## Rows: 344
+## Columns: 8
+## $ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Adelie, Adel…
+## $ island            &lt;fct&gt; Torgersen, Torgersen, Torgersen, Torgersen, Torgerse…
+## $ bill_length_mm    &lt;dbl&gt; 39.1, 39.5, 40.3, NA, 36.7, 39.3, 38.9, 39.2, 34.1, …
+## $ bill_depth_mm     &lt;dbl&gt; 18.7, 17.4, 18.0, NA, 19.3, 20.6, 17.8, 19.6, 18.1, …
+## $ flipper_length_mm &lt;int&gt; 181, 186, 195, NA, 193, 190, 181, 195, 193, 190, 186…
+## $ body_mass_g       &lt;int&gt; 3750, 3800, 3250, NA, 3450, 3650, 3625, 4675, 3475, …
+## $ sex               &lt;fct&gt; male, female, female, NA, female, male, female, male…
+## $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007…
+```
+
+```r
+#solution
+weight_male &lt;- mean(penguins[penguins$sex == "male", "body_mass_g"][[1]], na.rm = T)
+weight_female &lt;- mean(penguins[penguins$sex == "female", "body_mass_g"][[1]], na.rm = T)
+
+body_mass &lt;- c(weight_male, weight_female)
+gender &lt;- c("male", "female")
+
+comparison &lt;- tibble(gender = gender, body_mass = body_mass)
+
+#next lecture!
+penguins |&gt; filter(sex == "male") |&gt; summarize(mean = mean(body_mass_g, na.rm = T))
+```
+
+```
+## # A tibble: 1 × 1
+##    mean
+##   &lt;dbl&gt;
+## 1 4546.
+```
+
+```r
+penguins |&gt; group_by(sex) |&gt; summarize(weight = mean(body_mass_g, na.rm = T),
+                                       bill_length = mean(bill_length_mm, na.rm = T))
+```
+
+```
+## # A tibble: 3 × 3
+##   sex    weight bill_length
+##   &lt;fct&gt;   &lt;dbl&gt;       &lt;dbl&gt;
+## 1 female  3862.        42.1
+## 2 male    4546.        45.9
+## 3 &lt;NA&gt;    4006.        41.3
+```
+
+```r
+penguins |&gt;
+  drop_na() |&gt;
+  group_by(sex) |&gt;
+  summarize(across(where(is.numeric),
+                   mean))
+```
+
+```
+## # A tibble: 2 × 6
+##   sex    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g  year
+##   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;             &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt;
+## 1 female           42.1          16.4              197.       3862. 2008.
+## 2 male             45.9          17.9              205.       4546. 2008.
+```
+
+```r
+penguins |&gt;
+  select(where(is.numeric))
+```
+
+```
+## # A tibble: 344 × 5
+##    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g  year
+##             &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt; &lt;int&gt;
+##  1           39.1          18.7               181        3750  2007
+##  2           39.5          17.4               186        3800  2007
+##  3           40.3          18                 195        3250  2007
+##  4           NA            NA                  NA          NA  2007
+##  5           36.7          19.3               193        3450  2007
+##  6           39.3          20.6               190        3650  2007
+##  7           38.9          17.8               181        3625  2007
+##  8           39.2          19.6               195        4675  2007
+##  9           34.1          18.1               193        3475  2007
+## 10           42            20.2               190        4250  2007
+## # … with 334 more rows
+```
+
+Working with Tibbles
+Search for Values
+
+Logical Operations
+
+
+```r
+table(penguins$species == "Adelie")
+```
+
+```
+## 
+## FALSE  TRUE 
+##   192   152
+```
+
+```r
+penguins$bill_length_mm &lt; 35
+```
+
+```
+##   [1] FALSE FALSE FALSE    NA FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE
+##  [13] FALSE FALSE  TRUE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
+##  [25] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+##  [37] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+##  [49] FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE
+##  [61] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE
+##  [73] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE
+##  [85] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE
+##  [97] FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [109] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [121] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [133] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE
+## [145] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [157] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [169] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [181] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [193] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [205] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [217] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [229] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [241] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [253] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [265] FALSE FALSE FALSE FALSE FALSE FALSE FALSE    NA FALSE FALSE FALSE FALSE
+## [277] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [289] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [301] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [313] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [325] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [337] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+```
+
+```r
+penguins[penguins$species == "Adelie" &amp; penguins$bill_length_mm &lt; 35, ]
+```
+
+```
+## # A tibble: 10 × 8
+##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+##  1 &lt;NA&gt;    &lt;NA&gt;                NA            NA                  NA          NA
+##  2 Adelie  Torgersen           34.1          18.1               193        3475
+##  3 Adelie  Torgersen           34.6          21.1               198        4400
+##  4 Adelie  Torgersen           34.4          18.4               184        3325
+##  5 Adelie  Biscoe              34.5          18.1               187        2900
+##  6 Adelie  Torgersen           33.5          19                 190        3600
+##  7 Adelie  Torgersen           34.6          17.2               189        3200
+##  8 Adelie  Dream               34            17.1               185        3400
+##  9 Adelie  Dream               33.1          16.1               178        2900
+## 10 Adelie  Dream               32.1          15.5               188        3050
+## # … with 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
+```
+
+```r
+penguins[penguins$species == "Adelie" &amp; penguins$bill_length_mm &lt; 35, c("island", "sex", "year")]
+```
+
+```
+## # A tibble: 10 × 3
+##    island    sex     year
+##    &lt;fct&gt;     &lt;fct&gt;  &lt;int&gt;
+##  1 &lt;NA&gt;      &lt;NA&gt;      NA
+##  2 Torgersen &lt;NA&gt;    2007
+##  3 Torgersen male    2007
+##  4 Torgersen female  2007
+##  5 Biscoe    female  2008
+##  6 Torgersen female  2008
+##  7 Torgersen female  2008
+##  8 Dream     female  2008
+##  9 Dream     female  2008
+## 10 Dream     female  2009
+```
+
+replace data within a Tibble
+
+run this -&gt; what happens
+
+```r
+penguins[is.na(penguins$sex), "sex"] &lt;- "undefined"
+```
+
+```
+## Error:
+## ! Assigned data `"undefined"` must be compatible with existing data.
+## ℹ Error occurred for column `sex`.
+## ✖ Can't convert from &lt;character&gt; to &lt;factor&lt;8f119&gt;&gt; due to loss of generality.
+## • Locations: 1.
+```
+
+```r
+penguins[penguins$species == "Adelie",]
+```
+
+```
+## # A tibble: 152 × 8
+##    species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##    &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+##  1 Adelie  Torgersen           39.1          18.7               181        3750
+##  2 Adelie  Torgersen           39.5          17.4               186        3800
+##  3 Adelie  Torgersen           40.3          18                 195        3250
+##  4 Adelie  Torgersen           NA            NA                  NA          NA
+##  5 Adelie  Torgersen           36.7          19.3               193        3450
+##  6 Adelie  Torgersen           39.3          20.6               190        3650
+##  7 Adelie  Torgersen           38.9          17.8               181        3625
+##  8 Adelie  Torgersen           39.2          19.6               195        4675
+##  9 Adelie  Torgersen           34.1          18.1               193        3475
+## 10 Adelie  Torgersen           42            20.2               190        4250
+## # … with 142 more rows, and 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
+```
+---
+
+means averages etc... difference of weights in penguins what is the heaviest species etc...
 
 # Bullet Point Slide
 
@@ -317,7 +682,7 @@ Search for Values
 ## `geom_smooth()` using formula 'y ~ x'
 ```
 
-![](Intro_to_R_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+![](Intro_to_R_files/figure-html/unnamed-chunk-28-1.png)&lt;!-- --&gt;
 
 
 ]
