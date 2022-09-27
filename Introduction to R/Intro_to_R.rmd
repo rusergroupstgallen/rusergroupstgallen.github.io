@@ -60,7 +60,6 @@ library(rstudioapi)
 #setwd(dirname(getActiveDocumentContext()$path))
 
 ```
-
 # Introduction to R
 
 ## by
@@ -79,6 +78,11 @@ class: hide-logo, center, middle
 ```{r, echo=FALSE, out.width="50%"}
 knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 ```
+---
+
+## Welcome to our first Meeting
+
+- Picture, Presentation etc. 
 
 ---
 
@@ -95,37 +99,40 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 ### Content
 
-
-
 ---
 ## Why should you learn R? 
 
+### Excel can be extremely messy, especially when working with multiple data sheets
+
+```{r, echo = F, out.width= "110%"}
+knitr::include_graphics("GraphicsSlides/excel_mess.png")
+```
+---
 .scroll-output[
 ```{r, warning = F, message = F}
-
 
 trade_data <- read_csv("trade_data.csv", col_types = cols(`Period 1,2` = "d"))
 
 plot <- trade_data |>
   rename(Country = `Commercial partner`, Period = `Period 1,2`, Tariff = `Kind of rate`,
-         CHF_Value = `Value (CHF)`, Duties_CHF = `Amount of customs duties (CHF)`) |> 
-  select(Country, Period, Tariff, Duties_CHF, Product) |> 
+         CHF_Value = `Value (CHF)`, Duties_CHF = `Amount of customs duties (CHF)`) |>
+  select(Country, Period, Tariff, Duties_CHF, Product) |>
   mutate(
     Tariff = case_when(Tariff == "Total trade" ~ "Total_Trade",
                        Tariff == "10 - Normal rate" ~ "Normal_Rate",
                        Tariff == "20 - Reduced rate" ~ "Reduced_Rate",
                        Tariff == "30 - Exemption" ~ "Exemption",
-                       TRUE ~ "Other")) |> 
-  group_by(Country, Period, Tariff, Product) |> 
-  summarize(Duties_CHF = max(Duties_CHF)) |> 
-  pivot_wider(names_from = Tariff, values_from = Duties_CHF) |> 
-  ungroup() |> 
+                       TRUE ~ "Other")) |>
+  group_by(Country, Period, Tariff, Product) |>
+  summarize(Duties_CHF = max(Duties_CHF)) |>
+  pivot_wider(names_from = Tariff, values_from = Duties_CHF) |>
+  ungroup() |>
   replace_na(list(Normal_Rate = 0,
                   Total_Trade = 0,
                   Reduced_Rate = 0,
-                  Exemption = 0)) |> 
-  mutate(Util_Rate = (Exemption + Reduced_Rate) / Total_Trade) |> 
-  filter(Country == "India") |> 
+                  Exemption = 0)) |>
+  mutate(Util_Rate = (Exemption + Reduced_Rate) / Total_Trade) |>
+  filter(Country == "India") |>
   ggplot(aes(x = Period, y = Util_Rate, color = as_factor(Product)))+
   geom_point(size = 3)+
   geom_line(size = 0.8)+
@@ -135,7 +142,7 @@ plot <- trade_data |>
   theme_minimal()+
   labs(title = "Adjusted Utilization Rate 2000 - 2018")+
   theme(plot.title  = element_text(size = 22, hjust = 0.5, face = "bold"),
-        axis.title  = element_blank(), 
+        axis.title  = element_blank(),
         axis.text = element_text(size = 14),
         panel.grid.minor.x = element_blank(),
         panel.grid.major.x = element_blank(),
@@ -146,99 +153,110 @@ plot <- trade_data |>
 ]
 ---
 
-
-```{r, echo = F, message = F, dpi = 300, out.width = "90%", warning = F}
-plot
-```
-
+<div>
+<center>
+<iframe src="https://svenglinz.shinyapps.io/InteractivePlot/?showcase=0" width="900px" height="610px" frameBorder="0">
+</iframe>
+</center>
+</div>
 
 ---
-Basic Concepts - Strings, Vectors, Integers
+
+---
+
+### Basic Concepts - Data Types and Objects
 
 In our R environment, we can store all sorts of objects and data.
-
-The are various objects such as vectors, matrices, lists and data frames. 
+The are various objects such as *vectors*, *matrices*, *lists* and *tibbles*.
 
 All objects are of a certain type (for example Integer, Double, Character, Logical)
+and it is important to always make sure that your data is formatted as the right type.
 
-Example Integer: 
+.pull-left[
+```{r, echo = F, out.width= "90%"}
+  knitr::include_graphics("GraphicsSlides/wrong_data_type.png")
+```
+]
+.pull-right[
+Example Integers and Strings
 
-```{r}
-first_number <- 100
+```{r, error=TRUE}
+first_number <- "100"
 second_number <- 200
 first_number + second_number
-typeof(first_number)
+typeof(second_number)
 ```
+]
+
+---
+
+### Basic Concepts - Data Types and Objects
 
 Example Logical
 
+Logical Values can be represented by TRUE/FALSE as well as T/F
+--> When performing mathematical operations, TRUE = 1, and FALSE = 0
 ```{r}
 a <- TRUE
 c <- T
-b <- FALSE 
+b <- FALSE
 
-#True = 1, False = 0!!!
-a+b
-
-isTRUE(c)
+sum(a,b,c)
 ```
+---
 
-```{r, error = T}
-#other data types
-first_string <- "this is a string"
-second_string <- "this is another string"
+### Basic Concepts - Data Types and Objects
 
-first_string + second_string
-nchar(first_string)
+Vectors contain multiple numbers, strings, logical values etc. 
+However, they can only contain data of one type, so you cannot put a number and a string into the same vector!
+
+.pull-left[
+```{r, echo = F, out.width= "90%"}
+  knitr::include_graphics("GraphicsSlides/vectors.png")
 ```
+]
 
-```{r}
-typeof(first_string)
-typeof(first_number)
-```
-
+.pull-right[
 ```{r}
 first_vector <- c(1,2,3,4)
 second_vector <- c(5,6,7,8)
+third_vector <- c("hello", 100, "test", FALSE)
 
 first_vector + second_vector
+third_vector
 ```
+]
+
+---
+
+### Basic Concepts - Data Types and Objects
 
 Data Frames or Tibbles are a very important concept and will be used a lot when working with data!
 
-a Tibble is a two dimensional frame which is made of of diferent colums whereby each column is a distinct vector. 
-
+a Tibble is a two dimensional frame which is made of of different colums whereby each column is a distinct vector.
 
 ```{r}
 tibble_test <- tibble(x = first_vector, y = second_vector)
-print(a)
-plot(a)
+print(tibble_test)
 ```
 
 A list is like a vector but can contain different data types!
 
 ```{r}
 list_test <- list(vector = first_vector,
-                  tibble = tibble_test, 
-                  string = first_string, 
-                  number = first_number
-                  )
-
-list_test
-
-#how to subset tibbles etc.
+                  tibble = tibble_test,
+                  string = first_number,
+                  number = first_number)
 ```
-
 ---
 
-## Working with Tibbles 
+## Working with Tibbles
 
 
 .pull-left[
 
 ```{r, echo = F, out.width= "60%"}
 knitr::include_graphics("GraphicsSlides/palmerpenguins_package.png")
-
 ```
 ]
 
@@ -255,30 +273,30 @@ head(penguins, 5)
 
 ---
 
-Working with Tibbles 
+Working with Tibbles
 Simple Subsetting
 
-You can subset every tibble as follows: 
+You can subset every tibble as follows:
 
-- row and column: 
+- row and column:
 `tibble_name[row_index, column_index/name] `
-- row only 
+- row only
 tibble_name[row_index,]
-- column only 
+- column only
 `tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
 
 
-Lets get the second row and third Column of the penguins data 
+Lets get the second row and third Column of the penguins data
 
 ```{r}
 penguins[2,3]
 penguins[2, "bill_length_mm"]
 ```
 
-We can see, the result is again a tibble 
+We can see, the result is again a tibble
 
-The tibble consists of vectors 
-If we want to extract the vector 
+The tibble consists of vectors
+If we want to extract the vector
 penguins[2][[1]]
 
 
@@ -371,7 +389,7 @@ knitr::include_graphics("GraphicsSlides/flex tape.png")
 tibble(
   mean_g = c(mean(penguins[penguins$sex == "male",]$body_mass_g,
                   na.rm = T),
-             mean(penguins[penguins$sex == "female",]$body_mass_g, 
+             mean(penguins[penguins$sex == "female",]$body_mass_g,
                   na.rm = T)),
   sex = c("male",
           "female")
@@ -416,7 +434,7 @@ table(penguins$island)
 - Quick outlook on `tidyverse` alternative
 
 ```{r}
-penguins %>% 
+penguins %>%
   count(island) #<<
 ```
 
@@ -461,7 +479,7 @@ table(penguins[penguins$island == "Biscoe",]$species)
 - The answer is: No, convert to data frame first.
 
 ```{r}
-table(penguins[penguins$island == "Biscoe",]$species) %>% 
+table(penguins[penguins$island == "Biscoe",]$species) %>%
   as.data.frame() #<<
 ```
 
@@ -470,8 +488,8 @@ table(penguins[penguins$island == "Biscoe",]$species) %>%
 ### Step 4: Create a percentage column
 
 ```{r}
-freq_table <- 
-  table(penguins[penguins$island == "Biscoe",]$species) %>% 
+freq_table <-
+  table(penguins[penguins$island == "Biscoe",]$species) %>%
   as.data.frame()
 ```
 
@@ -492,9 +510,9 @@ freq_table
 - Not only faster to calculate percentages for one island...
 
 ```{r}
-penguins %>% 
-  filter(island == "Biscoe") %>% 
-  count(species) %>% 
+penguins %>%
+  filter(island == "Biscoe") %>%
+  count(species) %>%
   mutate(percentage = n/sum(n))
 ```
 
@@ -505,11 +523,11 @@ penguins %>%
 - ...but for all combinations as well.
 
 ```{r}
-penguins %>% 
-  group_by(island) %>% 
-  count(species) %>% 
+penguins %>%
+  group_by(island) %>%
+  count(species) %>%
   transmute(island, species,
-            percentage = n/sum(n)) %>% 
+            percentage = n/sum(n)) %>%
   pivot_wider(names_from = species, values_from = percentage)
 ```
 
@@ -592,7 +610,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
 ### Outlook on `Tidyverse`
 
 ```{r, out.width="90%", fig.height=3.5, dpi=300, warning=FALSE, message=FALSE}
-penguins %>% 
+penguins %>%
   ggplot(aes(x = bill_depth_mm, y = body_mass_g, colour = species)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = F, lty = 2)
@@ -606,7 +624,7 @@ penguins %>%
 - summary statistics by group "species"
 
 ```{r}
-lapply(penguins[, c("bill_length_mm", "bill_depth_mm")] %>% 
+lapply(penguins[, c("bill_length_mm", "bill_depth_mm")] %>%
          na.omit(),
        mean)
 ```

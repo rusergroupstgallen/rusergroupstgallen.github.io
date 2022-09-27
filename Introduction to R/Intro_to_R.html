@@ -34,7 +34,6 @@ overflow-y: scroll;
 
 
 
-
 # Introduction to R
 
 ## by
@@ -42,13 +41,18 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Authors/Presenters: Nina, Sven, Mathias
-##### Last updated: _2022-09-27 12:50:32_
+##### Last updated: _2022-09-27 14:58:49_
 
 ---
 
 class: hide-logo, center, middle
 
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
+---
+
+## Welcome to our first Meeting
+
+- Picture, Presentation etc. 
 
 ---
 
@@ -65,11 +69,13 @@ class: hide-logo, center, middle
 
 ### Content
 
-
-
 ---
 ## Why should you learn R? 
 
+### Excel can be extremely messy, especially when working with multiple data sheets
+
+&lt;img src="GraphicsSlides/excel_mess.png" width="110%" /&gt;
+---
 .scroll-output[
 
 ```r
@@ -77,24 +83,24 @@ trade_data &lt;- read_csv("trade_data.csv", col_types = cols(`Period 1,2` = "d")
 
 plot &lt;- trade_data |&gt;
   rename(Country = `Commercial partner`, Period = `Period 1,2`, Tariff = `Kind of rate`,
-         CHF_Value = `Value (CHF)`, Duties_CHF = `Amount of customs duties (CHF)`) |&gt; 
-  select(Country, Period, Tariff, Duties_CHF, Product) |&gt; 
+         CHF_Value = `Value (CHF)`, Duties_CHF = `Amount of customs duties (CHF)`) |&gt;
+  select(Country, Period, Tariff, Duties_CHF, Product) |&gt;
   mutate(
     Tariff = case_when(Tariff == "Total trade" ~ "Total_Trade",
                        Tariff == "10 - Normal rate" ~ "Normal_Rate",
                        Tariff == "20 - Reduced rate" ~ "Reduced_Rate",
                        Tariff == "30 - Exemption" ~ "Exemption",
-                       TRUE ~ "Other")) |&gt; 
-  group_by(Country, Period, Tariff, Product) |&gt; 
-  summarize(Duties_CHF = max(Duties_CHF)) |&gt; 
-  pivot_wider(names_from = Tariff, values_from = Duties_CHF) |&gt; 
-  ungroup() |&gt; 
+                       TRUE ~ "Other")) |&gt;
+  group_by(Country, Period, Tariff, Product) |&gt;
+  summarize(Duties_CHF = max(Duties_CHF)) |&gt;
+  pivot_wider(names_from = Tariff, values_from = Duties_CHF) |&gt;
+  ungroup() |&gt;
   replace_na(list(Normal_Rate = 0,
                   Total_Trade = 0,
                   Reduced_Rate = 0,
-                  Exemption = 0)) |&gt; 
-  mutate(Util_Rate = (Exemption + Reduced_Rate) / Total_Trade) |&gt; 
-  filter(Country == "India") |&gt; 
+                  Exemption = 0)) |&gt;
+  mutate(Util_Rate = (Exemption + Reduced_Rate) / Total_Trade) |&gt;
+  filter(Country == "India") |&gt;
   ggplot(aes(x = Period, y = Util_Rate, color = as_factor(Product)))+
   geom_point(size = 3)+
   geom_line(size = 0.8)+
@@ -104,7 +110,7 @@ plot &lt;- trade_data |&gt;
   theme_minimal()+
   labs(title = "Adjusted Utilization Rate 2000 - 2018")+
   theme(plot.title  = element_text(size = 22, hjust = 0.5, face = "bold"),
-        axis.title  = element_blank(), 
+        axis.title  = element_blank(),
         axis.text = element_text(size = 14),
         panel.grid.minor.x = element_blank(),
         panel.grid.major.x = element_blank(),
@@ -115,48 +121,49 @@ plot &lt;- trade_data |&gt;
 ]
 ---
 
-
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-6-1.png" width="90%" /&gt;
-
+&lt;div&gt;
+&lt;center&gt;
+&lt;iframe src="https://svenglinz.shinyapps.io/InteractivePlot/?showcase=0" width="900px" height="610px" frameBorder="0"&gt;
+&lt;/iframe&gt;
+&lt;/center&gt;
+&lt;/div&gt;
 
 ---
-Basic Concepts - Strings, Vectors, Integers
+
+---
+
+### Basic Concepts - Data Types and Objects
 
 In our R environment, we can store all sorts of objects and data.
+The are various objects such as *vectors*, *matrices*, *lists* and *tibbles*.
 
+All objects are of a certain type (for example Integer, Double, Character, Logical)
+and it is important to always make sure that your data is formatted as the right type.
+
+.pull-left[
+&lt;img src="GraphicsSlides/wrong_data_type.png" width="60%" /&gt;
+]
+
+.pull-right[
+Example Integers and Strings
 
 
 ```r
-first_number &lt;- 100
+first_number &lt;- "100"
 second_number &lt;- 200
 first_number + second_number
 ```
 
 ```
-## [1] 300
+## Error in first_number + second_number: non-numeric argument to binary operator
 ```
-
 
 ```r
-#other data types
-first_string &lt;- "this is a string"
-second_string &lt;- "this is another string"
-
-#first_string + second_string
-nchar(first_string)
+nchar(first_number)
 ```
 
 ```
-## [1] 16
-```
-
-
-```r
-typeof(first_string)
-```
-
-```
-## [1] "character"
+## [1] 3
 ```
 
 ```r
@@ -164,13 +171,55 @@ typeof(first_number)
 ```
 
 ```
-## [1] "double"
+## [1] "character"
 ```
 
+```r
+typeof(second_number)
+```
+
+```
+## [1] "double"
+```
+]
+
+---
+
+### Basic Concepts - Data Types and Objects
+
+Example Logical
+
+Logical Values can be represented by TRUE/FALSE as well as T/F
+--&gt; When performing mathematical operations, TRUE = 1, and FALSE = 0
+
+```r
+a &lt;- TRUE
+c &lt;- T
+b &lt;- FALSE
+
+sum(a,b,c)
+```
+
+```
+## [1] 2
+```
+---
+
+### Basic Concepts - Data Types and Objects
+
+Vectors contain multiple numbers, strings, logical values etc. 
+However, they can only contain data of one type, so you cannot put a number and a string into the same vector!
+
+.pull-left[
+&lt;img src="GraphicsSlides/vectors.png" width="60%" /&gt;
+]
+
+.pull-right[
 
 ```r
 first_vector &lt;- c(1,2,3,4)
 second_vector &lt;- c(5,6,7,8)
+third_vector &lt;- c("hello", 100, "test", FALSE)
 
 first_vector + second_vector
 ```
@@ -179,14 +228,54 @@ first_vector + second_vector
 ## [1]  6  8 10 12
 ```
 
+```r
+third_vector
+```
+
+```
+## [1] "hello" "100"   "test"  "FALSE"
+```
+]
+
 Data Frames or Tibbles are a very important concept and will be used a lot when working with data!
 
+a Tibble is a two dimensional frame which is made of of diferent colums whereby each column is a distinct vector.
+
+
+
 ```r
-a &lt;- tibble(x = first_vector, y = second_vector)
+tibble_test &lt;- tibble(x = first_vector, y = second_vector)
 print(a)
 ```
 
 ```
+## [1] TRUE
+```
+
+```r
+plot(a)
+```
+
+![](Intro_to_R_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+A list is like a vector but can contain different data types!
+
+
+```r
+list_test &lt;- list(vector = first_vector,
+                  tibble = tibble_test,
+                  string = first_number,
+                  number = first_number
+                  )
+
+list_test
+```
+
+```
+## $vector
+## [1] 1 2 3 4
+## 
+## $tibble
 ## # A tibble: 4 × 2
 ##       x     y
 ##   &lt;dbl&gt; &lt;dbl&gt;
@@ -194,17 +283,21 @@ print(a)
 ## 2     2     6
 ## 3     3     7
 ## 4     4     8
+## 
+## $string
+## [1] "100"
+## 
+## $number
+## [1] "100"
 ```
 
 ```r
-plot(a)
+#how to subset tibbles etc.
 ```
-
-![](Intro_to_R_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 
 ---
 
-## Working with Tibbles 
+## Working with Tibbles
 
 
 .pull-left[
@@ -239,20 +332,20 @@ head(penguins, 5)
 
 ---
 
-Working with Tibbles 
+Working with Tibbles
 Simple Subsetting
 
-You can subset every tibble as follows: 
+You can subset every tibble as follows:
 
-- row and column: 
+- row and column:
 `tibble_name[row_index, column_index/name] `
-- row only 
+- row only
 tibble_name[row_index,]
-- column only 
+- column only
 `tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
 
 
-Lets get the second row and third Column of the penguins data 
+Lets get the second row and third Column of the penguins data
 
 
 ```r
@@ -277,10 +370,10 @@ penguins[2, "bill_length_mm"]
 ## 1           39.5
 ```
 
-We can see, the result is again a tibble 
+We can see, the result is again a tibble
 
-The tibble consists of vectors 
-If we want to extract the vector 
+The tibble consists of vectors
+If we want to extract the vector
 penguins[2][[1]]
 
 
@@ -441,7 +534,7 @@ mean(penguins[penguins$sex == "male",]$body_mass_g,
 tibble(
   mean_g = c(mean(penguins[penguins$sex == "male",]$body_mass_g,
                   na.rm = T),
-             mean(penguins[penguins$sex == "female",]$body_mass_g, 
+             mean(penguins[penguins$sex == "female",]$body_mass_g,
                   na.rm = T)),
   sex = c("male",
           "female")
@@ -571,7 +664,7 @@ table(penguins$island)
 
 
 ```r
-penguins %&gt;% 
+penguins %&gt;%
 * count(island)
 ```
 
@@ -687,7 +780,7 @@ table(penguins[penguins$island == "Biscoe",]$species)
 
 
 ```r
-table(penguins[penguins$island == "Biscoe",]$species) %&gt;% 
+table(penguins[penguins$island == "Biscoe",]$species) %&gt;%
 * as.data.frame()
 ```
 
@@ -704,8 +797,8 @@ table(penguins[penguins$island == "Biscoe",]$species) %&gt;%
 
 
 ```r
-freq_table &lt;- 
-  table(penguins[penguins$island == "Biscoe",]$species) %&gt;% 
+freq_table &lt;-
+  table(penguins[penguins$island == "Biscoe",]$species) %&gt;%
   as.data.frame()
 ```
 
@@ -735,9 +828,9 @@ freq_table
 
 
 ```r
-penguins %&gt;% 
-  filter(island == "Biscoe") %&gt;% 
-  count(species) %&gt;% 
+penguins %&gt;%
+  filter(island == "Biscoe") %&gt;%
+  count(species) %&gt;%
   mutate(percentage = n/sum(n))
 ```
 
@@ -757,11 +850,11 @@ penguins %&gt;%
 
 
 ```r
-penguins %&gt;% 
-  group_by(island) %&gt;% 
-  count(species) %&gt;% 
+penguins %&gt;%
+  group_by(island) %&gt;%
+  count(species) %&gt;%
   transmute(island, species,
-            percentage = n/sum(n)) %&gt;% 
+            percentage = n/sum(n)) %&gt;%
   pivot_wider(names_from = species, values_from = percentage)
 ```
 
@@ -823,7 +916,7 @@ penguins[, c("body_mass_g", "bill_length_mm")]
 plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-42-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-44-1.png" width="75%" /&gt;
 
 ---
 
@@ -836,7 +929,7 @@ plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 *      col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-43-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-45-1.png" width="75%" /&gt;
 
 
 ---
@@ -854,7 +947,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-44-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-46-1.png" width="75%" /&gt;
 
 ---
 
@@ -867,7 +960,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-45-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-47-1.png" width="75%" /&gt;
 
 ---
 
@@ -875,13 +968,13 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
 
 
 ```r
-penguins %&gt;% 
+penguins %&gt;%
   ggplot(aes(x = bill_depth_mm, y = body_mass_g, colour = species)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = F, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-46-1.png" width="90%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-48-1.png" width="90%" /&gt;
 
 ---
 
@@ -892,7 +985,7 @@ penguins %&gt;%
 
 
 ```r
-lapply(penguins[, c("bill_length_mm", "bill_depth_mm")] %&gt;% 
+lapply(penguins[, c("bill_length_mm", "bill_depth_mm")] %&gt;%
          na.omit(),
        mean)
 ```
@@ -1097,6 +1190,8 @@ penguins[penguins$species == "Adelie" &amp; penguins$bill_length_mm &lt; 35, c("
 
 replace data within a Tibble
 
+-&gt; Merge data frames
+
 run this -&gt; what happens
 
 ```r
@@ -1134,32 +1229,6 @@ penguins[penguins$species == "Adelie",]
 ---
 
 means averages etc... difference of weights in penguins what is the heaviest species etc...
-
-# Bullet Point Slide
-
-.pull-left[
-
-- these
-
-- are
-
-- bullet
-
-- points
-
-]
-
-.pull-right[
-
-
-```
-## `geom_smooth()` using formula 'y ~ x'
-```
-
-![](Intro_to_R_files/figure-html/unnamed-chunk-51-1.png)&lt;!-- --&gt;
-
-
-]
 
 ---
 
