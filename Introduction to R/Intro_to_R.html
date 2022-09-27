@@ -42,7 +42,7 @@ pre {
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Nina &amp; Sven
-##### Last updated: _2022-09-27 00:22:27_
+##### Last updated: _2022-09-27 10:29:45_
 
 ---
 
@@ -72,11 +72,10 @@ class: hide-logo, center, middle
 ---
 ## Why should you learn R? 
 
+
 .scroll-output[
 
 ```r
-#setwd("./Introduction to R")
-
 trade_data &lt;- read_csv("trade_data.csv", col_types = cols(`Period 1,2` = "d"))
 
 plot &lt;- trade_data |&gt;
@@ -103,7 +102,7 @@ plot &lt;- trade_data |&gt;
   geom_point(size = 3)+
   geom_line(size = 0.8)+
   scale_y_continuous(breaks = seq(0,1.2, by = 0.2), labels = percent_format())+
-  scale_x_continuous(breaks = seq(2000,2018, by = 1))+
+  scale_x_continuous(breaks = seq(2000,2018, by = 2))+
   expand_limits(y = c(0, 1))+
   theme_minimal()+
   labs(title = "Adjusted Utilization Rate 2000 - 2018")+
@@ -119,12 +118,15 @@ plot &lt;- trade_data |&gt;
 ]
 ---
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-6-1.png" width="100%" /&gt;
+
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-6-1.png" width="90%" /&gt;
+
 
 ---
 Basic Concepts - Strings, Vectors, Integers
 
 In our R environment, we can store all sorts of objects and data.
+
 
 
 ```r
@@ -203,7 +205,95 @@ plot(a)
 
 ![](Intro_to_R_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 
-install.packages("palmerpenguins")
+---
+
+## Working with Tibbles 
+
+
+.pull-left[
+
+&lt;img src="GraphicsSlides/palmerpenguins_package.png" width="60%" /&gt;
+]
+
+.pull-right[
+
+```r
+#install.packages("palmerpenguins")
+penguins &lt;- palmerpenguins::penguins
+```
+]
+
+
+```r
+head(penguins, 5)
+```
+
+```
+## # A tibble: 5 × 8
+##   species island bill_length_mm bill_depth_mm flipper_length_… body_mass_g sex  
+##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt; &lt;fct&gt;
+## 1 Adelie  Torge…           39.1          18.7              181        3750 male 
+## 2 Adelie  Torge…           39.5          17.4              186        3800 fema…
+## 3 Adelie  Torge…           40.3          18                195        3250 fema…
+## 4 Adelie  Torge…           NA            NA                 NA          NA &lt;NA&gt; 
+## 5 Adelie  Torge…           36.7          19.3              193        3450 fema…
+## # … with 1 more variable: year &lt;int&gt;
+```
+
+---
+
+Working with Tibbles 
+Simple Subsetting
+
+You can subset every tibble as follows: 
+
+- row and column: 
+  tibble_name[row_index, column_index/name] 
+- row only 
+  tibble_name[row_index,]
+- column only 
+  tibble_name[column_index/name] OR tibble_name[,column_index/name]
+  
+  
+Lets get the second row and third Column of the penguins data 
+
+
+```r
+penguins[2,3]
+```
+
+```
+## # A tibble: 1 × 1
+##   bill_length_mm
+##            &lt;dbl&gt;
+## 1           39.5
+```
+
+```r
+penguins[2, "bill_length_mm"]
+```
+
+```
+## # A tibble: 1 × 1
+##   bill_length_mm
+##            &lt;dbl&gt;
+## 1           39.5
+```
+
+We can see, the result is again a tibble 
+
+The tibble consists of vectors 
+If we want to extract the vector 
+penguins[2][[1]]
+
+---
+
+Working with Tibbles 
+Search for Values 
+
+
+
+
 ---
 
 # Bullet Point Slide
@@ -227,7 +317,7 @@ install.packages("palmerpenguins")
 ## `geom_smooth()` using formula 'y ~ x'
 ```
 
-![](Intro_to_R_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+![](Intro_to_R_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
 
 
 ]

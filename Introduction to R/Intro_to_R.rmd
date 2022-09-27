@@ -49,9 +49,16 @@ xaringanExtra::use_panelset()
 options(htmltools.dir.version = FALSE)
 
 # Load packages for entire presentation here
+
+#Set Working Directory to subfolder of Website
+
 library(tidyverse)
 library(lubridate)
 library(scales)
+library(rstudioapi)
+
+#setwd(dirname(getActiveDocumentContext()$path))
+
 ```
 
 # Introduction to R
@@ -97,7 +104,7 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 .scroll-output[
 ```{r, warning = F, message = F}
-#setwd("./Introduction to R")
+
 
 trade_data <- read_csv("trade_data.csv", col_types = cols(`Period 1,2` = "d"))
 
@@ -125,7 +132,7 @@ plot <- trade_data |>
   geom_point(size = 3)+
   geom_line(size = 0.8)+
   scale_y_continuous(breaks = seq(0,1.2, by = 0.2), labels = percent_format())+
-  scale_x_continuous(breaks = seq(2000,2018, by = 1))+
+  scale_x_continuous(breaks = seq(2000,2018, by = 2))+
   expand_limits(y = c(0, 1))+
   theme_minimal()+
   labs(title = "Adjusted Utilization Rate 2000 - 2018")+
@@ -141,14 +148,17 @@ plot <- trade_data |>
 ]
 ---
 
-```{r, echo = F, message = F, dpi = 300, out.width = "100%", warning = F}
+
+```{r, echo = F, message = F, dpi = 300, out.width = "90%", warning = F}
 plot
 ```
+
 
 ---
 Basic Concepts - Strings, Vectors, Integers
 
 In our R environment, we can store all sorts of objects and data.
+
 
 ```{r}
 first_number <- 100
@@ -184,8 +194,113 @@ print(a)
 plot(a)
 ```
 
-install.packages("palmerpenguins")
 ---
+
+## Working with Tibbles 
+
+
+.pull-left[
+
+```{r, echo = F, out.width= "60%"}
+knitr::include_graphics("GraphicsSlides/palmerpenguins_package.png")
+```
+]
+
+.pull-right[
+```{r}
+#install.packages("palmerpenguins")
+penguins <- palmerpenguins::penguins
+```
+]
+
+```{r}
+head(penguins, 5)
+```
+
+---
+
+Working with Tibbles 
+Simple Subsetting
+
+You can subset every tibble as follows: 
+
+- row and column: 
+  tibble_name[row_index, column_index/name] 
+- row only 
+  tibble_name[row_index,]
+- column only 
+  tibble_name[column_index/name] OR tibble_name[,column_index/name]
+  
+  
+Lets get the second row and third Column of the penguins data 
+
+```{r}
+penguins[2,3]
+penguins[2, "bill_length_mm"]
+```
+
+We can see, the result is again a tibble 
+
+The tibble consists of vectors 
+If we want to extract the vector 
+penguins[2][[1]]
+
+---
+
+difference male vs female penguins
+male vs female body mass, bill length etc.
+```{r}
+
+#generate summary table
+glimpse(penguins)
+
+#solution
+weight_male <- mean(penguins[penguins$sex == "male", "body_mass_g"][[1]], na.rm = T)
+weight_female <- mean(penguins[penguins$sex == "female", "body_mass_g"][[1]], na.rm = T)
+
+body_mass <- c(weight_male, weight_female)
+gender <- c("male", "female")
+
+comparison <- tibble(gender = gender, body_mass = body_mass)
+
+#next lecture! --> Tidyverse 
+penguins |> filter(sex == "male") |> summarize(mean = mean(body_mass_g, na.rm = T))
+penguins |> group_by(sex) |> summarize(weight = mean(body_mass_g, na.rm = T),
+                                       bill_length = mean(bill_length_mm, na.rm = T))
+
+penguins |> 
+  drop_na() |> 
+  group_by(sex) |> 
+  summarize(across(where(is.numeric),
+                   mean))
+
+penguins |> 
+  select(where(is.numeric))
+```
+
+Working with Tibbles 
+Search for Values 
+
+Logical Operations
+
+```{r}
+table(penguins$species == "Adelie")
+penguins$bill_length_mm < 35
+
+penguins[penguins$species == "Adelie" & penguins$bill_length_mm < 35, ]
+penguins[penguins$species == "Adelie" & penguins$bill_length_mm < 35, c("island", "sex", "year")]
+```
+
+replace data within a Tibble
+
+run this -> what happens
+```{r}
+penguins[is.na(penguins$sex), "sex"] <- "undefined"
+penguins[penguins$species == "Adelie",]
+```
+---
+
+means averages etc... difference of weights in penguins what is the heaviest species etc...
 
 # Bullet Point Slide
 
