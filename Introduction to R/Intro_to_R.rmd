@@ -399,7 +399,7 @@ If we look for a specific value within our data set (column, row or both), we ca
 - `>`, `<`, `<=`, `>=` are used to **compare numerical values**
 
 ```{r, eval=FALSE}
-penguins[penguins$sex == "male" & penguins$island == "Biscoe",] #<<
+penguins[penguins$sex == "male" & penguins$island == "Biscoe",]
 ```
 
 ```{r, echo=FALSE}
