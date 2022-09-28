@@ -41,8 +41,8 @@ overflow-y: scroll;
 
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
-##### Authors/Presenters: Nina, Sven, Mathias
-##### Last updated: _2022-09-28 17:47:16_
+##### Authors/Presenters: Sven, Mathias
+##### Last updated: _2022-09-28 18:40:02_
 
 ---
 
@@ -964,6 +964,27 @@ penguins %&gt;%
 
 - Eventually: Calculate a percentage for each species on island Biscoe
 
+
+```r
+glimpse(penguins)
+```
+
+```
+## Rows: 344
+## Columns: 8
+## $ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Adelie, Adel…
+## $ island            &lt;fct&gt; Torgersen, Torgersen, Torgersen, Torgersen, Torgerse…
+## $ bill_length_mm    &lt;dbl&gt; 39.1, 39.5, 40.3, NA, 36.7, 39.3, 38.9, 39.2, 34.1, …
+## $ bill_depth_mm     &lt;dbl&gt; 18.7, 17.4, 18.0, NA, 19.3, 20.6, 17.8, 19.6, 18.1, …
+## $ flipper_length_mm &lt;int&gt; 181, 186, 195, NA, 193, 190, 181, 195, 193, 190, 186…
+## $ body_mass_g       &lt;int&gt; 3750, 3800, 3250, NA, 3450, 3650, 3625, 4675, 3475, …
+## $ sex               &lt;fct&gt; male, female, female, NA, female, male, female, male…
+## $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007…
+```
+
+
+---
+
 ### Step 1: Subset for island
 
 
@@ -1022,6 +1043,7 @@ penguins[penguins$island == "Biscoe",]$species
 
 ### Step 3: Ol' reliable `table()`
 
+.scroll-output[
 
 ```r
 table(penguins[penguins$island == "Biscoe",]$species)
@@ -1037,7 +1059,7 @@ table(penguins[penguins$island == "Biscoe",]$species)
 
 - The answer is: No, convert to data frame first.
 
---&gt; A data frame is similar to a tibble, however, sometimes the arguments the functions 
+--&gt; A data frame is similar to a tibble, however, sometimes the functions 
 need to coerce an element of class "table" are different. 
 
 
@@ -1052,6 +1074,8 @@ my_table &lt;- table(penguins[penguins$island == "Biscoe",]$species)
 ## 2 Chinstrap    0
 ## 3    Gentoo  124
 ```
+]
+
 ---
 
 ### Step 4: Create a percentage column
@@ -1090,6 +1114,10 @@ Alternatively, with `as_tibble()`
 ```r
 as_tibble(my_table, .name_repair = "unique")
 ```
+
+---
+
+### Why did we use a Data Frame? - What about Tibbles?
 
 If you are interested, run the following commands!
 
@@ -1229,7 +1257,7 @@ penguins[, c("body_mass_g", "bill_length_mm")]
 plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-71-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-72-1.png" width="75%" /&gt;
 
 ---
 
@@ -1242,7 +1270,7 @@ plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 *      col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-72-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-73-1.png" width="75%" /&gt;
 
 
 ---
@@ -1260,7 +1288,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-73-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-74-1.png" width="75%" /&gt;
 
 ---
 
@@ -1273,7 +1301,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-74-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-75-1.png" width="75%" /&gt;
 
 ---
 
@@ -1287,12 +1315,12 @@ penguins %&gt;%
   geom_smooth(method = "lm", se = F, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-75-1.png" width="90%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-76-1.png" width="90%" /&gt;
 ---
 
 # That's it for today!
 
-**Some finishing words**
+This was an introduction to R. For more (machine learning, data visualisation, intro to packages, writing your thesis in RMarkdown, etc.), join our upcoming session.
 
 For further questions, feel free to reach out to us. Make sure to stay updated on our socials and via our website where all resources and dates are also published.
 

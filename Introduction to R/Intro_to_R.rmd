@@ -69,7 +69,7 @@ library(rstudioapi)
 knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 ```
 
-##### Authors/Presenters: Nina, Sven, Mathias
+##### Authors/Presenters: Sven, Mathias
 ##### Last updated: _`r Sys.time()`_
 
 ---
@@ -779,6 +779,10 @@ Alternatively, with `as_tibble()`
 as_tibble(my_table, .name_repair = "unique")
 ```
 
+---
+
+### Why did we use a Data Frame? - What about Tibbles?
+
 If you are interested, run the following commands!
 
 .pull-left[
@@ -915,7 +919,7 @@ penguins %>%
 
 # That's it for today!
 
-**Some finishing words**
+This was an introduction to R. For more (machine learning, data visualisation, intro to packages, writing your thesis in RMarkdown, etc.), join our upcoming session.
 
 For further questions, feel free to reach out to us. Make sure to stay updated on our socials and via our website where all resources and dates are also published.
 
