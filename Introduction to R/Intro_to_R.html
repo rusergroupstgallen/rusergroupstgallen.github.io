@@ -42,7 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Authors/Presenters: Nina, Sven, Mathias
-##### Last updated: _2022-09-28 15:42:00_
+##### Last updated: _2022-09-28 15:56:22_
 
 ---
 
@@ -141,6 +141,10 @@ out_plot &lt;- trade_data |&gt;
 ---
 
 .center[
+
+&lt;br&gt;
+&lt;br&gt;
+
 &lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-9-1.png" width="100%" /&gt;
 ]
 ---
@@ -148,13 +152,7 @@ out_plot &lt;- trade_data |&gt;
 ### Why should you learn R? 
 
 .pull-left[
-
-```
-## function (x, y, ...) 
-## UseMethod("plot")
-## &lt;bytecode: 0x000001aca9c84f88&gt;
-## &lt;environment: namespace:base&gt;
-```
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-10-1.png" width="100%" /&gt;
 ]
 
 .pull-right[
@@ -652,6 +650,37 @@ mean(penguins[penguins$sex == "male",]$body_mass_g,
 
 ---
 
+&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+=======
+&lt;img src="GraphicsSlides/wait_a_minute.png" width="40%" /&gt;
+
+How do we know what arguments a function such as `mean()` can take?
+
+
+```r
+args(mean.default)
+```
+
+```
+## function (x, trim = 0, na.rm = FALSE, ...) 
+## NULL
+```
+
+or just check out the R documentation 
+https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/mean
+
+or the easier way:
+
+```r
+?mean()
+```
+
+```
+## starting httpd help server ... done
+```
+
+---
+
 ### Step 4: Compare male and female penguins
 
 
@@ -691,7 +720,6 @@ args(mean.default)
 ## NULL
 ```
 
-or check out the 
 [**R-Documentation**](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/mean)
 
 or the easier way:
@@ -1132,7 +1160,7 @@ penguins[, c("body_mass_g", "bill_length_mm")]
 plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-65-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-68-1.png" width="75%" /&gt;
 
 ---
 
@@ -1145,7 +1173,7 @@ plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 *      col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-66-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-69-1.png" width="75%" /&gt;
 
 
 ---
@@ -1163,7 +1191,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-67-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-70-1.png" width="75%" /&gt;
 
 ---
 
@@ -1176,7 +1204,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-68-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-71-1.png" width="75%" /&gt;
 
 ---
 
@@ -1190,7 +1218,7 @@ penguins %&gt;%
   geom_smooth(method = "lm", se = F, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-69-1.png" width="90%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-72-1.png" width="90%" /&gt;
 ---
 
 # That's it for today!

@@ -132,7 +132,7 @@ knitr::include_graphics("GraphicsSlides/excel_data.png")
 ### Why should you learn R? 
 
 .scroll-output[
-```{r, warning = F, message = F}
+```{r, warning = F, message = F, dpi = 300}
 trade_data <- read_csv("DataSets/trade_data.csv", col_types = cols(`Period 1,2` = "d"))
 
 out_plot <- trade_data |>
@@ -176,7 +176,11 @@ out_plot <- trade_data |>
 ---
 
 .center[
-```{r, warning=FALSE, echo = F, out.width="100%"}
+
+<br>
+<br>
+
+```{r, warning=FALSE, echo = F, out.width="100%", dpi=300, fig.height=4.5}
 out_plot
 ```
 ]
@@ -186,7 +190,7 @@ out_plot
 
 .pull-left[
 ```{r, out.width="100%", fig.height=9, echo=FALSE, message=FALSE, warning=FALSE, dpi=300}
-plot
+out_plot
 ```
 ]
 
@@ -232,7 +236,6 @@ and it is important to always make sure that your data is formatted as the right
 .pull-left[
 .center[
 ```{r, echo = F, out.width= "65%"}
-#>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
   knitr::include_graphics("GraphicsSlides/wrong_data_type.png")
 ```
 ]
@@ -334,7 +337,6 @@ list_test
 
 
 ```{r, echo = F, out.width= "50%"}
-#>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 knitr::include_graphics("GraphicsSlides/palmerpenguins_package.png")
 ```
 ]
@@ -681,6 +683,27 @@ as.data.frame(my_table) #<<
 ```
 ---
 
+### Step 4: Create a percentage column
+
+```{r}
+freq_table <-
+  table(penguins[penguins$island == "Biscoe",]$species)
+freq_table <- as.data.frame(freq_table)
+
+```
+
+- Create a new column to the right dividing the observation by the sum of `Freq`
+
+--
+
+```{r}
+freq_table$percentage <- freq_table[,"Freq"]/sum(freq_table$Freq)
+
+freq_table
+```
+---
+---
+
 ### What about Tibbles?
 
 Alternatively, with `as_tibble()`
@@ -705,27 +728,6 @@ methods(as.data.frame)[29:32]
 ```
 [**Class Tibble Documentation**](https://tibble.tidyverse.org/reference/as_tibble.html)
 ]
----
-
-### Step 4: Create a percentage column
-
-```{r}
-freq_table <-
-  table(penguins[penguins$island == "Biscoe",]$species)
-freq_table <- as.data.frame(freq_table)
-
-```
-
-- Create a new column to the right dividing the observation by the sum of `Freq`
-
---
-
-```{r}
-freq_table$percentage <- freq_table[,"Freq"]/sum(freq_table$Freq)
-
-freq_table
-```
-
 ---
 
 ### Outlook on `Tidyverse`: Join us in one of the next sessions
