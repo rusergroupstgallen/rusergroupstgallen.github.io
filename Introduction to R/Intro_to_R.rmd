@@ -57,7 +57,7 @@ library(lubridate)
 library(scales)
 library(rstudioapi)
 
-#setwd(dirname(getActiveDocumentContext()$path))
+setwd(dirname(getActiveDocumentContext()$path))
 
 ```
 
@@ -74,17 +74,15 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 ---
 
-<<<<<<< HEAD
 class: hide-logo, center, middle
 
 ```{r, echo=FALSE, out.width="50%"}
 knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 ```
-=======
+
 ### Welcome to our first Meeting
 
 - Picture, Presentation etc. 
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 ---
 
@@ -115,18 +113,12 @@ knitr::include_graphics("GraphicsSlides/excel_mess.png")
 ```
 
 ---
-<<<<<<< HEAD
-.center[
-```{r, echo = F, out.width= "90%"}
-=======
 
 ### Why should you learn R? 
 
-- **TBD:  description of the below?**
-
 .pull-left[
+  
 ```{r, echo = F, out.width= "100%"}
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 knitr::include_graphics("GraphicsSlides/plot_paper.png")
 ```
 ]
@@ -184,13 +176,13 @@ out_plot <- trade_data |>
 ]
 ---
 
-<<<<<<< HEAD
-```{r, warning=FALSE, echo = F}
+.center[
+```{r, warning=FALSE, echo = F, out.width="100%"}
 out_plot
 ```
+]
 ---
 
-=======
 ### Why should you learn R? 
 
 .pull-left[
@@ -218,7 +210,6 @@ knitr::include_graphics("GraphicsSlides/strong v weak.png")
 
 ### Shiny Apps: Host your work online for external users
 
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 <div>
 <center>
 <iframe src="https://svenglinz.shinyapps.io/InteractivePlot/?showcase=0" width="900px" height="610px" frameBorder="0">
@@ -228,13 +219,11 @@ knitr::include_graphics("GraphicsSlides/strong v weak.png")
 
 **TBD: Error in der Shiny app**
 
-<<<<<<< HEAD
 ### Basic Concepts - Data Types and Objects
 =======
 ---
 
 ### Just shortly: Data Types and Objects
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 In our R environment, we can store all sorts of objects and data.
 The are various objects such as *vectors*, *matrices*, *lists* and *tibbles*.
@@ -243,12 +232,9 @@ All objects are of a certain type (for example Integer, Double, Character, Logic
 and it is important to always make sure that your data is formatted as the right type.
 
 .pull-left[
-<<<<<<< HEAD
-```{r, echo = F, out.width= "75%"}
-=======
 .center[
 ```{r, echo = F, out.width= "65%"}
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
+#>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
   knitr::include_graphics("GraphicsSlides/wrong_data_type.png")
 ```
 ]
@@ -268,16 +254,14 @@ first_number + second_number
 
 ### Data Types and Objects
 
-<<<<<<< HEAD
 Logical Values can be represented by TRUE/FALSE as well as T/F
 --> When performing mathematical operations, TRUE = 1, and FALSE = 0
-=======
+
 - Logical Values can be represented by:
   - TRUE/FALSE (alternatively: T/F)
 
 - When performing mathematical operations, TRUE = 1, and FALSE = 0:
 
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 ```{r}
 a <- TRUE
 b <- T
@@ -350,11 +334,9 @@ list_test
 
 .pull-left[
 
-<<<<<<< HEAD
-```{r, echo = F, out.width= "70%"}
-=======
+
 ```{r, echo = F, out.width= "50%"}
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
+#>>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 knitr::include_graphics("GraphicsSlides/palmerpenguins_package.png")
 ```
 ]
@@ -533,6 +515,26 @@ knitr::include_graphics("GraphicsSlides/flex tape.png")
 
 ---
 
+```{r, echo=FALSE, out.width="70%"}
+knitr::include_graphics("GraphicsSlides/wait_a_minute.png")
+```
+
+How do we know what arguments a function such as `mean()` can take?
+
+```{r}
+args(mean.default)
+```
+
+or just check out the R documentation 
+https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/mean
+
+or the easier way:
+```{r}
+?mean()
+```
+
+---
+
 ### Step 4: Compare male and female penguins
 
 ```{r}
@@ -554,7 +556,6 @@ tibble(
 
 ```{r}
 library(dplyr)
-
 glimpse(penguins)
 ```
 
@@ -622,19 +623,38 @@ table(penguins[penguins$island == "Biscoe",]$species)
 
 - The answer is: No, convert to data frame first.
 
+--> A data frame is similar to a tibble, however, sometimes the arguments the functions 
+need to coerce an element of class "table" are different. Here, `as.data.frame()` is clearly easier :)
+
 ```{r}
-table(penguins[penguins$island == "Biscoe",]$species) |> 
-  as.data.frame() #<<
+my_table <- table(penguins[penguins$island == "Biscoe",]$species)
+
+as.data.frame(my_table) #<<
 ```
 
+### What about Tibbles?
+---
+
+Alternatively, with `as_tibble()`
+
+```{r, eval = FALSE}
+as_tibble(my_table, .name_repair = "unique")
+```
+
+If you are interested, run the following commands!
+
+>class(my_table)
+>methods(as_tibble)
+>methods(as.data.frame)
+>https://tibble.tidyverse.org/reference/as_tibble.html
 ---
 
 ### Step 4: Create a percentage column
 
 ```{r}
 freq_table <-
-  table(penguins[penguins$island == "Biscoe",]$species) %>%
-  as.data.frame()
+  table(penguins[penguins$island == "Biscoe",]$species)
+freq_table <- as.data.frame(freq_table)
 
 ```
 

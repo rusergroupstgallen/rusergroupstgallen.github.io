@@ -42,23 +42,17 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Authors/Presenters: Nina, Sven, Mathias
-<<<<<<< HEAD
-##### Last updated: _2022-09-27 19:41:27_
+##### Last updated: _2022-09-28 12:07:54_
 
 ---
 
 class: hide-logo, center, middle
 
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
-=======
-##### Last updated: _2022-09-27 19:45:03_
-
----
 
 ### Welcome to our first Meeting
 
 - Picture, Presentation etc. 
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 ---
 
@@ -87,18 +81,12 @@ class: hide-logo, center, middle
 &lt;img src="GraphicsSlides/excel_mess.png" width="110%" /&gt;
 
 ---
-<<<<<<< HEAD
-.center[
-&lt;img src="GraphicsSlides/plot_paper.png" width="90%" /&gt;
-=======
 
 ### Why should you learn R? 
 
-- **TBD:  description of the below?**
-
 .pull-left[
+  
 &lt;img src="GraphicsSlides/plot_paper.png" width="100%" /&gt;
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 ]
 
 .center[
@@ -153,15 +141,21 @@ out_plot &lt;- trade_data |&gt;
 ]
 ---
 
-<<<<<<< HEAD
-![](Intro_to_R_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+.center[
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-9-1.png" width="100%" /&gt;
+]
 ---
 
-=======
 ### Why should you learn R? 
 
 .pull-left[
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-8-1.png" width="100%" /&gt;
+
+```
+## function (x, y, ...) 
+## UseMethod("plot")
+## &lt;bytecode: 0x000002b413b63488&gt;
+## &lt;environment: namespace:base&gt;
+```
 ]
 
 .pull-right[
@@ -181,7 +175,6 @@ out_plot &lt;- trade_data |&gt;
 
 ### Shiny Apps: Host your work online for external users
 
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 &lt;div&gt;
 &lt;center&gt;
 &lt;iframe src="https://svenglinz.shinyapps.io/InteractivePlot/?showcase=0" width="900px" height="610px" frameBorder="0"&gt;
@@ -191,13 +184,11 @@ out_plot &lt;- trade_data |&gt;
 
 **TBD: Error in der Shiny app**
 
-<<<<<<< HEAD
 ### Basic Concepts - Data Types and Objects
 =======
 ---
 
 ### Just shortly: Data Types and Objects
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 In our R environment, we can store all sorts of objects and data.
 The are various objects such as *vectors*, *matrices*, *lists* and *tibbles*.
@@ -206,12 +197,8 @@ All objects are of a certain type (for example Integer, Double, Character, Logic
 and it is important to always make sure that your data is formatted as the right type.
 
 .pull-left[
-<<<<<<< HEAD
-&lt;img src="GraphicsSlides/wrong_data_type.png" width="75%" /&gt;
-=======
 .center[
 &lt;img src="GraphicsSlides/wrong_data_type.png" width="65%" /&gt;
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 ]
 ]
 
@@ -234,16 +221,14 @@ first_number + second_number
 
 ### Data Types and Objects
 
-<<<<<<< HEAD
 Logical Values can be represented by TRUE/FALSE as well as T/F
 --&gt; When performing mathematical operations, TRUE = 1, and FALSE = 0
-=======
+
 - Logical Values can be represented by:
   - TRUE/FALSE (alternatively: T/F)
 
 - When performing mathematical operations, TRUE = 1, and FALSE = 0:
 
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 
 ```r
 a &lt;- TRUE
@@ -363,11 +348,8 @@ list_test
 
 .pull-left[
 
-<<<<<<< HEAD
-&lt;img src="GraphicsSlides/palmerpenguins_package.png" width="70%" /&gt;
-=======
+
 &lt;img src="GraphicsSlides/palmerpenguins_package.png" width="50%" /&gt;
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
 ]
 
 .pull-right[
@@ -690,7 +672,6 @@ tibble(
 
 ```r
 library(dplyr)
-
 glimpse(penguins)
 ```
 
@@ -890,10 +871,14 @@ table(penguins[penguins$island == "Biscoe",]$species)
 
 - The answer is: No, convert to data frame first.
 
+--&gt; A data frame is similar to a tibble, however, sometimes the arguments the functions 
+need to coerce an element of class "table" are different. Here, `as.data.frame()` is clearly easier :)
+
 
 ```r
-table(penguins[penguins$island == "Biscoe",]$species) |&gt; 
-* as.data.frame()
+my_table &lt;- table(penguins[penguins$island == "Biscoe",]$species)
+
+*as.data.frame(my_table)
 ```
 
 ```
@@ -903,6 +888,19 @@ table(penguins[penguins$island == "Biscoe",]$species) |&gt;
 ## 3    Gentoo  124
 ```
 
+Alternatively, with `as_tibble()`
+
+
+```r
+as_tibble(my_table, .name_repair = "unique")
+```
+
+If you are interested, run the following commands!
+
+&gt;class(my_table)
+&gt;methods(as_tibble)
+&gt;methods(as.data.frame)
+&gt;https://tibble.tidyverse.org/reference/as_tibble.html
 ---
 
 ### Step 4: Create a percentage column
@@ -910,8 +908,8 @@ table(penguins[penguins$island == "Biscoe",]$species) |&gt;
 
 ```r
 freq_table &lt;-
-  table(penguins[penguins$island == "Biscoe",]$species) %&gt;%
-  as.data.frame()
+  table(penguins[penguins$island == "Biscoe",]$species)
+freq_table &lt;- as.data.frame(freq_table)
 ```
 
 - Create a new column to the right dividing the observation by the sum of `Freq`
@@ -1028,11 +1026,7 @@ penguins[, c("body_mass_g", "bill_length_mm")]
 plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 ```
 
-<<<<<<< HEAD
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-53-1.png" width="75%" /&gt;
-=======
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-47-1.png" width="75%" /&gt;
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-56-1.png" width="75%" /&gt;
 
 ---
 
@@ -1045,11 +1039,7 @@ plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 *      col = "blue", lwd = 2, lty = 2)
 ```
 
-<<<<<<< HEAD
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-54-1.png" width="75%" /&gt;
-=======
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-48-1.png" width="75%" /&gt;
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-57-1.png" width="75%" /&gt;
 
 
 ---
@@ -1067,11 +1057,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-<<<<<<< HEAD
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-55-1.png" width="75%" /&gt;
-=======
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-49-1.png" width="75%" /&gt;
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-58-1.png" width="75%" /&gt;
 
 ---
 
@@ -1084,11 +1070,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-<<<<<<< HEAD
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-56-1.png" width="75%" /&gt;
-=======
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-50-1.png" width="75%" /&gt;
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-59-1.png" width="75%" /&gt;
 
 ---
 
@@ -1102,11 +1084,7 @@ penguins %&gt;%
   geom_smooth(method = "lm", se = F, lty = 2)
 ```
 
-<<<<<<< HEAD
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-57-1.png" width="90%" /&gt;
-=======
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-51-1.png" width="90%" /&gt;
->>>>>>> db0532604a9dd2fd77f9a6393e73a38795fb05e5
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-60-1.png" width="90%" /&gt;
 
 ---
 
