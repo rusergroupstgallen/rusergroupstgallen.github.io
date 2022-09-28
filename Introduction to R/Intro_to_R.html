@@ -42,7 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Authors/Presenters: Nina, Sven, Mathias
-##### Last updated: _2022-09-28 17:07:42_
+##### Last updated: _2022-09-28 17:47:16_
 
 ---
 
@@ -70,6 +70,9 @@ class: hide-logo, center, middle
 
 - Learn a bit about Penguins
 
+&lt;img src="GraphicsSlides/palmer.png" width="35%" /&gt;
+
+
 ---
 
 ### Why should you learn R? 
@@ -84,6 +87,7 @@ class: hide-logo, center, middle
 
 ### Why should you learn R? 
 
+.scroll-output[
 .center[
   
 &lt;img src="GraphicsSlides/plot_paper.png" width="70%" /&gt;
@@ -92,6 +96,8 @@ class: hide-logo, center, middle
 .center[
 &lt;img src="GraphicsSlides/excel_data.png" width="120%" /&gt;
 ]
+]
+
 ---
 
 ### Why should you learn R? 
@@ -146,14 +152,14 @@ out_plot &lt;- trade_data |&gt;
 &lt;br&gt;
 &lt;br&gt;
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-9-1.png" width="100%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-10-1.png" width="100%" /&gt;
 ]
 ---
 
 ### Why should you learn R? 
 
 .pull-left[
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-10-1.png" width="100%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-11-1.png" width="100%" /&gt;
 ]
 
 .pull-right[
@@ -179,10 +185,6 @@ out_plot &lt;- trade_data |&gt;
 &lt;/center&gt;
 &lt;/div&gt;
 
-**TBD: Error in der Shiny app**
-
-### Basic Concepts - Data Types and Objects
-=======
 ---
 
 ### Just shortly: Data Types and Objects
@@ -377,13 +379,13 @@ head(penguins, 4)
 You can subset every tibble as follows:
 
 - row and column:
-`tibble_name[row_index, column_index/name] `
+  - `tibble_name[row_index, column_index/name] `
 - row only:
-`tibble_name[row_index,]`
+  - `tibble_name[row_index,]`
 - column only:
-`tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
+  - `tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
 
-Now Lets get the second row and third Column of the penguins data
+Now let's get the **second row** and **third column** of the penguins data
 
 --
 
@@ -392,7 +394,12 @@ Now Lets get the second row and third Column of the penguins data
 penguins[2,3]
 penguins[2, "bill_length_mm"]
 ```
+
+--
+
 What if we want multiple rows/ columns or if we want to delete an entry?
+
+--
 
 
 ```r
@@ -404,53 +411,57 @@ penguins[-c(1:4),1]
 
 ### Subsetting with Logical Conditions
 
-If we look for a specific value within our data set (column, row or both), we can 
-subset the data frame by logical conditions (==, &amp;, |, &gt;, &gt;= etc...)
+If we look for a specific value within our data set (column, row or both), we can subset the data frame by **logical conditions**.
 
-.center[
-&lt;img src="GraphicsSlides/spongebob_search.gif" width="40%" /&gt;
-]
+- `==` **equal to**
+- `&amp;` means **and**
+- `|` means **or**
+- `&gt;`, `&lt;`, `&lt;=`, `&gt;=` are used to **compare numerical values**
 
 
 ```r
-head(
-* penguins[penguins$sex == "male" &amp; penguins$island == "Biscoe",]
-  ,2)
+*penguins[penguins$sex == "male" &amp; penguins$island == "Biscoe",]
 ```
 
+
 ```
-## # A tibble: 2 × 8
+## # A tibble: 5 × 8
 ##   species island bill_length_mm bill_depth_mm flipper_length_… body_mass_g sex  
 ##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt; &lt;fct&gt;
 ## 1 Adelie  Biscoe           37.7          18.7              180        3600 male 
 ## 2 Adelie  Biscoe           38.2          18.1              185        3950 male 
+## 3 Adelie  Biscoe           38.8          17.2              180        3800 male 
+## 4 Adelie  Biscoe           40.6          18.6              183        3550 male 
+## 5 Adelie  Biscoe           40.5          18.9              180        3950 male 
 ## # … with 1 more variable: year &lt;int&gt;
 ```
 
 ---
 
-### Task 1: Replace all observations of island = "Dream" with "Unknown"
+### Task 1: Replace island "Dream" with "Unknown"
 
-Tip: First filter out the column *Island* and within this column, all Values which are *Dream*.
-Then: Assign a new value to these values with &lt;-
+**Tip:** Start by subsetting the tibble for column *Island* and within this column, all values which are *Dream*. Then, assign a new value to these values with the operator `&lt;-`.
 
 
 ```r
-library(dplyr)
-glimpse(penguins)
+penguins[,"island"]
 ```
 
 ```
-## Rows: 344
-## Columns: 8
-## $ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Adelie, Adel…
-## $ island            &lt;fct&gt; Torgersen, Torgersen, Torgersen, Torgersen, Torgerse…
-## $ bill_length_mm    &lt;dbl&gt; 39.1, 39.5, 40.3, NA, 36.7, 39.3, 38.9, 39.2, 34.1, …
-## $ bill_depth_mm     &lt;dbl&gt; 18.7, 17.4, 18.0, NA, 19.3, 20.6, 17.8, 19.6, 18.1, …
-## $ flipper_length_mm &lt;int&gt; 181, 186, 195, NA, 193, 190, 181, 195, 193, 190, 186…
-## $ body_mass_g       &lt;int&gt; 3750, 3800, 3250, NA, 3450, 3650, 3625, 4675, 3475, …
-## $ sex               &lt;fct&gt; male, female, female, NA, female, male, female, male…
-## $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007…
+## # A tibble: 344 × 1
+##    island   
+##    &lt;fct&gt;    
+##  1 Torgersen
+##  2 Torgersen
+##  3 Torgersen
+##  4 Torgersen
+##  5 Torgersen
+##  6 Torgersen
+##  7 Torgersen
+##  8 Torgersen
+##  9 Torgersen
+## 10 Torgersen
+## # … with 334 more rows
 ```
 
 ---
@@ -491,6 +502,24 @@ Lets convert the data type from factor to string
 penguins$island &lt;- as.character(penguins$island)
 ```
 
+--
+
+Did it work?
+
+--
+
+Yes!
+
+
+```r
+str(penguins$island)
+```
+
+```
+##  chr [1:344] "Torgersen" "Torgersen" "Torgersen" "Torgersen" "Torgersen" ...
+```
+
+
 ---
 
 ### Back to Step 1: 
@@ -498,8 +527,17 @@ penguins$island &lt;- as.character(penguins$island)
 
 ```r
 penguins[penguins$island == "Dream", "island"] &lt;- "Unknown"
-head(penguins[penguins$island == "Unknown",], 3)
 ```
+
+--
+
+This time, it worked:
+
+
+```r
+penguins[penguins$island == "Unknown",]
+```
+
 
 ```
 ## # A tibble: 3 × 8
@@ -513,7 +551,7 @@ head(penguins[penguins$island == "Unknown",], 3)
 
 --
 
-And if needed, lets reformat back to factor 
+And if needed, reformat back to factor.
 
 
 ```r
@@ -711,6 +749,7 @@ args(mean.default)
 
 or the easier way:
 
+
 ```r
 ?mean()
 ```
@@ -748,24 +787,35 @@ Filter out all numeric columns and store the result as a new object
 
 
 ```r
-data_male &lt;- penguins[penguins$sex == "female", c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g")]
+data_male &lt;- penguins[penguins$sex == "male", c("bill_length_mm",
+                                                "bill_depth_mm",
+                                                "flipper_length_mm",
+                                                "body_mass_g")]
 
-data_female &lt;- penguins[penguins$sex == "female", c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g")]
+data_female &lt;- penguins[penguins$sex == "female", c("bill_length_mm",
+                                                    "bill_depth_mm",
+                                                    "flipper_length_mm",
+                                                    "body_mass_g")]
 ```
 
 ---
 ### Step 2: 
 
+.scroll-output[
 Calculate the mean for all columns in the data frame with `sapply()`, store the resulting vectors and produce the tibble.
 
 
 ```r
-mean_male &lt;- sapply(data_male, mean, 
-*                   na.rm = T)
+mean_male &lt;- sapply(
+  data_male, 
+  mean, 
+* na.rm = T
+  ) 
 
 mean_female &lt;- sapply(
-*                     na.omit(data_female),
-                      mean)
+* na.omit(data_female),
+  mean
+)
 
 tibble(male = mean_male, female = mean_female)
 ```
@@ -774,11 +824,13 @@ tibble(male = mean_male, female = mean_female)
 ## # A tibble: 4 × 2
 ##     male female
 ##    &lt;dbl&gt;  &lt;dbl&gt;
-## 1   42.1   42.1
-## 2   16.4   16.4
-## 3  197.   197. 
-## 4 3862.  3862.
+## 1   45.9   42.1
+## 2   17.9   16.4
+## 3  205.   197. 
+## 4 4546.  3862.
 ```
+]
+
 ---
 
 ### Task 2: How many penguins live on each island?
@@ -1056,8 +1108,12 @@ head(methods(as_tibble))
 ```
 
 ```
-## [1] "as_tibble.data.frame" "as_tibble.default"    "as_tibble.grouped_df"
-## [4] "as_tibble.list"       "as_tibble.matrix"     "as_tibble.NULL"
+## [1] "as_tibble.data.frame"                         
+## [2] "as_tibble.default"                            
+## [3] "as_tibble.dribble"                            
+## [4] "as_tibble.googlesheets4_schema_GridRange"     
+## [5] "as_tibble.googlesheets4_schema_NamedRange"    
+## [6] "as_tibble.googlesheets4_schema_ProtectedRange"
 ```
 ]
 
@@ -1173,7 +1229,7 @@ penguins[, c("body_mass_g", "bill_length_mm")]
 plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-67-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-71-1.png" width="75%" /&gt;
 
 ---
 
@@ -1186,7 +1242,7 @@ plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 *      col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-68-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-72-1.png" width="75%" /&gt;
 
 
 ---
@@ -1204,7 +1260,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-69-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-73-1.png" width="75%" /&gt;
 
 ---
 
@@ -1217,7 +1273,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-70-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-74-1.png" width="75%" /&gt;
 
 ---
 
@@ -1231,7 +1287,7 @@ penguins %&gt;%
   geom_smooth(method = "lm", se = F, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-71-1.png" width="90%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-75-1.png" width="90%" /&gt;
 ---
 
 # That's it for today!

@@ -57,7 +57,7 @@ library(lubridate)
 library(scales)
 library(rstudioapi)
 
-setwd(dirname(getActiveDocumentContext()$path))
+# setwd(dirname(getActiveDocumentContext()$path))
 
 ```
 
@@ -100,6 +100,11 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 - Learn a bit about Penguins
 
+```{r, echo=FALSE, out.width="35%"}
+knitr::include_graphics("GraphicsSlides/palmer.png")
+```
+
+
 ---
 
 ### Why should you learn R? 
@@ -116,6 +121,7 @@ knitr::include_graphics("GraphicsSlides/excel_mess.png")
 
 ### Why should you learn R? 
 
+.scroll-output[
 .center[
   
 ```{r, echo = F, out.width= "70%"}
@@ -128,6 +134,8 @@ knitr::include_graphics("GraphicsSlides/plot_paper.png")
 knitr::include_graphics("GraphicsSlides/excel_data.png")
 ```
 ]
+]
+
 ---
 
 ### Why should you learn R? 
@@ -220,10 +228,6 @@ knitr::include_graphics("GraphicsSlides/strong v weak.png")
 </center>
 </div>
 
-**TBD: Error in der Shiny app**
-
-### Basic Concepts - Data Types and Objects
-=======
 ---
 
 ### Just shortly: Data Types and Objects
@@ -357,13 +361,13 @@ head(penguins, 4)
 You can subset every tibble as follows:
 
 - row and column:
-`tibble_name[row_index, column_index/name] `
+  - `tibble_name[row_index, column_index/name] `
 - row only:
-`tibble_name[row_index,]`
+  - `tibble_name[row_index,]`
 - column only:
-`tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
+  - `tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
 
-Now Lets get the second row and third Column of the penguins data
+Now let's get the **second row** and **third column** of the penguins data
 
 --
 
@@ -371,7 +375,12 @@ Now Lets get the second row and third Column of the penguins data
 penguins[2,3]
 penguins[2, "bill_length_mm"]
 ```
+
+--
+
 What if we want multiple rows/ columns or if we want to delete an entry?
+
+--
 
 ```{r, eval=FALSE}
 penguins[c(1:5, 200:202), c(2,5)]
@@ -382,31 +391,30 @@ penguins[-c(1:4),1]
 
 ### Subsetting with Logical Conditions
 
-If we look for a specific value within our data set (column, row or both), we can 
-subset the data frame by logical conditions (==, &, |, >, >= etc...)
+If we look for a specific value within our data set (column, row or both), we can subset the data frame by **logical conditions**.
 
-.center[
-```{r, echo=FALSE, out.width="40%"}
-knitr::include_graphics("GraphicsSlides/spongebob_search.gif")
+- `==` **equal to**
+- `&` means **and**
+- `|` means **or**
+- `>`, `<`, `<=`, `>=` are used to **compare numerical values**
+
+```{r, eval=FALSE}
+penguins[penguins$sex == "male" & penguins$island == "Biscoe",] #<<
 ```
-]
 
-```{r}
-head(
-  penguins[penguins$sex == "male" & penguins$island == "Biscoe",] #<<
-  ,2)
+```{r, echo=FALSE}
+penguins[penguins$sex == "male" & penguins$island == "Biscoe",] %>% 
+  head(5)
 ```
 
 ---
 
-### Task 1: Replace all observations of island = "Dream" with "Unknown"
+### Task 1: Replace island "Dream" with "Unknown"
 
-Tip: First filter out the column *Island* and within this column, all Values which are *Dream*.
-Then: Assign a new value to these values with <-
+**Tip:** Start by subsetting the tibble for column *Island* and within this column, all values which are *Dream*. Then, assign a new value to these values with the operator `<-`.
 
 ```{r}
-library(dplyr)
-glimpse(penguins)
+penguins[,"island"]
 ```
 
 ---
@@ -442,18 +450,42 @@ Lets convert the data type from factor to string
 penguins$island <- as.character(penguins$island)
 ```
 
+--
+
+Did it work?
+
+--
+
+Yes!
+
+```{r}
+str(penguins$island)
+```
+
+
 ---
 
 ### Back to Step 1: 
 
 ```{r, error = TRUE}
 penguins[penguins$island == "Dream", "island"] <- "Unknown"
+```
+
+--
+
+This time, it worked:
+
+```{r, eval=FALSE}
+penguins[penguins$island == "Unknown",]
+```
+
+```{r, echo=FALSE}
 head(penguins[penguins$island == "Unknown",], 3)
 ```
 
 --
 
-And if needed, lets reformat back to factor 
+And if needed, reformat back to factor.
 
 ```{r}
 penguins$island <- as.factor(penguins$island)
@@ -569,6 +601,7 @@ args(mean.default)
 [**R-Documentation**](https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/mean)
 
 or the easier way:
+
 ```{r, eval = FALSE}
 ?mean()
 ```
@@ -592,28 +625,40 @@ Filter out all numeric columns and store the result as a new object
 
 ```{r}
 
-data_male <- penguins[penguins$sex == "female", c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g")]
+data_male <- penguins[penguins$sex == "male", c("bill_length_mm",
+                                                "bill_depth_mm",
+                                                "flipper_length_mm",
+                                                "body_mass_g")]
 
-data_female <- penguins[penguins$sex == "female", c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g")]
+data_female <- penguins[penguins$sex == "female", c("bill_length_mm",
+                                                    "bill_depth_mm",
+                                                    "flipper_length_mm",
+                                                    "body_mass_g")]
 
 ```
 
 ---
 ### Step 2: 
 
+.scroll-output[
 Calculate the mean for all columns in the data frame with `sapply()`, store the resulting vectors and produce the tibble.
 
 ```{r}
-mean_male <- sapply(data_male, mean, 
-                    na.rm = T) #<<
+mean_male <- sapply(
+  data_male, 
+  mean, 
+  na.rm = T #<<
+  ) 
 
 mean_female <- sapply(
-                      na.omit(data_female), #<<
-                      mean)
+  na.omit(data_female), #<<
+  mean
+)
 
 tibble(male = mean_male, female = mean_female)
-
 ```
+]
+
 ---
 
 ### Task 2: How many penguins live on each island?
@@ -661,6 +706,13 @@ penguins %>%
 
 - Eventually: Calculate a percentage for each species on island Biscoe
 
+```{r}
+glimpse(penguins)
+```
+
+
+---
+
 ### Step 1: Subset for island
 
 ```{r}
@@ -679,6 +731,7 @@ penguins[penguins$island == "Biscoe",]$species
 
 ### Step 3: Ol' reliable `table()`
 
+.scroll-output[
 ```{r}
 table(penguins[penguins$island == "Biscoe",]$species)
 ```
@@ -687,13 +740,15 @@ table(penguins[penguins$island == "Biscoe",]$species)
 
 - The answer is: No, convert to data frame first.
 
---> A data frame is similar to a tibble, however, sometimes the arguments the functions 
+--> A data frame is similar to a tibble, however, sometimes the functions 
 need to coerce an element of class "table" are different. 
 
 ```{r}
 my_table <- table(penguins[penguins$island == "Biscoe",]$species)
 as.data.frame(my_table) #<<
 ```
+]
+
 ---
 
 ### Step 4: Create a percentage column
