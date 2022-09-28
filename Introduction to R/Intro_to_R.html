@@ -42,7 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Authors/Presenters: Nina, Sven, Mathias
-##### Last updated: _2022-09-28 15:56:22_
+##### Last updated: _2022-09-28 17:07:42_
 
 ---
 
@@ -51,6 +51,7 @@ class: hide-logo, center, middle
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ### Welcome to our first Meeting
+
 ---
 
 ### Goals for today's session
@@ -63,9 +64,9 @@ class: hide-logo, center, middle
 
 - Getting a first overview over R Studio 
 
-- Getting to know Base R commands 
-
 - Quick Intro into Data Types and Objects 
+
+- Getting to know Base R commands 
 
 - Learn a bit about Penguins
 
@@ -187,7 +188,7 @@ out_plot &lt;- trade_data |&gt;
 ### Just shortly: Data Types and Objects
 
 In our R environment, we can store all sorts of objects and data.
-The are various objects such as *vectors*, *matrices*, *lists* and *tibbles*.
+There are various objects such as *vectors*, *matrices*, *lists* and *tibbles*.
 
 All objects are of a certain type (for example Integer, Double, Character, Logical)
 and it is important to always make sure that your data is formatted as the right type.
@@ -216,9 +217,6 @@ first_number + second_number
 ---
 
 ### Data Types and Objects
-
-Logical Values can be represented by TRUE/FALSE as well as T/F
---&gt; When performing mathematical operations, TRUE = 1, and FALSE = 0
 
 - Logical Values can be represented by:
   - TRUE/FALSE (alternatively: T/F)
@@ -380,9 +378,9 @@ You can subset every tibble as follows:
 
 - row and column:
 `tibble_name[row_index, column_index/name] `
-- row only
+- row only:
 `tibble_name[row_index,]`
-- column only
+- column only:
 `tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
 
 Now Lets get the second row and third Column of the penguins data
@@ -415,7 +413,9 @@ subset the data frame by logical conditions (==, &amp;, |, &gt;, &gt;= etc...)
 
 
 ```r
-head(penguins[penguins$sex == "male" &amp; penguins$island == "Biscoe",],2)
+head(
+* penguins[penguins$sex == "male" &amp; penguins$island == "Biscoe",]
+  ,2)
 ```
 
 ```
@@ -431,10 +431,28 @@ head(penguins[penguins$sex == "male" &amp; penguins$island == "Biscoe",],2)
 
 ### Task 1: Replace all observations of island = "Dream" with "Unknown"
 
-.center[
-Tip: First filter out the column Island and within this column, all Values which are "Dream".
+Tip: First filter out the column *Island* and within this column, all Values which are *Dream*.
 Then: Assign a new value to these values with &lt;-
-]
+
+
+```r
+library(dplyr)
+glimpse(penguins)
+```
+
+```
+## Rows: 344
+## Columns: 8
+## $ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Adelie, Adel…
+## $ island            &lt;fct&gt; Torgersen, Torgersen, Torgersen, Torgersen, Torgerse…
+## $ bill_length_mm    &lt;dbl&gt; 39.1, 39.5, 40.3, NA, 36.7, 39.3, 38.9, 39.2, 34.1, …
+## $ bill_depth_mm     &lt;dbl&gt; 18.7, 17.4, 18.0, NA, 19.3, 20.6, 17.8, 19.6, 18.1, …
+## $ flipper_length_mm &lt;int&gt; 181, 186, 195, NA, 193, 190, 181, 195, 193, 190, 186…
+## $ body_mass_g       &lt;int&gt; 3750, 3800, 3250, NA, 3450, 3650, 3625, 4675, 3475, …
+## $ sex               &lt;fct&gt; male, female, female, NA, female, male, female, male…
+## $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007…
+```
+
 ---
 
 ### Step 1:
@@ -650,37 +668,6 @@ mean(penguins[penguins$sex == "male",]$body_mass_g,
 
 ---
 
-&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-=======
-&lt;img src="GraphicsSlides/wait_a_minute.png" width="40%" /&gt;
-
-How do we know what arguments a function such as `mean()` can take?
-
-
-```r
-args(mean.default)
-```
-
-```
-## function (x, trim = 0, na.rm = FALSE, ...) 
-## NULL
-```
-
-or just check out the R documentation 
-https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/mean
-
-or the easier way:
-
-```r
-?mean()
-```
-
-```
-## starting httpd help server ... done
-```
-
----
-
 ### Step 4: Compare male and female penguins
 
 
@@ -733,7 +720,26 @@ or the easier way:
 
 ### Task 3 - Calculate the mean for all numeric variables
 
-.center[Tip: the function **`sapply(tibble, function)`** applies the **function** to all vectors/columns in the **tibble** and returns the result as a vector (also think about `NA` again!)]
+Tip: the function **`sapply(tibble, function)`** applies the **function** to all vectors/columns in the **tibble** and returns the result as a vector (also think about `NA` again!)
+
+
+```r
+library(dplyr)
+glimpse(penguins)
+```
+
+```
+## Rows: 344
+## Columns: 8
+## $ species           &lt;fct&gt; Adelie, Adelie, Adelie, Adelie, Adelie, Adelie, Adel…
+## $ island            &lt;fct&gt; Torgersen, Torgersen, Torgersen, Torgersen, Torgerse…
+## $ bill_length_mm    &lt;dbl&gt; 39.1, 39.5, 40.3, NA, 36.7, 39.3, 38.9, 39.2, 34.1, …
+## $ bill_depth_mm     &lt;dbl&gt; 18.7, 17.4, 18.0, NA, 19.3, 20.6, 17.8, 19.6, 18.1, …
+## $ flipper_length_mm &lt;int&gt; 181, 186, 195, NA, 193, 190, 181, 195, 193, 190, 186…
+## $ body_mass_g       &lt;int&gt; 3750, 3800, 3250, NA, 3450, 3650, 3625, 4675, 3475, …
+## $ sex               &lt;fct&gt; male, female, female, NA, female, male, female, male…
+## $ year              &lt;int&gt; 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007, 2007…
+```
 
 ---
 ### Step 1:
@@ -754,8 +760,12 @@ Calculate the mean for all columns in the data frame with `sapply()`, store the 
 
 
 ```r
-mean_male &lt;- sapply(data_male, mean, na.rm = T)
-mean_female &lt;- sapply(na.omit(data_female), mean)
+mean_male &lt;- sapply(data_male, mean, 
+*                   na.rm = T)
+
+mean_female &lt;- sapply(
+*                     na.omit(data_female),
+                      mean)
 
 tibble(male = mean_male, female = mean_female)
 ```
@@ -992,7 +1002,35 @@ my_table &lt;- table(penguins[penguins$island == "Biscoe",]$species)
 ```
 ---
 
-### What about Tibbles?
+### Step 4: Create a percentage column
+
+
+```r
+freq_table &lt;-
+  table(penguins[penguins$island == "Biscoe",]$species)
+freq_table &lt;- as.data.frame(freq_table)
+```
+
+- Create a new column to the right dividing the observation by the sum of `Freq`
+
+--
+
+
+```r
+freq_table$percentage &lt;- freq_table[,"Freq"]/sum(freq_table$Freq)
+
+freq_table
+```
+
+```
+##        Var1 Freq percentage
+## 1    Adelie   44  0.2619048
+## 2 Chinstrap    0  0.0000000
+## 3    Gentoo  124  0.7380952
+```
+---
+
+### Why did we use a Data Frame? - What about Tibbles?
 
 Alternatively, with `as_tibble()`
 
@@ -1035,34 +1073,6 @@ methods(as.data.frame)[29:32]
 ```
 [**Class Tibble Documentation**](https://tibble.tidyverse.org/reference/as_tibble.html)
 ]
----
-
-### Step 4: Create a percentage column
-
-
-```r
-freq_table &lt;-
-  table(penguins[penguins$island == "Biscoe",]$species)
-freq_table &lt;- as.data.frame(freq_table)
-```
-
-- Create a new column to the right dividing the observation by the sum of `Freq`
-
---
-
-
-```r
-freq_table$percentage &lt;- freq_table[,"Freq"]/sum(freq_table$Freq)
-
-freq_table
-```
-
-```
-##        Var1 Freq percentage
-## 1    Adelie   44  0.2619048
-## 2 Chinstrap    0  0.0000000
-## 3    Gentoo  124  0.7380952
-```
 
 ---
 
@@ -1120,6 +1130,8 @@ penguins %&gt;%
 
 - Console output is boring to look at: Plot the linear relationship between bill length and body mass with base R
 
+- Tip: Check out how the function `plot` works with `?plot`
+
 
 ```r
 penguins[, c("body_mass_g", "bill_length_mm")]
@@ -1138,6 +1150,7 @@ penguins[, c("body_mass_g", "bill_length_mm")]
 ## 6        3650           39.3
 ```
 ]
+
 
 ---
 
@@ -1160,7 +1173,7 @@ penguins[, c("body_mass_g", "bill_length_mm")]
 plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-68-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-67-1.png" width="75%" /&gt;
 
 ---
 
@@ -1173,7 +1186,7 @@ plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 *      col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-69-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-68-1.png" width="75%" /&gt;
 
 
 ---
@@ -1191,7 +1204,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-70-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-69-1.png" width="75%" /&gt;
 
 ---
 
@@ -1204,7 +1217,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-71-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-70-1.png" width="75%" /&gt;
 
 ---
 
@@ -1218,7 +1231,7 @@ penguins %&gt;%
   geom_smooth(method = "lm", se = F, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-72-1.png" width="90%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-71-1.png" width="90%" /&gt;
 ---
 
 # That's it for today!

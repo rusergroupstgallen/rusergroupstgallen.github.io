@@ -81,6 +81,7 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 ```
 
 ### Welcome to our first Meeting
+
 ---
 
 ### Goals for today's session
@@ -93,9 +94,9 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 - Getting a first overview over R Studio 
 
-- Getting to know Base R commands 
-
 - Quick Intro into Data Types and Objects 
+
+- Getting to know Base R commands 
 
 - Learn a bit about Penguins
 
@@ -228,7 +229,7 @@ knitr::include_graphics("GraphicsSlides/strong v weak.png")
 ### Just shortly: Data Types and Objects
 
 In our R environment, we can store all sorts of objects and data.
-The are various objects such as *vectors*, *matrices*, *lists* and *tibbles*.
+There are various objects such as *vectors*, *matrices*, *lists* and *tibbles*.
 
 All objects are of a certain type (for example Integer, Double, Character, Logical)
 and it is important to always make sure that your data is formatted as the right type.
@@ -254,9 +255,6 @@ first_number + second_number
 ---
 
 ### Data Types and Objects
-
-Logical Values can be represented by TRUE/FALSE as well as T/F
---> When performing mathematical operations, TRUE = 1, and FALSE = 0
 
 - Logical Values can be represented by:
   - TRUE/FALSE (alternatively: T/F)
@@ -360,9 +358,9 @@ You can subset every tibble as follows:
 
 - row and column:
 `tibble_name[row_index, column_index/name] `
-- row only
+- row only:
 `tibble_name[row_index,]`
-- column only
+- column only:
 `tibble_name[column_index/name]` OR `tibble_name[,column_index/name]`
 
 Now Lets get the second row and third Column of the penguins data
@@ -394,17 +392,23 @@ knitr::include_graphics("GraphicsSlides/spongebob_search.gif")
 ]
 
 ```{r}
-head(penguins[penguins$sex == "male" & penguins$island == "Biscoe",],2)
+head(
+  penguins[penguins$sex == "male" & penguins$island == "Biscoe",] #<<
+  ,2)
 ```
 
 ---
 
 ### Task 1: Replace all observations of island = "Dream" with "Unknown"
 
-.center[
-Tip: First filter out the column Island and within this column, all Values which are "Dream".
+Tip: First filter out the column *Island* and within this column, all Values which are *Dream*.
 Then: Assign a new value to these values with <-
-]
+
+```{r}
+library(dplyr)
+glimpse(penguins)
+```
+
 ---
 
 ### Step 1:
@@ -574,7 +578,12 @@ or the easier way:
 
 ### Task 3 - Calculate the mean for all numeric variables
 
-.center[Tip: the function **`sapply(tibble, function)`** applies the **function** to all vectors/columns in the **tibble** and returns the result as a vector (also think about `NA` again!)]
+Tip: the function **`sapply(tibble, function)`** applies the **function** to all vectors/columns in the **tibble** and returns the result as a vector (also think about `NA` again!)
+
+```{r}
+library(dplyr)
+glimpse(penguins)
+```
 
 ---
 ### Step 1:
@@ -595,8 +604,12 @@ data_female <- penguins[penguins$sex == "female", c("bill_length_mm", "bill_dept
 Calculate the mean for all columns in the data frame with `sapply()`, store the resulting vectors and produce the tibble.
 
 ```{r}
-mean_male <- sapply(data_male, mean, na.rm = T)
-mean_female <- sapply(na.omit(data_female), mean)
+mean_male <- sapply(data_male, mean, 
+                    na.rm = T) #<<
+
+mean_female <- sapply(
+                      na.omit(data_female), #<<
+                      mean)
 
 tibble(male = mean_male, female = mean_female)
 
@@ -702,9 +715,8 @@ freq_table$percentage <- freq_table[,"Freq"]/sum(freq_table$Freq)
 freq_table
 ```
 ---
----
 
-### What about Tibbles?
+### Why did we use a Data Frame? - What about Tibbles?
 
 Alternatively, with `as_tibble()`
 
@@ -728,6 +740,7 @@ methods(as.data.frame)[29:32]
 ```
 [**Class Tibble Documentation**](https://tibble.tidyverse.org/reference/as_tibble.html)
 ]
+
 ---
 
 ### Outlook on `Tidyverse`: Join us in one of the next sessions
@@ -764,6 +777,8 @@ penguins %>%
 
 - Console output is boring to look at: Plot the linear relationship between bill length and body mass with base R
 
+- Tip: Check out how the function `plot` works with `?plot`
+
 ```{r, eval=FALSE}
 penguins[, c("body_mass_g", "bill_length_mm")]
 ```
@@ -772,6 +787,7 @@ penguins[, c("body_mass_g", "bill_length_mm")]
 head(penguins[, c("body_mass_g", "bill_length_mm")])
 ```
 ]
+
 
 ---
 
