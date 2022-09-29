@@ -80,7 +80,13 @@ class: hide-logo, center, middle
 knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 ```
 
-### Welcome to our first Meeting
+### Who's in the room?
+
+---
+
+class: center, hide-logo
+background-image: url("GraphicsSlides/Offering.png")
+background-size: contain
 
 ---
 
