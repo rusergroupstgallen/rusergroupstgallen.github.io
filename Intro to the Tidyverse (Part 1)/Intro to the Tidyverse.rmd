@@ -66,7 +66,8 @@ options(htmltools.dir.version = FALSE)
 knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 ```
 
-##### Author/Presenter: Mathias Steilen
+##### Presenter: Ruben Ernst
+##### Author: Mathias Steilen
 ##### Last updated: _`r Sys.time()`_
 
 ---
@@ -80,12 +81,11 @@ knitr::include_graphics("GraphicsSlides/components.png")
 _[(Source)](https://hbctraining.github.io/Intro-to-R/lessons/08_intro_tidyverse.html)_
 ---
 
-# Goals for this session
+### Goals for this session
 
 - Touch a little bit of everything by working live on a data set
 - Know where to look for an answer if something is not immediately clear
-
-Mastering the packages in the `tidyverse` alone takes years, it's completely normal to spend a large amount of time on stackoverflow looking for answers.
+- Important takeaway: Mastering the packages in the `tidyverse` alone takes years, it's completely normal to spend a large amount of time on stackoverflow looking for answers
 
 .center[
 ```{r, echo=FALSE, out.width="60%"}
@@ -95,7 +95,7 @@ knitr::include_graphics("GraphicsSlides/stackoverflow meme.png")
 
 ---
 
-# Let's get settled in
+### Let's get settled in
 
 Installing and loading the `tidyverse` which in turn loads all packages contained in it:
 
@@ -119,11 +119,9 @@ penguins <- palmerpenguins::penguins
 
 ---
 
-class: hide-logo
+### The Pipe: `%>%`
 
-# The Pipe: `%>%`
-
-The pipe from the package `magrittr` can be translated into "take the thing from before and pipe it (put it) into what's coming after".
+The pipe from the package `magrittr` can be translated into **"take the thing from before and pipe it (put it) into what's coming after"**.
 
 ```{r}
 penguins %>% summary()
@@ -131,7 +129,7 @@ penguins %>% summary()
 
 ---
 
-# The Pipe: `%>%`
+### The Pipe: `%>%`
 
 When working with many variables:
 
@@ -141,11 +139,11 @@ penguins %>% glimpse()
 
 ---
 
-# The Pipe: `%>%`
+### The Pipe's Major Advantage Is Readability
 
-The pipe can make nested functions look much nicer and easier to read with the human eye. It will save you many headaches and is a major selling point.
+The pipe can make nested functions look much nicer and **easier to read**.
 
-Code summarising the mean body weight for the species _Adelie_ by island without the pipe ([Source](https://cfss.uchicago.edu/notes/pipes/)):
+The code below shows how to calculate the **mean body weight for the species _Adelie_ by island** without the pipe ([Source](https://cfss.uchicago.edu/notes/pipes/)):
 
 ```{r}
 summarize(group_by(filter(penguins, species == "Adelie"), island), body_mass = mean(body_mass_g, na.rm = TRUE))
@@ -153,9 +151,9 @@ summarize(group_by(filter(penguins, species == "Adelie"), island), body_mass = m
 
 ---
 
-# The Pipe: `%>%`
+### The Pipe's Major Advantage Is Readability
 
-The same code using the pipe can be read and produced line by line:
+The same code using the pipe can be **written, executed, and read line by line**:
 
 ```{r}
 penguins %>%
@@ -164,13 +162,79 @@ penguins %>%
   summarize(body_mass = mean(body_mass_g, na.rm = TRUE))
 ```
 
-Much simpler.
+This is **much** easier to read.
 
 ---
 
-# Let's deconstruct that: `filter()`
+### So let's read it line-by-line
 
-The `filter` function will give you back what you ask it for. You can think about it as "including" the observations matching your criterion. Note the lack of dollar signs.
+```{r}
+penguins %>% #<<
+  filter(species == "Adelie") %>%
+  group_by(island) %>%
+  summarize(body_mass = mean(body_mass_g, na.rm = TRUE))
+```
+
+Line-By-Line:
+
+1. **Take `penguins` and (pass it on)**
+
+---
+
+### So let's read it line-by-line
+
+```{r}
+penguins %>% 
+  filter(species == "Adelie") %>% #<<
+  group_by(island) %>%
+  summarize(body_mass = mean(body_mass_g, na.rm = TRUE))
+```
+
+Line-By-Line:
+
+1. Take `penguins` and (pass it on)
+1. **Filter it so only species Adelie remains (and pass it on)**
+
+---
+
+### So let's read it line-by-line
+
+```{r}
+penguins %>% 
+  filter(species == "Adelie") %>%
+  group_by(island) %>% #<<
+  summarize(body_mass = mean(body_mass_g, na.rm = TRUE))
+```
+
+Line-By-Line:
+
+1. Take `penguins` and (pass it on)
+1. Filter it so only species Adelie remains (and pass it on)
+1. **Group the data by island (and pass it on)**
+
+---
+
+### So let's read it line-by-line
+
+```{r}
+penguins %>% 
+  filter(species == "Adelie") %>%
+  group_by(island) %>%
+  summarize(body_mass = mean(body_mass_g, na.rm = TRUE)) #<<
+```
+
+Line-By-Line:
+
+1. Take `penguins` and (pass it on)
+1. Filter it so only species Adelie remains (and pass it on)
+1. Group the data by island (and pass it on)
+1. **Create a summarised variable `body_mass` with `mean`**
+
+---
+
+### Let's deconstruct that: `filter()`
+
+The `filter` function will give you back what you ask it for. You can think about it as **including the observations matching your criterion**.
 
 ```{r, eval=FALSE}
 penguins %>% 
@@ -184,7 +248,7 @@ penguins %>%
 ```
 ---
 
-# Let's deconstruct that: `filter()`
+### Let's deconstruct that: `filter()`
 
 `filter` replaces the native R equivalent...
 
@@ -201,11 +265,11 @@ penguins %>%
 
 ---
 
-# Let's deconstruct that: `filter()`
+### Let's deconstruct that: `filter()`
 
 Another neat trick: `%in%`. You can give the criterion more species.
 
-It's your go, please filter this data set. We only want to see the species:
+**It's your go**, please filter this data set. We **only** want to see the species:
 
 - Adelie
 - Gentoo
@@ -228,47 +292,35 @@ penguins %>%
 
 ---
 
-# Let's deconstruct that: `filter()`
+### Let's deconstruct that: `filter()`
 
-How did I know which species are in the data set?
-
---
+How do we know which species are in the data set?
 
 Using the `count` function, which is really useful for categorical variables:
 
 ```{r}
 penguins %>% 
-  count(species, sort = T)
+  count(species)
 ```
 
 ---
 
-# Let's deconstruct that: `filter()`
+### Let's deconstruct that: `filter()`
 
-It's your go, please filter this data set. We only want to see the species:
+How do we know which species are in the data set?
 
-- Adelie
-- Gentoo
+You can also sort the results:
 
-```{r, eval=FALSE}
+```{r}
 penguins %>% 
-  filter(species %in% c("Species 1 here", "Species 2 here"))
+  count(species, sort = TRUE) #<<
 ```
-
-Solution:
-
-```{r, eval=FALSE}
-penguins %>% 
-  filter(species %in% c("Adelie", "Gentoo"))
-```
-
-There is actually another way here. We now know there are only three species in there.
 
 ---
 
-# Let's deconstruct that: `filter()`
+### Let's deconstruct that: `filter()`
 
-So we could also frame it as: Filter for anything **but** Chinstrap. That's where the exclamation mark comes in, which is the `NOT` operator.
+If you want to exclude something, you need to use the `NOT` operator:
 
 ```{r}
 TRUE
@@ -277,7 +329,7 @@ TRUE
 
 ---
 
-# Let's deconstruct that: `filter()`
+### Let's deconstruct that: `filter()`
 
 Just put it before your condition:
 
@@ -285,6 +337,8 @@ Just put it before your condition:
 penguins %>% 
   filter(!species %in% c("Chinstrap"))
 ```
+
+Show everything that's **NOT** any of the values in the vector to the right.
 
 ```{r, echo=F}
 penguins %>% 
@@ -294,11 +348,11 @@ penguins %>%
 
 ---
 
-# Coming back to the example
+### Coming back to the example
 
-The goal is to calculate mean body mass for the species Adelie by island.
+The goal is to calculate **mean body mass for the species Adelie by island**.
 
-```{r, eval = F}
+```{r, echo=F}
 penguins %>%
   filter(species == "Adelie") %>%
   group_by(island) %>%
@@ -307,11 +361,11 @@ penguins %>%
 
 ---
 
-# What's `group_by()`?
+### What's `group_by()`?
 
 It unlocks the ability to calculate a number for different categories:
 
-We have three islands. 
+We have **three islands**. 
 
 ```{r}
 penguins %>% count(island, sort = T)
@@ -319,9 +373,9 @@ penguins %>% count(island, sort = T)
 
 ---
 
-# `group_by()` and `summarise()`
+### `group_by()` and `summarise()`
 
-Just summarising without grouping gives the mean just for the species Adelie.
+Just summarising without grouping gives the **mean just for the species Adelie**.
 
 ```{r}
 penguins %>% 
@@ -331,7 +385,7 @@ penguins %>%
 
 ---
 
-# `group_by()` and `summarise()`
+### `group_by()` and `summarise()`
 
 Note that adding `na.rm = TRUE` is necessary to avoid running into errors when missing values are present. Observations with `NA` as values are discarded for the calculation, if `na.rm = TRUE` is specified.
 
@@ -343,9 +397,9 @@ penguins %>%
 
 ---
 
-# `group_by()` and `summarise()`
+### `group_by()` and `summarise()`
 
-So let's add it again. Now comes the magic. By adding the `group_by` argument, the value is calculated across all different islands.
+So let's add it again. Now comes the magic. By adding the `group_by` argument, the **value is calculated across all different elements in the group**.
 
 ```{r}
 penguins %>% 
@@ -358,23 +412,28 @@ penguins %>%
 
 ---
 
-# `mutate()`
+### `mutate()`
 
-Summarise collapsed the observations in each group for our calculations. If we want to preserve the same number of observations and add a new column containing a value for each existing value, we have to use `mutate`.
+Summarise **collapsed the observations in each group** for our calculations. If we want to **preserve the same number of observations** and add a new column containing a value for each existing value, we have to use **`mutate`**.
 
 ```{r}
 penguins %>% 
   filter(species == "Adelie") %>%
   group_by(island) %>% 
   summarize(body_mass = mean(body_mass_g, na.rm = T)) %>% 
-  mutate(species = "Adelie")
+  mutate(species = "Adelie") #<<
 ```
 
 ---
 
-# It's your go
+### It's your go
 
-Please calculate the mean for each species and each island (as a combination). Tip: You can add more than one variable to the `group_by()` argument.
+Please calculate the mean bodyweight for each species.
+
+Instructions:
+
+1. Group by the variable `species`
+1. Use `summarise` to calculate a mean
 
 <br>
 
@@ -388,21 +447,21 @@ knitr::include_graphics("GraphicsSlides/programmer.png")
 
 ---
 
-#### Solution:
-
-Please calculate the mean for each species and each island. Tip: You can add more than one variable to the `group_by()` argument.
+### Solution:
 
 ```{r, warning=FALSE, message=FALSE}
 penguins %>% 
-  group_by(island, species) %>% 
+  group_by(species) %>% 
   summarise(body_mass = mean(body_mass_g, na.rm = T))
 ```
 
 ---
 
-# It's your go
+### It's your go
 
-Please calculate the mean for each species and each sex.
+Please calculate the mean bodyweight for each species and each island (as a combination). 
+
+Tip: You can **add more than one variable to the `group_by()` argument**.
 
 <br>
 
@@ -416,7 +475,33 @@ knitr::include_graphics("GraphicsSlides/programmer.png")
 
 ---
 
-# Hold on
+### Solution:
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  group_by(island, species) %>% #<<
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+---
+
+### It's your go
+
+Please calculate the mean bodymass for each combination of species and sex.
+
+<br>
+
+.center[
+
+```{r, echo=FALSE, out.width="50%"}
+knitr::include_graphics("GraphicsSlides/programmer.png")
+```
+
+]
+
+---
+
+### Hold on
 
 .pull-left[
 
@@ -441,7 +526,7 @@ knitr::include_graphics("GraphicsSlides/afraid.png")
 
 ---
 
-# Hold on
+### Hold on
 
 .pull-left[
 
@@ -457,41 +542,46 @@ penguins %>%
 
 .pull-right[
 
-The NAs come from the `sex` variable.
+**The NAs come from the `sex` variable.**
 
 ```{r}
 penguins %>% 
   count(sex)
 ```
 
-
 ]
 
 ---
 
-# `drop_na` and `select`
+### `drop_na` and `select`
 
 To solve this task, we need to take care of the `NA` values in the columns we are working with.
 
 However, there is one problem:
 
-_If we drop all rows with NA values in the whole data frame, we will delete too many rows!_
+**If we drop all rows with NA values in the whole data frame, we will delete too many rows!**
 
-```{r, warning=FALSE, echo=FALSE, fig.height=3, fig.width=7, out.width="100%", dpi=300}
+```{r, warning=FALSE, echo=FALSE, fig.height=2.75, fig.width=7, out.width="100%", dpi=300}
 colSums(is.na(penguins)) %>% 
   broom::tidy() %>% 
   rename(missing = x) %>% 
-  ggplot(aes(missing, names %>% reorder(missing))) +
+  mutate(fill_cat = case_when(names %in% c("species", "sex") ~ "Yes",
+                              TRUE ~ "No")) %>% 
+  ggplot(aes(x = missing, 
+             y = names %>% reorder(missing),
+             fill = fill_cat)) +
   geom_col() +
   labs(y = "Variable",
-       x = "# of NAs")
+       x = "# of NAs",
+       fill = "Variable used\nfor calculation in\nthis exercise?") +
+  theme_light()
 ```
 
 ---
 
-# `drop_na` and `select`
+### `drop_na` and `select`
 
-So we need to select the columns we need first:
+So we need to **select the columns we need first**:
 
 ```{r}
 penguins %>% 
@@ -500,7 +590,7 @@ penguins %>%
 
 ---
 
-# `drop_na` and `select`
+### `drop_na` and `select`
 
 **Then** drop.
 
@@ -512,38 +602,9 @@ penguins %>%
 
 ---
 
-# So let's try again
+### So let's try again
 
-Please calculate the mean for each species and each sex, dropping missing data in the necessary columns first.
-
---
-
-```{r, warning=FALSE, message=FALSE}
-penguins %>% 
-  select(species, sex, body_mass_g) %>% 
-  drop_na() %>% 
-  group_by(species, sex) %>% 
-  summarise(body_mass = mean(body_mass_g, na.rm = T))
-```
-
----
-
-# Note: If you continue, ungroup:
-
-```{r, warning=FALSE, message=FALSE}
-penguins %>% 
-  select(species, sex, body_mass_g) %>% 
-  drop_na() %>% 
-  group_by(species, sex) %>% 
-  summarise(body_mass = mean(body_mass_g, na.rm = T)) %>% 
-  ungroup() #<<
-```
-
----
-
-# It's your go
-
-Please calculate the mean bill length and depth over the available three years for all species.
+Please calculate the mean for each species and each sex, dropping missing data in the necessary columns first (first select, then drop missing values, then summarise by groups).
 
 <br>
 
@@ -557,7 +618,48 @@ knitr::include_graphics("GraphicsSlides/programmer.png")
 
 ---
 
-#### Solution:
+### Solution:
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  select(species, sex, body_mass_g) %>% 
+  drop_na() %>% 
+  group_by(species, sex) %>% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T))
+```
+
+---
+
+### Note: If you continue, ungroup:
+
+```{r, warning=FALSE, message=FALSE}
+penguins %>% 
+  select(species, sex, body_mass_g) %>% 
+  drop_na() %>% 
+  group_by(species, sex) %>% 
+  summarise(body_mass = mean(body_mass_g, na.rm = T)) %>% 
+  ungroup() #<<
+```
+
+---
+
+### It's your go
+
+Please calculate the **mean bill length and depth for all the available years for all species**.
+
+<br>
+
+.center[
+
+```{r, echo=FALSE, out.width="50%"}
+knitr::include_graphics("GraphicsSlides/programmer.png")
+```
+
+]
+
+---
+
+### Solution:
 
 ```{r, warning=FALSE, message=FALSE}
 penguins %>% 
@@ -569,20 +671,24 @@ Now it would be really nice to be able to compare from left to right, over time.
 
 ---
 
-# Enter: `pivot_wider()`
+### Enter: `pivot_wider()`
 
 ```{r, warning=FALSE, message=FALSE}
 penguins %>% 
   group_by(year, species) %>% 
   summarise(mean_body_mass = mean(body_mass_g, na.rm = T)) %>% 
   ungroup() %>% 
-  pivot_wider(names_from = year,#<<
-              values_from = mean_body_mass)#<<
+  pivot_wider( #<<
+    names_from = year, # make this the column names #<<
+    values_from = mean_body_mass # fill rows with these values #<<
+    ) #<<
 ```
 
 ---
 
-#### The opposite: `pivot_longer()`
+### The opposite: `pivot_longer()`
+
+.scroll-output[
 
 ```{r, warning=FALSE, message=FALSE}
 penguins %>% 
@@ -591,21 +697,23 @@ penguins %>%
   ungroup() %>% 
   pivot_wider(names_from = year, 
               values_from = mean_body_mass) %>% 
-  pivot_longer(- species,#<<
-               names_to = "year",#<<
-               values_to = "mean_body_mass") %>% #<<
+  pivot_longer(- species, # Don't pivot this column #<<
+               names_to = "year", # Column for column headers #<<
+               values_to = "mean_body_mass") %>% # Column for values #<<
   arrange(species) # sort descending: desc(species)
 ```
 
+]
+
 ---
 
-# One last time
+### Now everything together
 
 We want to see the **percentage** of male or percentage of female penguins **for each species**. Here, pivoting wider will come in handy.
 
-Please `count` the numbers of penguins for each sex and species. Then, pivot wider to have sex as the column headers. Make sure to drop missing values in the two variables. Tip: No grouping is necessary for `count`, just pass the two variables to the function.
+Please **`count` the numbers of penguins for each sex and species**. Then, **pivot wider to have sex as the column headers**. Make sure to **drop missing values in the two variables**. Tip: No grouping is necessary for `count`, just pass the two variables to the function.
 
-With `mutate`, you will be able to calculate the percentage. Then use `select` to remove unnecessary information. (If you know it, you can use `transmute` as well.)
+With **`mutate`, you will be able to calculate the percentage**. Then use **`select` to remove unnecessary information**. (If you know it, you can use `transmute` as well.)
 
 <br>
 
@@ -619,7 +727,7 @@ knitr::include_graphics("GraphicsSlides/programmer.png")
 
 ---
 
-#### Solution:
+### Solution:
 
 ```{r, warning=FALSE, message=FALSE}
 penguins %>% 
@@ -631,7 +739,7 @@ penguins %>%
             pct_male = male/(male + female))
 ```
 
-Note: Using `transmute` does the same as first mutating and then selecting. It is a `mutate` and a `select` in one single step.
+Note: Using **`transmute` does the same as first mutating and then selecting**. It is a `mutate` and a `select` in **one single step**.
 
 ---
 
