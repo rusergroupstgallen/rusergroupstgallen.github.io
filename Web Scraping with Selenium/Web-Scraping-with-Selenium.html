@@ -42,11 +42,11 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Ruben
-##### Last updated: _2022-10-09 23:59:44_
+##### Last updated: _2022-10-13 12:27:42_
 
 ---
 
-# Goals for today's session
+## Goals for today's session
 
 Obvious ones:
 - Learn about commonly used approaches to web scraping
@@ -57,7 +57,7 @@ Less obvious ones:
 - Get a more intuitive understanding of the make-up of websites
 
 ---
-# The basic idea behind web scraping
+## The basic idea behind web scraping
 
 If interesting data is available openly on websites, why not just take it?
 
@@ -69,7 +69,7 @@ If interesting data is available openly on websites, why not just take it?
 
 ---
 
-# The basic idea behind web scraping
+## The basic idea behind web scraping
 
 Just a couple of possible roadblocks:
 - It's spread across a lot of sites
@@ -77,15 +77,13 @@ Just a couple of possible roadblocks:
 
 And most importantly: why do something by hand when you can write code for hours to do it for you?
 
---
-
 .center[
 &lt;img src="GraphicsSlides/rick-and-morty-you-pass-butter.gif" width="40%" /&gt;
 ]
 
 ---
 
-# Different approaches for webscraping
+## Different approaches for webscraping
 
 You might have heard of these:
 - BeautifulSoup
@@ -101,10 +99,10 @@ As you might have guessed, today we're using Selenium!
 
 ---
 
-# Why use Selenium?
+## Why use Selenium?
 
 .pull-left[
-##BeautifulSoup and Requests
+### BeautifulSoup and Requests
 are mainly used to
 - GET web pages and
 - support you in the extraction of data from the DOM (you don't need to fully understand this right now)
@@ -113,7 +111,7 @@ are mainly used to
 ]
 
 .pull-right[
-##Selenium
+### Selenium
 "drives" a browser and can therefore be used to scrape more complex websites with
 - buttons to press
 - inputs to fill out
@@ -124,7 +122,7 @@ are mainly used to
 
 ---
 
-# The setup
+## The setup
 
 First we need to install some packages:
 
@@ -142,7 +140,7 @@ And choose our desired browser to drive (I like Chrome):
 
 ---
 
-# Download chromedriver
+## Download chromedriver
 
 Chromedriver is a development tool. You can download it here:
 https://chromedriver.chromium.org/downloads
@@ -164,7 +162,7 @@ On MacOS put the file in&lt;br&gt;
 
 ---
 
-# Today's target: homegate.ch
+## Today's target: homegate.ch
 
 .center[
 &lt;img src="GraphicsSlides/screenshot_homegate.jpg" width="100%" /&gt;
@@ -172,7 +170,7 @@ On MacOS put the file in&lt;br&gt;
 
 ---
 
-# Some considerations before we start
+## Some considerations before we start
 
 .pull-left[
 - Why not just click the "search" button to have all the listings
@@ -188,7 +186,7 @@ On MacOS put the file in&lt;br&gt;
 
 ---
 
-# Some considerations before we start
+## Some considerations before we start
 
 Having a look around the page reveals that we can nonetheless access all the listings:
 
@@ -200,17 +198,17 @@ We can go by canton and make Selenium click all the buttons for us
 
 ---
 
-# Let's fire up that robo-browser
+## Let's fire up that robo-browser
 
 
 ```r
 chromeDr &lt;- rsDriver(browser = "chrome", port = 4569L, chromever = "105.0.5195.52",
-                       extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1280,800'),
-                                                                     prefs = list(
-                                                                       "profile.default_content_settings.popups" = 0L,
-                                                                       "download.prompt_for_download" = FALSE,
-                                                                       "directory_upgrade" = TRUE
-                                                                     ))))
+                     extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1280,800'),
+                                                                   prefs = list(
+                                                                     "profile.default_content_settings.popups" = 0L,
+                                                                     "download.prompt_for_download" = FALSE,
+                                                                     "directory_upgrade" = TRUE
+                                                                   ))))
 
 remDr &lt;- chromeDr[["client"]]
 ```
@@ -222,7 +220,7 @@ The extra options are used ensure that:
 
 ---
 
-# Opening a webpage
+## Opening a webpage
 
 From here it's like regular web browsing - except controlled by your code
 
@@ -241,7 +239,7 @@ e$clickElement()
 
 ---
 
-# How to find stuff on a webpage
+## How to find stuff on a webpage
 
 We find elements (such as buttons and the data we want) via XPATHs (among others)
 
@@ -257,7 +255,7 @@ Like you've seen previously:&lt;br&gt;
 
 ---
 
-# The DOM
+## The DOM
 
 Webpages are built in the hypertext markup language (HTML):&lt;br&gt;
 
@@ -265,13 +263,13 @@ Webpages are built in the hypertext markup language (HTML):&lt;br&gt;
 ```html
 &lt;!DOCTYPE html&gt;
   &lt;html&gt;
-    &lt;body&gt;
-      &lt;h1&gt;My First Heading&lt;/h1&gt;
-      &lt;p&gt;My first paragraph.&lt;/p&gt;
-    &lt;/body&gt;
+  &lt;body&gt;
+  &lt;h1&gt;My First Heading&lt;/h1&gt;
+  &lt;p&gt;My first paragraph.&lt;/p&gt;
+  &lt;/body&gt;
   &lt;/html&gt;
 ```
-    
+
 XPATHs are just a way to express the "path" of any element in this structure
 
 --
@@ -284,7 +282,7 @@ In this case: to get the heading element:&lt;br&gt;
 
 ---
 
-# Extracting the actual data
+## Extracting the actual data
 
 Depending on the element, we want different attributes of the elements:
 - text
@@ -298,21 +296,21 @@ or even metadata:
 
 ---
 
-# Example
+## Example
 
 
 ```html
-  &lt;body&gt;
-    &lt;div&gt;
-      &lt;a href='https://example.com'&gt;Link 1&lt;/a&gt;
-      &lt;a href='https://example.com'&gt;Link 2&lt;/a&gt;
-      &lt;a href='https://example.com'&gt;Link 3&lt;/a&gt;
-    &lt;/div&gt;
+&lt;body&gt;
+  &lt;div&gt;
+  &lt;a href='https://example.com'&gt;Link 1&lt;/a&gt;
+  &lt;a href='https://example.com'&gt;Link 2&lt;/a&gt;
+  &lt;a href='https://example.com'&gt;Link 3&lt;/a&gt;
+  &lt;/div&gt;
   &lt;/body&gt;
 ```
-
+  
 --
-
+  
 
 ```r
 '//body/div/a[2]'
@@ -333,7 +331,7 @@ gives us:
 
 ---
 
-# Supertrick: Getting XPATHS easily
+## Supertrick: Getting XPATHS easily
 
 In your browser, open the developer console:&lt;br&gt;
 `F12` or `cmd + opt + i`
@@ -355,7 +353,13 @@ Find the element with the picker tool (top left) and copy its XPATH
 remDr$findElement(value = '//some XPATH')$getElementText()
 ```
 
---
+.center[
+&lt;img src="GraphicsSlides/programmer.png" width="50%" /&gt;
+]
+
+---
+### Solution
+
 
 
 ```r
@@ -370,7 +374,7 @@ remDr$findElement(value = '//*[@id="app"]/main/div/div[2]/div/div/div[5]/button'
 
 ---
 
-# Finding multiple elements
+## Finding multiple elements
 
 Often it is useful to find multiple elements at once.
 
@@ -384,10 +388,147 @@ Here we could extract the links to all cantons and save them to go through later
 ```r
 e &lt;- remDr$findElements(value = "//*/div[contains(@class, 'GeoDrillDownSRPLink')]/a")
 
-for (elem in e){
-    print(elem$getElementAttribute(attrName = "href"))
-}
+canton_links &lt;- unlist(lapply(e, function(x){x$getElementAttribute("href")}))[2:27]
 ```
+
+---
+
+## New concept: element attribute
+
+HTML elements carry more data than just a text. These can be useful for &lt;b&gt; finding &lt;/b&gt; elements as well as &lt;b&gt; extracting &lt;/b&gt; additional data.
+
+- Example of a `&lt;div&gt;` tag with a class:
+
+
+```html
+&lt;div class="my_class_name"&gt; Text &lt;/div&gt;
+```
+
+-&gt; We can use the class to &lt;b&gt; find &lt;/b&gt; this `&lt;div&gt;` element.
+
+- Example of an `&lt;a&gt;` tag with an href (a link):
+
+
+```html
+&lt;a href="https://example.com"&gt; Link to example.com &lt;/a&gt;
+```
+
+-&gt; We might want to &lt;b&gt; extract &lt;/b&gt; this link
+
+---
+
+## Homegate does not like to be scraped
+
+With the specific example of Homegate, we have a problem:
+
+&lt;b&gt; They randomize their classes, so we cannot easily grab them &lt;/b&gt;
+
+&lt;b&gt; BUT: &lt;/b&gt; we have a solution:
+
+Instead of searching for a specific class (with the randomized part in it), we just search for the constant part:
+
+
+```html
+*&lt;div class="GeoDrillDownSRPLink_srpLink_2Zztq col-md-5"&gt; Text &lt;/div&gt;
+```
+
+We can do that by specifying `contains(@class, 'my_class_name')` in square brackets:
+
+
+```r
+e &lt;- remDr$findElements(value = "//*/div[contains(@class, 'GeoDrillDownSRPLink')]/a")
+```
+
+---
+
+## Other attributes
+
+The class attribute is generally the most useful for finding elements, however you might need to use others:
+- id
+- css styles
+- title
+- value
+- etc.
+
+You can use the same syntax:
+- if looking for the exact attribute:
+
+
+```r
+e &lt;- remDr$findElements(value = "//*/div[@id='full_id_name']/a")
+```
+
+- if looking for partial attribute name:
+
+
+```r
+e &lt;- remDr$findElements(value = "//*/div[contains(@id, 'partial_id_name')]/a")
+```
+
+---
+
+## Let's get into the main scraping
+
+Now we have all the links of the Cantons, let's look at the actual listings.
+
+First, navigate to the first Canton's page:
+
+
+```r
+e &lt;- remDr$navigate(canton_links[1])
+```
+
+.center[
+&lt;img src="GraphicsSlides/screenshot_listing_1.png" width="100%" /&gt;
+]
+
+---
+
+## What to scrape
+
+Thinking about potential analyses we might want to conduct, interesting values to scrape could be:
+- price
+- size of the appartment
+- number of rooms
+- location
+- description (maybe we can extract important keywords)
+
+Less obvious but useful: &lt;b&gt; the link &lt;/b&gt; of the detailed listing. At a later time we might want to extract more data from the listing and saving the link will make this much easier.
+
+---
+
+### Task 2: Find the XPATH of all elements containing the price
+
+**Tip:** You might need to find the class of the parent elements
+
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+
+.center[
+&lt;img src="GraphicsSlides/programmer.png" width="50%" /&gt;
+]
+
+---
+
+### Solution
+
+The price is in a `&lt;span&gt;` element without a class. However, the parent of this `&lt;span&gt;` (which is another `&lt;span&gt;`) has the convenient `class='ListItemPrice_price_1o0i3'`.
+
+Again, Homegate includes a random part '1o0i3' (this might be different for you), but we can just search for the first part of the class name:
+
+
+```r
+e &lt;- remDr$findElements(value = "//*/span[contains(@class, 'ListItemPrice')]/span[2]")
+```
+
+So let's see what we have scraped:
+
+
+```r
+canton_links &lt;- unlist(lapply(e, function(x){x$getElementText()}))
+```
+
 
 
 
