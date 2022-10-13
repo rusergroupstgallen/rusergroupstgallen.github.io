@@ -101,8 +101,8 @@ Just a couple of possible roadblocks:
 And most importantly: why do something by hand when you can write code for hours to do it for you?
 
 .center[
-```{r, echo=FALSE, out.width="40%"}
-knitr::include_graphics("GraphicsSlides/rick-and-morty-you-pass-butter.gif")
+```{r, echo=FALSE, out.width="35%"}
+knitr::include_graphics("GraphicsSlides/hacker-hackerman.gif")
 ```
 ]
 
@@ -296,10 +296,10 @@ Webpages are built in the hypertext markup language (HTML):<br>
 ```{html, echo=TRUE, eval=FALSE}
 <!DOCTYPE html>
   <html>
-  <body>
-  <h1>My First Heading</h1>
-  <p>My first paragraph.</p>
-  </body>
+    <body>
+      <h1>My First Heading</h1>
+      <p>My first paragraph.</p>
+    </body>
   </html>
   ```
 
@@ -333,11 +333,11 @@ or even metadata:
 ```{html, echo=TRUE, eval=FALSE}
 <body>
   <div>
-  <a href='https://example.com'>Link 1</a>
-  <a href='https://example.com'>Link 2</a>
-  <a href='https://example.com'>Link 3</a>
+    <a href='https://example.com'>Link 1</a>
+    <a href='https://example.com'>Link 2</a>
+    <a href='https://example.com'>Link 3</a>
   </div>
-  </body>
+</body>
 ```
   
 --
@@ -781,12 +781,15 @@ How can we mitigate this?
 
 ```{r, echo=TRUE, eval=FALSE}
 for (parent in parents){
+  price <- NA
+  
   tryCatch(
     expr = {
-      price <- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+      price <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemPrice_price')]/span[2]"))
+      price <- unlist(price$getElementText())
     },
-    error = function(err) {
-      price <- NA
+    error = function(err){
+      return(1)
     })
 }
 ```
@@ -800,12 +803,15 @@ In web scraping it is quite common to encounter unexpected (or expected) errors,
 
 ```{r, echo=TRUE, eval=FALSE}
 for (parent in parents){
+  price <- NA
+  
   tryCatch(
     expr = { #<<
-      price <- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]") #<<
+      price <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemPrice_price')]/span[2]")) #<<
+      price <- unlist(price$getElementText()) #<<
     }, #<<
-    error = function(err) {
-      price <- NA
+    error = function(err){
+      return(1)
     })
 }
 ```
@@ -815,16 +821,19 @@ for (parent in parents){
 ## tryCatch
 In web scraping it is quite common to encounter unexpected (or expected) errors, but we nonetheless would like to keep going.
 
-and if it throws an error, we do something else:
+and if it throws an error, we "catch" it:
 
 ```{r, echo=TRUE, eval=FALSE}
 for (parent in parents){
+  price <- NA
+  
   tryCatch(
     expr = {
-      price <- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+      price <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemPrice_price')]/span[2]"))
+      price <- unlist(price$getElementText())
     },
-    error = function(err) { #<<
-      price <- NA #<<
+    error = function(err){ #<<
+      return(1) #<<
     }) #<<
 }
 ```
@@ -845,12 +854,15 @@ To make our code run a bit faster and to increase code reusability, let's put th
 
 ```{r, echo=TRUE, eval=FALSE}
 find_homegate_elements <- function(listing){
+  price <- NA
+  
   tryCatch(
     expr = {
-      price <- listing$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+      price <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemPrice_price')]/span[2]"))
+      price <- unlist(price$getElementText())
     },
-    error = function(err) {
-      price <- NA
+    error = function(err){
+      return(1)
     })
   
   # Same procedure with the other 4 values
@@ -885,12 +897,12 @@ The resulting table for every page has all the information we wanted:
 ```{r, echo=TRUE, eval=FALSE}
 Rows: 20
 Columns: 6
-$ price       <chr> "790.–", "2,350.–", "1,810.–", "1,440.–", "1,340.–", "1,415.–", "1,535.–", "1,710.–", "1,915.–", "1,995.–", "2,100.–", "2,200.–", "2,330.–", "2,430.–", "3,1…
+$ price       <chr> "790.–", "2,350.–", "1,810.–", "1,440.–", "1,340.–", "1,415.–", "1,535.–", "1,710.–", "1,915.–", "1,995.–", "2,100.–", "2,200.–", "2,330.–", "2,430.–", "3,1…"
 $ sq_m        <chr> "55m2", "114m2", "84m2", NA, NA, NA, "69m2", "64m2", "78m2", "126m2", "85m2", "100m2", "130m2", "87m2", "119m2", "193m2", NA, NA, "140m2", "97m2"
-$ nr_rooms    <chr> "2rm", "3.5rm", "3.5rm", "3.5rm", "4rm", "3.5rm", "3rm", "2.5rm", "3.5rm", "5rm", "2.5rm", "4.5rm", "2rm", "2.5rm", "3.5rm", "4.5rm", "3.5rm", "5.5rm", "1rm…
-$ location    <chr> "5620 Bremgarten AG", "Habsburgerstrasse 54, 5200 Brugg", "General-Guisanstrasse, 5316 Leuggern", "Hauptstrasse 73C, 5737 Menziken", "Küttigerstrasse 28, 50…
-$ description <chr> "• Ab sofort ist diese 2 Zi-Wohnung frei in der Altstadt/Unterstadt von Bremgarten mit Küche (neu), Wohnraum, Schlafzimmer und Badzimmer • Separater Zugang …
-$ listing_id  <chr> "3002143209", "3002078497", "3001740639", "3002051685", "3002008282", "3002139009", "3002137050", "3002090945", "3002095259", "3002083088", "3002115827", "3…
+$ nr_rooms    <chr> "2rm", "3.5rm", "3.5rm", "3.5rm", "4rm", "3.5rm", "3rm", "2.5rm", "3.5rm", "5rm", "2.5rm", "4.5rm", "2rm", "2.5rm", "3.5rm", "4.5rm", "3.5rm", "5.5rm", "1rm…"
+$ location    <chr> "5620 Bremgarten AG", "Habsburgerstrasse 54, 5200 Brugg", "General-Guisanstrasse, 5316 Leuggern", "Hauptstrasse 73C, 5737 Menziken", "Küttigerstrasse 28, 50…"
+$ description <chr> "• Ab sofort ist diese 2 Zi-Wohnung frei in der Altstadt/Unterstadt von Bremgarten mit Küche (neu), Wohnraum, Schlafzimmer und Badzimmer • Separater Zugang …"
+$ listing_id  <chr> "3002143209", "3002078497", "3001740639", "3002051685", "3002008282", "3002139009", "3002137050", "3002090945", "3002095259", "3002083088", "3002115827", "3…"
 ```
 
 <br>
@@ -911,17 +923,255 @@ To do that, a human would click the "next page" button, so why don't we tell our
 
 First, we locate the "next page" button:
 ```{r, echo=TRUE, eval=FALSE}
-
+e <- remDr$findElement(value = "//*/a[contains(@aria-label, 'Go to next page')]")
 ```
 
+And we click it:
+```{r, echo=TRUE, eval=FALSE}
+e$clickElement()
+```
 
+Notice, here we are using the attribute `'aria-label'` which is quite uncommon, yet we can use the exact same syntax we already know.
 
+---
 
+## Turning a page...
 
+When we're on the next page, we use the same function as before and go to the next page.
 
+Until we've arrived on the last page, which we somehow need to register.
 
+One way to do that is to look for the "next page" button, once it's disabled, we know we have arrived on the last page.
 
+```{r, echo=TRUE, eval=FALSE}
+tryCatch(
+      next_page_button <- remDr$findElements(value = "//*/p[contains(@class, 'HgPaginationSelector_nextPreviousArrow')]")
+    )
+```
 
+--
+
+With a simple if statement, we can evaluate what we found:
+
+```{r, echo=TRUE, eval=FALSE}
+if (length(next_page_button) < 1){
+      last_page <- TRUE
+}
+```
+
+---
+
+## Turning a page...
+
+To keep looping through the pages until we have arrived at the last one, we can use a `while` loop:
+
+```{r, echo=TRUE, eval=FALSE}
+while (last_page == FALSE){
+  # Scrape the page
+}
+```
+
+--
+
+If we now put all of this in a `for` loop that goes over all of the canton links we have extracted previously, we have a recipe to scrape all of the rental properties on Homegate:
+
+```{r, echo=TRUE, eval=FALSE}
+for (c_link in canton_links){
+  while (last_page == FALSE){
+    # Scrape the page
+  }
+}
+```
+
+---
+
+## Home stretch
+
+All that is left to do is to also scrape all of the properties listed to buy:
+
+```{r, echo=TRUE, eval=FALSE}
+remDr$navigate("https://www.homegate.ch/buy/real-estate/switzerland")
+```
+
+--
+
+We can apply the exact same recipe as for the rental properties as we wrote code that would be highly reusable:
+
+```{r, echo=TRUE, eval=FALSE}
+for (c_link in canton_links){
+  while (last_page == FALSE){
+    # Scrape the page
+  }
+}
+```
+
+---
+
+## Home stretch
+
+The only thing we need to adjust is to add a different value for the listing type:
+
+```{r, echo=TRUE, eval=FALSE}
+# Add a column for the listing type
+page_result$listing_type <- "buy"
+```
+
+--
+
+We now have a data set of about 45'000 real estate listings in Switzerland and the skills to scrape almost any website out there!
+
+Let's just save it really quick:
+
+```{r, echo=TRUE, eval=FALSE}
+save(homegate_data, file = "Homegate_scrape.RData")
+```
+
+---
+
+## Data cleaning
+
+Now that we have all that data, there is still some work to do: <b> clean it! </b>
+
+- Some of our numeric data is saved as strings (e.g., listing IDs):
+```{r, echo=TRUE, eval=FALSE}
+$ listing_id  <chr> "3002143209", "3002078497", "..."
+```
+- Other data points include symbols that hinder further analysis (e.g., prices):
+```{r, echo=TRUE, eval=FALSE}
+$ price       <chr> "790.–", "2,350.–", "..."
+```
+- Some data is hidden within other data points (e.g., ZIP codes):
+```{r, echo=TRUE, eval=FALSE}
+$ location    <chr> "5620 Bremgarten AG", "Habsburgerstrasse 54, 5200 Brugg", "..."
+```
+
+---
+
+## Data cleaning
+
+Turning numbers that are saved as strings into numbers again is easy:
+
+```{r, echo=TRUE, eval=FALSE}
+homegate_data$listing_id <- sapply(homegate_data$listing_id, as.numeric)
+```
+
+If they contain characters such as ".-" or ",", we first need to remove them, otherwise we just get NAs:
+
+```{r, echo=TRUE, eval=FALSE}
+sapply(homegate_data$price, as.numeric)
+```
+
+```{r, echo=TRUE, eval=FALSE}
+[1] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[58] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+```
+
+---
+
+## New concept: regular expressions (regex)
+
+Regular expressions help us to find strings of characters in other strings:
+
+```{r, echo=TRUE, eval=TRUE}
+str_remove("69420.-", "\\.-") %>% as.numeric()
+```
+
+*Note:* We need to "escape" the period character because it has a different meaning in regular expressions: it is a so-called wildcard for any other character. With the double backslashes it just selects a period though.
+
+---
+
+## New concept: regular expressions (regex)
+
+With regex, we can also specify patterns that we are looking for in a string (such as four digit numbers of ZIP codes).
+
+--
+
+We do that by specifying:
+- The type of character we want: in this case digits: `\\d`
+- The number of consecutive occurrences: in this case four `{4}`
+
+```{r, echo=TRUE, eval=TRUE}
+str_extract("9000 St. Gallen", "\\d{4}") %>% as.numeric()
+```
+
+Here, it does not matter where the target substring occurs:
+
+```{r, echo=TRUE, eval=TRUE}
+str_extract("St. Gallen (9000)", "\\d{4}") %>% as.numeric()
+```
+
+---
+
+## Applying regex
+
+Let's apply these concepts to clean the data:
+
+```{r, echo=TRUE, eval=FALSE}
+homegate_data$price <- sapply(homegate_data$price,
+                              function(x){str_remove(x, "\\.-")}) %>%
+  sapply(., function(x){str_remove(x, ",")}) %>%
+  as.numeric()
+```
+
+```{r, echo=TRUE, eval=FALSE}
+homegate_data$sq_m <- sapply(homegate_data$sq_m,
+                              function(x){str_remove(x, "m2")}) %>%
+  as.numeric()
+```
+
+```{r, echo=TRUE, eval=FALSE}
+homegate_data$zip_code <- sapply(homegate_data$location,
+                                 function(x){str_extract(x, "\\d{4}")}) %>%
+  as.numeric()
+```
+
+```{r, echo=TRUE, eval=FALSE}
+homegate_data$nr_rooms <- sapply(homegate_data$nr_rooms,
+                                 function(x){str_remove(x, "rm")}) %>%
+  as.numeric()
+```
+
+---
+
+## Applying regex
+
+Now things look much cleaner and more useable for future analysis:
+
+```{r, echo=TRUE, eval=FALSE}
+glimpse(homegate_data)
+```
+
+```{r, echo=TRUE, eval=FALSE}
+$ price        <dbl> 790, 2350, 1810, 1440, 1340, ...
+$ sq_m         <chr> 55, 114, 84, NA, NA, ...
+$ nr_rooms     <dbl> 2.0, 3.5, 3.5, 3.5, 4.0, ...
+$ location     <chr> "5620 Bremgarten AG", "Habsburgerstrasse 54, 5200 Brugg", ...
+$ description  <chr> "• Ab sofort ist diese 2 Zi-Wohnung frei in der Altstadt/Unterstadt von ..."
+$ listing_id   <dbl> 3002143209, 3002078497, 3001740639, 3002051685, 3002008282, ...
+$ listing_type <chr> "rent", "rent", "rent", "rent", "rent", ...
+$ zip_code     <dbl> 5620, 5200, 5316, 5737, 5000, ...
+```
+
+.center[
+```{r, echo=FALSE, out.width="30%"}
+knitr::include_graphics("GraphicsSlides/nice-smack.gif")
+```
+]
+
+---
+
+## Great success!
+
+We now have a **clean** data set of over 45'000 real estate listings!
+
+<br>
+<br>
+
+.center[
+```{r, echo=FALSE, out.width="70%"}
+knitr::include_graphics("GraphicsSlides/thats_all.webp")
+```
+]
 
 ---
 

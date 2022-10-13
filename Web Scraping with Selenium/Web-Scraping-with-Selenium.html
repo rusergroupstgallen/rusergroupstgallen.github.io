@@ -42,7 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Ruben
-##### Last updated: _2022-10-13 18:47:43_
+##### Last updated: _2022-10-14 01:19:31_
 
 ---
 
@@ -78,7 +78,7 @@ Just a couple of possible roadblocks:
 And most importantly: why do something by hand when you can write code for hours to do it for you?
 
 .center[
-&lt;img src="GraphicsSlides/rick-and-morty-you-pass-butter.gif" width="40%" /&gt;
+&lt;img src="GraphicsSlides/hacker-hackerman.gif" width="35%" /&gt;
 ]
 
 ---
@@ -263,10 +263,10 @@ Webpages are built in the hypertext markup language (HTML):&lt;br&gt;
 ```html
 &lt;!DOCTYPE html&gt;
   &lt;html&gt;
-  &lt;body&gt;
-  &lt;h1&gt;My First Heading&lt;/h1&gt;
-  &lt;p&gt;My first paragraph.&lt;/p&gt;
-  &lt;/body&gt;
+    &lt;body&gt;
+      &lt;h1&gt;My First Heading&lt;/h1&gt;
+      &lt;p&gt;My first paragraph.&lt;/p&gt;
+    &lt;/body&gt;
   &lt;/html&gt;
 ```
 
@@ -302,11 +302,11 @@ or even metadata:
 ```html
 &lt;body&gt;
   &lt;div&gt;
-  &lt;a href='https://example.com'&gt;Link 1&lt;/a&gt;
-  &lt;a href='https://example.com'&gt;Link 2&lt;/a&gt;
-  &lt;a href='https://example.com'&gt;Link 3&lt;/a&gt;
+    &lt;a href='https://example.com'&gt;Link 1&lt;/a&gt;
+    &lt;a href='https://example.com'&gt;Link 2&lt;/a&gt;
+    &lt;a href='https://example.com'&gt;Link 3&lt;/a&gt;
   &lt;/div&gt;
-  &lt;/body&gt;
+&lt;/body&gt;
 ```
   
 --
@@ -758,12 +758,15 @@ How can we mitigate this?
 
 ```r
 for (parent in parents){
+  price &lt;- NA
+  
   tryCatch(
     expr = {
-      price &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+      price &lt;- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemPrice_price')]/span[2]"))
+      price &lt;- unlist(price$getElementText())
     },
-    error = function(err) {
-      price &lt;- NA
+    error = function(err){
+      return(1)
     })
 }
 ```
@@ -778,12 +781,15 @@ In web scraping it is quite common to encounter unexpected (or expected) errors,
 
 ```r
 for (parent in parents){
+  price &lt;- NA
+  
   tryCatch(
 *   expr = {
-*     price &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+*     price &lt;- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemPrice_price')]/span[2]"))
+*     price &lt;- unlist(price$getElementText())
 *   },
-    error = function(err) {
-      price &lt;- NA
+    error = function(err){
+      return(1)
     })
 }
 ```
@@ -793,24 +799,27 @@ for (parent in parents){
 ## tryCatch
 In web scraping it is quite common to encounter unexpected (or expected) errors, but we nonetheless would like to keep going.
 
-and if it throws an error, we do something else:
+and if it throws an error, we "catch" it:
 
 
 ```r
 for (parent in parents){
+  price &lt;- NA
+  
   tryCatch(
     expr = {
-      price &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+      price &lt;- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemPrice_price')]/span[2]"))
+      price &lt;- unlist(price$getElementText())
     },
-*   error = function(err) {
-*     price &lt;- NA
+*   error = function(err){
+*     return(1)
 *   })
 }
 ```
 
 ---
 
-## Finishing up
+## Putting it all together
 
 If we put the `tryCatch()` clauses on every statement where we look for an element that is potentially missing, we are covered against the unevitable errors and *our code is much more stable*.
 
@@ -818,19 +827,22 @@ If we put the `tryCatch()` clauses on every statement where we look for an eleme
 
 ---
 
-## Finishing up
+## Putting it all together
 
 To make our code run a bit faster and to increase code reusability, let's put the child-element-search in a convenient function with the following logic:
 
 
 ```r
 find_homegate_elements &lt;- function(listing){
+  price &lt;- NA
+  
   tryCatch(
     expr = {
-      price &lt;- listing$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+      price &lt;- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemPrice_price')]/span[2]"))
+      price &lt;- unlist(price$getElementText())
     },
-    error = function(err) {
-      price &lt;- NA
+    error = function(err){
+      return(1)
     })
   
   # Same procedure with the other 4 values
@@ -845,7 +857,7 @@ find_homegate_elements &lt;- function(listing){
 
 ---
 
-## Finishing up
+## Putting it all together
 
 Now we can apply this function to the list of parent elements for each page:
 
@@ -859,7 +871,7 @@ page_result &lt;- as.data.frame(do.call(rbind, page_result))
 
 ---
 
-## Finishing up
+## Putting it all together
 
 The resulting table for every page has all the information we wanted:
 
@@ -867,12 +879,12 @@ The resulting table for every page has all the information we wanted:
 ```r
 Rows: 20
 Columns: 6
-$ price       &lt;chr&gt; "790.–", "2,350.–", "1,810.–", "1,440.–", "1,340.–", "1,415.–", "1,535.–", "1,710.–", "1,915.–", "1,995.–", "2,100.–", "2,200.–", "2,330.–", "2,430.–", "3,1…
+$ price       &lt;chr&gt; "790.–", "2,350.–", "1,810.–", "1,440.–", "1,340.–", "1,415.–", "1,535.–", "1,710.–", "1,915.–", "1,995.–", "2,100.–", "2,200.–", "2,330.–", "2,430.–", "3,1…"
 $ sq_m        &lt;chr&gt; "55m2", "114m2", "84m2", NA, NA, NA, "69m2", "64m2", "78m2", "126m2", "85m2", "100m2", "130m2", "87m2", "119m2", "193m2", NA, NA, "140m2", "97m2"
-$ nr_rooms    &lt;chr&gt; "2rm", "3.5rm", "3.5rm", "3.5rm", "4rm", "3.5rm", "3rm", "2.5rm", "3.5rm", "5rm", "2.5rm", "4.5rm", "2rm", "2.5rm", "3.5rm", "4.5rm", "3.5rm", "5.5rm", "1rm…
-$ location    &lt;chr&gt; "5620 Bremgarten AG", "Habsburgerstrasse 54, 5200 Brugg", "General-Guisanstrasse, 5316 Leuggern", "Hauptstrasse 73C, 5737 Menziken", "Küttigerstrasse 28, 50…
-$ description &lt;chr&gt; "• Ab sofort ist diese 2 Zi-Wohnung frei in der Altstadt/Unterstadt von Bremgarten mit Küche (neu), Wohnraum, Schlafzimmer und Badzimmer • Separater Zugang …
-$ listing_id  &lt;chr&gt; "3002143209", "3002078497", "3001740639", "3002051685", "3002008282", "3002139009", "3002137050", "3002090945", "3002095259", "3002083088", "3002115827", "3…
+$ nr_rooms    &lt;chr&gt; "2rm", "3.5rm", "3.5rm", "3.5rm", "4rm", "3.5rm", "3rm", "2.5rm", "3.5rm", "5rm", "2.5rm", "4.5rm", "2rm", "2.5rm", "3.5rm", "4.5rm", "3.5rm", "5.5rm", "1rm…"
+$ location    &lt;chr&gt; "5620 Bremgarten AG", "Habsburgerstrasse 54, 5200 Brugg", "General-Guisanstrasse, 5316 Leuggern", "Hauptstrasse 73C, 5737 Menziken", "Küttigerstrasse 28, 50…"
+$ description &lt;chr&gt; "• Ab sofort ist diese 2 Zi-Wohnung frei in der Altstadt/Unterstadt von Bremgarten mit Küche (neu), Wohnraum, Schlafzimmer und Badzimmer • Separater Zugang …"
+$ listing_id  &lt;chr&gt; "3002143209", "3002078497", "3001740639", "3002051685", "3002008282", "3002139009", "3002137050", "3002090945", "3002095259", "3002083088", "3002115827", "3…"
 ```
 
 &lt;br&gt;
@@ -881,15 +893,298 @@ $ listing_id  &lt;chr&gt; "3002143209", "3002078497", "3001740639", "3002051685"
 &lt;img src="GraphicsSlides/great_success.gif" width="40%" /&gt;
 ]
 
+---
+
+## Turning a page...
+
+Now that we have code to scrape all the info from one page, let's also scrape all the other pages!
+
+To do that, a human would click the "next page" button, so why don't we tell our robot to do the same?!
+
+First, we locate the "next page" button:
+
+```r
+e &lt;- remDr$findElement(value = "//*/a[contains(@aria-label, 'Go to next page')]")
+```
+
+And we click it:
+
+```r
+e$clickElement()
+```
+
+Notice, here we are using the attribute `'aria-label'` which is quite uncommon, yet we can use the exact same syntax we already know.
+
+---
+
+## Turning a page...
+
+When we're on the next page, we use the same function as before and go to the next page.
+
+Until we've arrived on the last page, which we somehow need to register.
+
+One way to do that is to look for the "next page" button, once it's disabled, we know we have arrived on the last page.
 
 
+```r
+tryCatch(
+      next_page_button &lt;- remDr$findElements(value = "//*/p[contains(@class, 'HgPaginationSelector_nextPreviousArrow')]")
+    )
+```
+
+--
+
+With a simple if statement, we can evaluate what we found:
 
 
+```r
+if (length(next_page_button) &lt; 1){
+      last_page &lt;- TRUE
+}
+```
+
+---
+
+## Turning a page...
+
+To keep looping through the pages until we have arrived at the last one, we can use a `while` loop:
 
 
+```r
+while (last_page == FALSE){
+  # Scrape the page
+}
+```
+
+--
+
+If we now put all of this in a `for` loop that goes over all of the canton links we have extracted previously, we have a recipe to scrape all of the rental properties on Homegate:
 
 
+```r
+for (c_link in canton_links){
+  while (last_page == FALSE){
+    # Scrape the page
+  }
+}
+```
 
+---
+
+## Home stretch
+
+All that is left to do is to also scrape all of the properties listed to buy:
+
+
+```r
+remDr$navigate("https://www.homegate.ch/buy/real-estate/switzerland")
+```
+
+--
+
+We can apply the exact same recipe as for the rental properties as we wrote code that would be highly reusable:
+
+
+```r
+for (c_link in canton_links){
+  while (last_page == FALSE){
+    # Scrape the page
+  }
+}
+```
+
+---
+
+## Home stretch
+
+The only thing we need to adjust is to add a different value for the listing type:
+
+
+```r
+# Add a column for the listing type
+page_result$listing_type &lt;- "buy"
+```
+
+--
+
+We now have a data set of about 45'000 real estate listings in Switzerland and the skills to scrape almost any website out there!
+
+Let's just save it really quick:
+
+
+```r
+save(homegate_data, file = "Homegate_scrape.RData")
+```
+
+---
+
+## Data cleaning
+
+Now that we have all that data, there is still some work to do: &lt;b&gt; clean it! &lt;/b&gt;
+
+- Some of our numeric data is saved as strings (e.g., listing IDs):
+
+```r
+$ listing_id  &lt;chr&gt; "3002143209", "3002078497", "..."
+```
+- Other data points include symbols that hinder further analysis (e.g., prices):
+
+```r
+$ price       &lt;chr&gt; "790.–", "2,350.–", "..."
+```
+- Some data is hidden within other data points (e.g., ZIP codes):
+
+```r
+$ location    &lt;chr&gt; "5620 Bremgarten AG", "Habsburgerstrasse 54, 5200 Brugg", "..."
+```
+
+---
+
+## Data cleaning
+
+Turning numbers that are saved as strings into numbers again is easy:
+
+
+```r
+homegate_data$listing_id &lt;- sapply(homegate_data$listing_id, as.numeric)
+```
+
+If they contain characters such as ".-" or ",", we first need to remove them, otherwise we just get NAs:
+
+
+```r
+sapply(homegate_data$price, as.numeric)
+```
+
+
+```r
+[1] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+[58] NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA NA
+```
+
+---
+
+## New concept: regular expressions (regex)
+
+Regular expressions help us to find strings of characters in other strings:
+
+
+```r
+str_remove("69420.-", "\\.-") %&gt;% as.numeric()
+```
+
+```
+## [1] 69420
+```
+
+*Note:* We need to "escape" the period character because it has a different meaning in regular expressions: it is a so-called wildcard for any other character. With the double backslashes it just selects a period though.
+
+---
+
+## New concept: regular expressions (regex)
+
+With regex, we can also specify patterns that we are looking for in a string (such as four digit numbers of ZIP codes).
+
+--
+
+We do that by specifying:
+- The type of character we want: in this case digits: `\\d`
+- The number of consecutive occurrences: in this case four `{4}`
+
+
+```r
+str_extract("9000 St. Gallen", "\\d{4}") %&gt;% as.numeric()
+```
+
+```
+## [1] 9000
+```
+
+Here, it does not matter where the target substring occurs:
+
+
+```r
+str_extract("St. Gallen (9000)", "\\d{4}") %&gt;% as.numeric()
+```
+
+```
+## [1] 9000
+```
+
+---
+
+## Applying regex
+
+Let's apply these concepts to clean the data:
+
+
+```r
+homegate_data$price &lt;- sapply(homegate_data$price,
+                              function(x){str_remove(x, "\\.-")}) %&gt;%
+  sapply(., function(x){str_remove(x, ",")}) %&gt;%
+  as.numeric()
+```
+
+
+```r
+homegate_data$sq_m &lt;- sapply(homegate_data$sq_m,
+                              function(x){str_remove(x, "m2")}) %&gt;%
+  as.numeric()
+```
+
+
+```r
+homegate_data$zip_code &lt;- sapply(homegate_data$location,
+                                 function(x){str_extract(x, "\\d{4}")}) %&gt;%
+  as.numeric()
+```
+
+
+```r
+homegate_data$nr_rooms &lt;- sapply(homegate_data$nr_rooms,
+                                 function(x){str_remove(x, "rm")}) %&gt;%
+  as.numeric()
+```
+
+---
+
+## Applying regex
+
+Now things look much cleaner and more useable for future analysis:
+
+
+```r
+glimpse(homegate_data)
+```
+
+
+```r
+$ price        &lt;dbl&gt; 790, 2350, 1810, 1440, 1340, ...
+$ sq_m         &lt;chr&gt; 55, 114, 84, NA, NA, ...
+$ nr_rooms     &lt;dbl&gt; 2.0, 3.5, 3.5, 3.5, 4.0, ...
+$ location     &lt;chr&gt; "5620 Bremgarten AG", "Habsburgerstrasse 54, 5200 Brugg", ...
+$ description  &lt;chr&gt; "• Ab sofort ist diese 2 Zi-Wohnung frei in der Altstadt/Unterstadt von ..."
+$ listing_id   &lt;dbl&gt; 3002143209, 3002078497, 3001740639, 3002051685, 3002008282, ...
+$ listing_type &lt;chr&gt; "rent", "rent", "rent", "rent", "rent", ...
+$ zip_code     &lt;dbl&gt; 5620, 5200, 5316, 5737, 5000, ...
+```
+
+.center[
+&lt;img src="GraphicsSlides/nice-smack.gif" width="30%" /&gt;
+]
+
+---
+
+## Great success!
+
+We now have a **clean** data set of over 45'000 real estate listings!
+
+&lt;br&gt;
+&lt;br&gt;
+
+.center[
+&lt;img src="GraphicsSlides/thats_all.webp" width="70%" /&gt;
+]
 
 ---
 
