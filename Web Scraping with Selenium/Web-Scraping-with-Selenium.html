@@ -42,7 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Ruben
-##### Last updated: _2022-10-13 12:27:42_
+##### Last updated: _2022-10-13 18:47:43_
 
 ---
 
@@ -124,11 +124,11 @@ are mainly used to
 
 ## The setup
 
-First we need to install some packages:
+First we need to install the RSelenium package (and tidyverse of course):
 
 ```r
 library(RSelenium)
-library(xml2)
+library(tidyverse)
 ```
 --
 
@@ -395,7 +395,7 @@ canton_links &lt;- unlist(lapply(e, function(x){x$getElementAttribute("href")}))
 
 ## New concept: element attribute
 
-HTML elements carry more data than just a text. These can be useful for &lt;b&gt; finding &lt;/b&gt; elements as well as &lt;b&gt; extracting &lt;/b&gt; additional data.
+HTML elements carry more data than just a text. These can be useful for ** finding ** elements as well as ** extracting ** additional data.
 
 - Example of a `&lt;div&gt;` tag with a class:
 
@@ -404,7 +404,7 @@ HTML elements carry more data than just a text. These can be useful for &lt;b&gt
 &lt;div class="my_class_name"&gt; Text &lt;/div&gt;
 ```
 
--&gt; We can use the class to &lt;b&gt; find &lt;/b&gt; this `&lt;div&gt;` element.
+-&gt; We can use the class to **find** this `&lt;div&gt;` element.
 
 - Example of an `&lt;a&gt;` tag with an href (a link):
 
@@ -413,7 +413,7 @@ HTML elements carry more data than just a text. These can be useful for &lt;b&gt
 &lt;a href="https://example.com"&gt; Link to example.com &lt;/a&gt;
 ```
 
--&gt; We might want to &lt;b&gt; extract &lt;/b&gt; this link
+-&gt; We might want to **extract** this link
 
 ---
 
@@ -421,9 +421,9 @@ HTML elements carry more data than just a text. These can be useful for &lt;b&gt
 
 With the specific example of Homegate, we have a problem:
 
-&lt;b&gt; They randomize their classes, so we cannot easily grab them &lt;/b&gt;
+**They randomize part of their class names, so we cannot easily grab them**
 
-&lt;b&gt; BUT: &lt;/b&gt; we have a solution:
+**BUT:** we have a solution:
 
 Instead of searching for a specific class (with the randomized part in it), we just search for the constant part:
 
@@ -493,7 +493,7 @@ Thinking about potential analyses we might want to conduct, interesting values t
 - location
 - description (maybe we can extract important keywords)
 
-Less obvious but useful: &lt;b&gt; the link &lt;/b&gt; of the detailed listing. At a later time we might want to extract more data from the listing and saving the link will make this much easier.
+Less obvious but useful: **the link** of the detailed listing. At a later time we might want to extract more data from the listing and saving the link will make this much easier.
 
 ---
 
@@ -515,21 +515,371 @@ Less obvious but useful: &lt;b&gt; the link &lt;/b&gt; of the detailed listing. 
 
 The price is in a `&lt;span&gt;` element without a class. However, the parent of this `&lt;span&gt;` (which is another `&lt;span&gt;`) has the convenient `class='ListItemPrice_price_1o0i3'`.
 
-Again, Homegate includes a random part '1o0i3' (this might be different for you), but we can just search for the first part of the class name:
+Again, Homegate includes a random part `'1o0i3'` (this might be different for you), but we can just search for the first part of the class name:
 
 
 ```r
-e &lt;- remDr$findElements(value = "//*/span[contains(@class, 'ListItemPrice')]/span[2]")
+e &lt;- remDr$findElements(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
 ```
 
 So let's see what we have scraped:
 
 
 ```r
-canton_links &lt;- unlist(lapply(e, function(x){x$getElementText()}))
+unlist(lapply(e, function(x){x$getElementText()}))
 ```
 
 
+```r
+[1] "790.–"   "2,350.–" "1,810.–" "1,440.–" "1,340.–" "1,415.–" "1,535.–" "1,710.–" "1,915.–" "1,995.–" "2,100.–" "2,200.–" "2,330.–" "2,430.–" "3,120.–" "3,200.–" "1,615.–"
+[18] "1,920.–" "1,800.–" "1,680.–"
+```
+
+---
+
+### Task 3: Find all areas of the appartments (given in square meters)
+
+**Tip:** This time, the `&lt;span&gt;` you're looking for has a class, no need to go via the parent!
+
+&lt;br&gt;
+&lt;br&gt;
+&lt;br&gt;
+
+.center[
+&lt;img src="GraphicsSlides/gimme_that.jpeg" width="60%" /&gt;
+]
+
+---
+
+### Solution
+
+The span that has the area information has the class `'ListItemLivingSpace_value_2zFir'`. Again, we only look for the first (non-random) part.
+
+
+```r
+e &lt;- remDr$findElements(value = "//*/span[contains(@class, 'ListItemLivingSpace_value')]")
+```
+
+Which gives us the following values:
+
+
+```r
+unlist(lapply(e, function(x){x$getElementText()}))
+```
+
+
+```r
+[1] "55m2"  "114m2" "84m2"  "69m2"  "64m2"  "78m2"  "126m2" "85m2"  "100m2" "130m2" "87m2"  "119m2" "193m2" "140m2" "97m2"
+```
+
+---
+
+## A small hick-up: missing values
+
+Unfortunately, not every listing has the living area given, we only found 15 values in 20 listings:
+
+
+```r
+[1] "55m2"  "114m2" "84m2"  "69m2"  "64m2"  "78m2"  "126m2" "85m2"  "100m2" "130m2" "87m2"  "119m2" "193m2" "140m2" "97m2"
+```
+
+Why could this be a problem?
+
+---
+
+## A small hick-up: missing values
+
+.pull-left[
+If we just fill this data into a table and assume the rest is `NA`, we get the following:&lt;br&gt;
+&lt;img src="GraphicsSlides/screenshot_table_wrong.png" width="60%" /&gt;
+]
+
+.pull-right[
+In reality, this is the correct data:&lt;br&gt;&lt;br&gt;&lt;br&gt;
+&lt;img src="GraphicsSlides/screenshot_table_right.png" width="60%" /&gt;
+]
+
+---
+
+## How can we deal with this?
+
+Because `findElements` only lists all the elements that match with certain criteria and does not tell us anything about associated data (which listing it came from), we have to find a new approach.
+
+**Currently:** we get all the values on one page in vectors (of different lengths, unfortunately).
+
+**Idea:** we could go listing-by-listing and extract all values that are associated with that listing.
+
+--
+
+Remember that we can specify the parent(s) of a certain element we are looking for?
+
+--&gt; So let's find all the listing parents (the large boxes all the other stuff is contained in)
+
+
+```r
+parents &lt;- remDr$findElements(value = "//*/a[contains(@class, 'ResultList_ListItem')]")
+```
+
+All listings are wrapped in a link that leads to the detailed listing page --&gt; we can use that!
+
+---
+
+## A closer look at the listing wrappers
+
+Interestingly, all these `&lt;a&gt;` elements that wrap around the listings contain a link with the listing ID:
+
+
+```html
+&lt;a class="ResultList_Listitem" href="https://www.homegate.ch/mieten/3002089277"&gt;&lt;/a&gt;
+```
+
+This ID is useful to scrape, as this allows us to have a time-stable identifier for the listings. With this, we could for example scrape the page regularly and see:
+- which listings have come on the market recently
+- which ones no one wants
+- how prices might have changed
+
+.center[
+&lt;img src="GraphicsSlides/zucc.jpeg" width="30%" /&gt;
+]
+
+---
+
+## How can we go "listing-by-listing"?
+
+Because the return of the `findElement` function returns an active binding instead of a fixed value, we can continue working with them.
+
+For example, we can use `findChildElement` to find its "children", such as the `&lt;span&gt;` containing the price:
+
+
+```r
+child &lt;- parents[[1]]$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+```
+
+---
+
+### Task 4: Find the rest of the XPATHs for the information we wanted to scrape
+
+**Reminder:** Besides the price and area we also wanted to get:
+- number of rooms
+- location
+- description
+
+&lt;br&gt;
+
+.center[
+&lt;img src="GraphicsSlides/programmer.png" width="50%" /&gt;
+]
+
+---
+
+### Solution
+
+- The **number of rooms** is contained in:
+
+```r
+"//*/span[contains(@class, 'ListItemRoomNumber_value')]"
+```
+
+- The **location** is in:
+
+```r
+"//*/div[contains(@class, 'ListItem') and contains(@class, '_data_')]/p[2]/span"
+```
+
+*Note:* Some elements are harder to specify than others. You can use the logical operators **and** and **or** to chain multiple `contains` together.
+
+- The **description** is in:
+
+```r
+"//*/div[contains(@class, 'ListItemDescription_description')]/p"
+```
+
+---
+
+## Let's put it all together
+
+We have:
+- a list of all parent elements `&lt;a&gt;`
+- the XPATHs to their children
+
+Now we can loop over all the parents:
+
+
+```r
+for (parent in parents){
+  price &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+  sq_m &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemLivingSpace_value')]")
+  nr_rooms &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemRoomNumber_value')]")
+  location &lt;- parent$findChildElement(value = "//*/div[contains(@class, 'ListItem') and contains(@class, '_data_')]/p[2]/span")
+  description &lt;- parent$findChildElement(value = "//*/div[contains(@class, 'ListItemDescription_description')]/p")
+* listing_link &lt;- parent$getElementAttribute("href")
+  
+  data.frame("price" = price, "sq_m" = sq_m, "nr_rooms" = nr_rooms, "location" = location, "description" = description, "listing_link" = listing_link)
+}
+```
+
+*Note:* don't forget to extract the link of the detailed listing, as we have done previously.
+
+---
+
+## We uncover the next problem
+
+The previous code will likely throw this error:
+
+
+```r
+"Selenium message:no such element: Unable to locate element: {'method':'xpath','selector':'//*/span[contains(@class, 'ListItemLivingSpace_value')]'}
+  (Session info: chrome=106.0.5249.119)
+For documentation on this error, please visit: https://www.seleniumhq.org/exceptions/no_such_element.html
+Build info: version: '4.0.0-alpha-2', revision: 'f148142cf8', time: '2019-07-01T21:30:10'
+System info: host: 'eduroamstud-130-82-245-171.unisg.ch', ip: 'fe80:0:0:0:10ba:f169:ddd9:af11%en0', os.name: 'Mac OS X', os.arch: 'x86_64', os.version: '10.16', java.version: '14.0.1'
+Driver info: driver.version: unknown
+
+Error: 	 Summary: NoSuchElement
+ 	 Detail: An element could not be located on the page using the given search parameters.
+ 	 class: org.openqa.selenium.NoSuchElementException
+	 Further Details: run errorDetails method"
+```
+
+---
+
+## We uncover the next problem
+
+`Summary: NoSuchElement` is pretty self-explanatory and it's about a known issue:
+
+__*Some listings don't have an area value*__
+
+How can we mitigate this?
+
+--
+
+--&gt; We **try** to find the element and assign `"NA"` if we can't
+
+
+```r
+for (parent in parents){
+  tryCatch(
+    expr = {
+      price &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+    },
+    error = function(err) {
+      price &lt;- NA
+    })
+}
+```
+
+---
+
+## tryCatch
+In web scraping it is quite common to encounter unexpected (or expected) errors, but we nonetheless would like to keep going.
+
+`tryCatch()` offers exactly that functionality: we **try** some expression:
+
+
+```r
+for (parent in parents){
+  tryCatch(
+*   expr = {
+*     price &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+*   },
+    error = function(err) {
+      price &lt;- NA
+    })
+}
+```
+
+---
+
+## tryCatch
+In web scraping it is quite common to encounter unexpected (or expected) errors, but we nonetheless would like to keep going.
+
+and if it throws an error, we do something else:
+
+
+```r
+for (parent in parents){
+  tryCatch(
+    expr = {
+      price &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+    },
+*   error = function(err) {
+*     price &lt;- NA
+*   })
+}
+```
+
+---
+
+## Finishing up
+
+If we put the `tryCatch()` clauses on every statement where we look for an element that is potentially missing, we are covered against the unevitable errors and *our code is much more stable*.
+
+&gt; We do not include the full code here but you can download it from our [GitHub](https://github.com/rusergroupstgallen/rusergroupstgallen.github.io/blob/main/Web%20Scraping%20with%20Selenium/scraper.R)
+
+---
+
+## Finishing up
+
+To make our code run a bit faster and to increase code reusability, let's put the child-element-search in a convenient function with the following logic:
+
+
+```r
+find_homegate_elements &lt;- function(listing){
+  tryCatch(
+    expr = {
+      price &lt;- listing$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+    },
+    error = function(err) {
+      price &lt;- NA
+    })
+  
+  # Same procedure with the other 4 values
+  
+  return(data.frame(data.frame("price" = price,
+                               "sq_m" = sq_m,
+                               "nr_rooms" = nr_rooms,
+                               "location" = location,
+                               "description" = description)))
+}
+```
+
+---
+
+## Finishing up
+
+Now we can apply this function to the list of parent elements for each page:
+
+
+```r
+page_result &lt;- lapply(parents, find_homegate_elements)
+
+# Coerce the results into a data frame
+page_result &lt;- as.data.frame(do.call(rbind, page_result))
+```
+
+---
+
+## Finishing up
+
+The resulting table for every page has all the information we wanted:
+
+
+```r
+Rows: 20
+Columns: 6
+$ price       &lt;chr&gt; "790.–", "2,350.–", "1,810.–", "1,440.–", "1,340.–", "1,415.–", "1,535.–", "1,710.–", "1,915.–", "1,995.–", "2,100.–", "2,200.–", "2,330.–", "2,430.–", "3,1…
+$ sq_m        &lt;chr&gt; "55m2", "114m2", "84m2", NA, NA, NA, "69m2", "64m2", "78m2", "126m2", "85m2", "100m2", "130m2", "87m2", "119m2", "193m2", NA, NA, "140m2", "97m2"
+$ nr_rooms    &lt;chr&gt; "2rm", "3.5rm", "3.5rm", "3.5rm", "4rm", "3.5rm", "3rm", "2.5rm", "3.5rm", "5rm", "2.5rm", "4.5rm", "2rm", "2.5rm", "3.5rm", "4.5rm", "3.5rm", "5.5rm", "1rm…
+$ location    &lt;chr&gt; "5620 Bremgarten AG", "Habsburgerstrasse 54, 5200 Brugg", "General-Guisanstrasse, 5316 Leuggern", "Hauptstrasse 73C, 5737 Menziken", "Küttigerstrasse 28, 50…
+$ description &lt;chr&gt; "• Ab sofort ist diese 2 Zi-Wohnung frei in der Altstadt/Unterstadt von Bremgarten mit Küche (neu), Wohnraum, Schlafzimmer und Badzimmer • Separater Zugang …
+$ listing_id  &lt;chr&gt; "3002143209", "3002078497", "3001740639", "3002051685", "3002008282", "3002139009", "3002137050", "3002090945", "3002095259", "3002083088", "3002115827", "3…
+```
+
+&lt;br&gt;
+
+.center[
+&lt;img src="GraphicsSlides/great_success.gif" width="40%" /&gt;
+]
 
 
 
@@ -545,23 +895,20 @@ canton_links &lt;- unlist(lapply(e, function(x){x$getElementText()}))
 
 # So let's recap
 
-We wanted:
+We learned:
+- How websites are structured
+- How to find stuff with XPATHs
+- How to drive a robo-browser
+- How to deal with missing values
+- How to clean scraped data
 
-- Title page
-- Table of contents
-- Table of figures
-- Page numbering
-- Citations
-- References
-- ...
-
-And most importantly: No more manual copying and pasting.
+And most importantly: We learned how to harvest some juicy, free data!
 
 ---
 
 # That's it for today!
 
-**Some finishing words**
+**Some closing words**
 
 For further questions, feel free to reach out to us. Make sure to stay updated on our socials and via our website where all resources and dates are also published.
 
