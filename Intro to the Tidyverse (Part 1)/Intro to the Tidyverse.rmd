@@ -663,8 +663,10 @@ knitr::include_graphics("GraphicsSlides/programmer.png")
 
 ```{r, warning=FALSE, message=FALSE}
 penguins %>% 
-  group_by(year, species) %>% 
-  summarise(mean_body_mass = mean(body_mass_g, na.rm = T))
+  select(species, year, bill_length_mm, bill_depth_mm) %>% 
+  group_by(species, year) %>% 
+  summarise(bill_length = mean(bill_length_mm, na.rm = T),
+            bill_depth = mean(bill_depth_mm, na.rm = T))
 ```
 
 Now it would be really nice to be able to compare from left to right, over time.

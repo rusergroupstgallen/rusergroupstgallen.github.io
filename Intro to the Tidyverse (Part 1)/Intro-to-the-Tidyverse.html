@@ -51,7 +51,7 @@ pre {
 
 ##### Presenter: Ruben Ernst
 ##### Author: Mathias Steilen
-##### Last updated: _2022-10-10 19:51:47_
+##### Last updated: _2022-10-15 11:46:28_
 
 ---
 
@@ -322,14 +322,15 @@ penguins %&gt;%
 
 ```
 ## # A tibble: 152 × 8
-##   species island bill_length_mm bill_depth_mm flipper_length_… body_mass_g sex  
-##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt; &lt;fct&gt;
-## 1 Adelie  Torge…           39.1          18.7              181        3750 male 
-## 2 Adelie  Torge…           39.5          17.4              186        3800 fema…
-## 3 Adelie  Torge…           40.3          18                195        3250 fema…
-## 4 Adelie  Torge…           NA            NA                 NA          NA &lt;NA&gt; 
-## 5 Adelie  Torge…           36.7          19.3              193        3450 fema…
-## # … with 147 more rows, and 1 more variable: year &lt;int&gt;
+##   species island    bill_length_mm bill_depth_mm flipper_l…¹ body_…² sex    year
+##   &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;       &lt;int&gt;   &lt;int&gt; &lt;fct&gt; &lt;int&gt;
+## 1 Adelie  Torgersen           39.1          18.7         181    3750 male   2007
+## 2 Adelie  Torgersen           39.5          17.4         186    3800 fema…  2007
+## 3 Adelie  Torgersen           40.3          18           195    3250 fema…  2007
+## 4 Adelie  Torgersen           NA            NA            NA      NA &lt;NA&gt;   2007
+## 5 Adelie  Torgersen           36.7          19.3         193    3450 fema…  2007
+## # … with 147 more rows, and abbreviated variable names ¹​flipper_length_mm,
+## #   ²​body_mass_g
 ```
 ---
 
@@ -465,14 +466,15 @@ Show everything that's **NOT** any of the values in the vector to the right.
 
 ```
 ## # A tibble: 276 × 8
-##   species island bill_length_mm bill_depth_mm flipper_length_… body_mass_g sex  
-##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt; &lt;fct&gt;
-## 1 Adelie  Torge…           39.1          18.7              181        3750 male 
-## 2 Adelie  Torge…           39.5          17.4              186        3800 fema…
-## 3 Adelie  Torge…           40.3          18                195        3250 fema…
-## 4 Adelie  Torge…           NA            NA                 NA          NA &lt;NA&gt; 
-## 5 Adelie  Torge…           36.7          19.3              193        3450 fema…
-## # … with 271 more rows, and 1 more variable: year &lt;int&gt;
+##   species island    bill_length_mm bill_depth_mm flipper_l…¹ body_…² sex    year
+##   &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;       &lt;int&gt;   &lt;int&gt; &lt;fct&gt; &lt;int&gt;
+## 1 Adelie  Torgersen           39.1          18.7         181    3750 male   2007
+## 2 Adelie  Torgersen           39.5          17.4         186    3800 fema…  2007
+## 3 Adelie  Torgersen           40.3          18           195    3250 fema…  2007
+## 4 Adelie  Torgersen           NA            NA            NA      NA &lt;NA&gt;   2007
+## 5 Adelie  Torgersen           36.7          19.3         193    3450 fema…  2007
+## # … with 271 more rows, and abbreviated variable names ¹​flipper_length_mm,
+## #   ²​body_mass_g
 ```
 
 ---
@@ -944,24 +946,26 @@ Please calculate the **mean bill length and depth for all the available years fo
 
 ```r
 penguins %&gt;% 
-  group_by(year, species) %&gt;% 
-  summarise(mean_body_mass = mean(body_mass_g, na.rm = T))
+  select(species, year, bill_length_mm, bill_depth_mm) %&gt;% 
+  group_by(species, year) %&gt;% 
+  summarise(bill_length = mean(bill_length_mm, na.rm = T),
+            bill_depth = mean(bill_depth_mm, na.rm = T))
 ```
 
 ```
-## # A tibble: 9 × 3
-## # Groups:   year [3]
-##    year species   mean_body_mass
-##   &lt;int&gt; &lt;fct&gt;              &lt;dbl&gt;
-## 1  2007 Adelie             3696.
-## 2  2007 Chinstrap          3694.
-## 3  2007 Gentoo             5071.
-## 4  2008 Adelie             3742 
-## 5  2008 Chinstrap          3800 
-## 6  2008 Gentoo             5020.
-## 7  2009 Adelie             3665.
-## 8  2009 Chinstrap          3725 
-## 9  2009 Gentoo             5141.
+## # A tibble: 9 × 4
+## # Groups:   species [3]
+##   species    year bill_length bill_depth
+##   &lt;fct&gt;     &lt;int&gt;       &lt;dbl&gt;      &lt;dbl&gt;
+## 1 Adelie     2007        38.8       18.8
+## 2 Adelie     2008        38.6       18.2
+## 3 Adelie     2009        39.0       18.1
+## 4 Chinstrap  2007        48.7       18.5
+## 5 Chinstrap  2008        48.7       18.4
+## 6 Chinstrap  2009        49.1       18.3
+## 7 Gentoo     2007        47.0       14.7
+## 8 Gentoo     2008        46.9       14.9
+## 9 Gentoo     2009        48.5       15.3
 ```
 
 Now it would be really nice to be able to compare from left to right, over time.
