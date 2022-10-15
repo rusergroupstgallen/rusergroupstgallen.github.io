@@ -96,6 +96,26 @@ find_homegate_elements <- function(listing){
                     "listing_url" = unlist(listing$getElementAttribute("href"))))
 }
 
+## Implicit wait
+implWait <- function(wait_s = 30){
+  counter <- 0
+  webElem <- NULL
+  while(is.null(webElem) & counter < wait_s){
+    webElem <- tryCatch(
+      expr = {
+        suppressMessages({
+          remDr$findElement(value = "//*/a[contains(@class, 'ResultList_ListItem')]")
+        })
+      },
+      error = function(err){
+        NULL
+      })
+    Sys.sleep(1)
+    counter <- counter + 1
+    print("waiting")
+  }
+}
+
 
 
 ## Listings for rent ----
@@ -110,6 +130,7 @@ canton_links <- unlist(lapply(e, function(x){x$getElementAttribute("href")}))[2:
 homegate_data <- data.frame()
 
 # Go through the listings by canton
+last_page <- FALSE
 for (c_link in canton_links){
   
   # Navigate to the page
@@ -152,22 +173,8 @@ for (c_link in canton_links){
       e$clickElement()
       
       # Wait for page to load before continuing
-      counter <- 0
-      webElem <- NULL
-      while(is.null(webElem) & counter < 30){
-        webElem <- tryCatch(
-          expr = {
-            suppressMessages({
-              remDr$findElement(value = "//*/a[contains(@class, 'ResultList_ListItem')]")
-            })
-          },
-          error = function(err){
-            NULL
-          })
-        Sys.sleep(1)
-        counter <- counter + 1
-        print("waiting")
-      }
+      implWait(30)
+      
       print("Next page")
     }
   }
@@ -191,6 +198,7 @@ e <- remDr$findElements(value = "//*/div[contains(@class, 'GeoDrillDownSRPLink')
 canton_links <- unlist(lapply(e, function(x){x$getElementAttribute("href")}))[2:27]
 
 # Go through the listings by canton
+last_page <- FALSE
 for (c_link in canton_links){
   
   # Navigate to the page
@@ -233,22 +241,8 @@ for (c_link in canton_links){
       e$clickElement()
       
       # Wait for page to load before continuing
-      counter <- 0
-      webElem <- NULL
-      while(is.null(webElem) & counter < 30){
-        webElem <- tryCatch(
-          expr = {
-            suppressMessages({
-              remDr$findElement(value = "//*/a[contains(@class, 'ResultList_ListItem')]")
-            })
-          },
-          error = function(err){
-            NULL
-          })
-        Sys.sleep(1)
-        counter <- counter + 1
-        print("waiting")
-      }
+      implWait(30)
+      
       print("Next page")
     }
   }
