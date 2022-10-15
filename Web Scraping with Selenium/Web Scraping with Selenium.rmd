@@ -652,7 +652,7 @@ Remember that we can specify the parent(s) of a certain element we are looking f
 --> So let's find all the listing parents (the large boxes all the other stuff is contained in)
 
 ```{r, echo=TRUE, eval=FALSE}
-parents <- remDr$findElements(value = "//*/a[contains(@class, 'ResultList_ListItem')]")
+parents <- remDr$findElements(value = "//*/a[contains(@class, 'ListItem')]")
 ```
 
 All listings are wrapped in a link that leads to the detailed listing page --> we can use that!
@@ -664,7 +664,7 @@ All listings are wrapped in a link that leads to the detailed listing page --> w
 Interestingly, all these `<a>` elements that wrap around the listings contain a link with the listing ID:
 
 ```{html, echo=TRUE, eval=FALSE}
-<a class="ResultList_Listitem" href="https://www.homegate.ch/mieten/3002089277"></a>
+<a class="ListItem" href="https://www.homegate.ch/mieten/3002089277"></a>
 ```
 
 This ID is useful to scrape, as this allows us to have a time-stable identifier for the listings. With this, we could for example scrape the page regularly and see:

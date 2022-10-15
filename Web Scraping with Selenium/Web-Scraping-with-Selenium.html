@@ -42,7 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Ruben
-##### Last updated: _2022-10-15 11:59:15_
+##### Last updated: _2022-10-15 12:52:37_
 
 ---
 
@@ -625,7 +625,7 @@ Remember that we can specify the parent(s) of a certain element we are looking f
 
 
 ```r
-parents &lt;- remDr$findElements(value = "//*/a[contains(@class, 'ResultList_ListItem')]")
+parents &lt;- remDr$findElements(value = "//*/a[contains(@class, 'ListItem')]")
 ```
 
 All listings are wrapped in a link that leads to the detailed listing page --&gt; we can use that!
@@ -638,7 +638,7 @@ Interestingly, all these `&lt;a&gt;` elements that wrap around the listings cont
 
 
 ```html
-&lt;a class="ResultList_Listitem" href="https://www.homegate.ch/mieten/3002089277"&gt;&lt;/a&gt;
+&lt;a class="ListItem" href="https://www.homegate.ch/mieten/3002089277"&gt;&lt;/a&gt;
 ```
 
 This ID is useful to scrape, as this allows us to have a time-stable identifier for the listings. With this, we could for example scrape the page regularly and see:

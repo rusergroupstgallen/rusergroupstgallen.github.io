@@ -104,7 +104,7 @@ implWait <- function(wait_s = 30){
     webElem <- tryCatch(
       expr = {
         suppressMessages({
-          remDr$findElement(value = "//*/a[contains(@class, 'ResultList_ListItem')]")
+          remDr$findElement(value = "//*/a[contains(@class, 'ListItem')]")
         })
       },
       error = function(err){
@@ -140,7 +140,7 @@ for (c_link in canton_links){
   while (last_page == FALSE){
     
     # Get all the listing wrappers on the page
-    parents <- remDr$findElements(value = "//*/a[contains(@class, 'ResultList_ListItem')]")
+    parents <- remDr$findElements(value = "//*/a[contains(@class, 'ListItem')]")
     
     # Get the values from the child elements
     page_result <- lapply(parents, find_homegate_elements)
@@ -208,7 +208,7 @@ for (c_link in canton_links){
   while (last_page == FALSE){
     
     # Get all the listing wrappers on the page
-    parents <- remDr$findElements(value = "//*/a[contains(@class, 'ResultList_ListItem')]")
+    parents <- remDr$findElements(value = "//*/a[contains(@class, 'ListItem')]")
     
     # Get the values from the child elements
     page_result <- lapply(parents, find_homegate_elements)
