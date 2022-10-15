@@ -260,10 +260,13 @@ save(homegate_data, file = "Homegate_scrape.RData")
 ## Finally ----
 # Some clean-up
 homegate_data$listing_id <- sapply(homegate_data$listing_id, as.numeric)
-homegate_data$price <- sapply(homegate_data$price, function(x){str_remove(x, "\\.-")}) %>%
-  sapply(., function(x){str_remove(x, ",")}) %>%
+homegate_data$price <- sapply(homegate_data$price, function(x){str_remove(x, "\\.–")}) %>%
+  sapply(., function(x){str_remove_all(x, ",")}) %>%
+  unlist(.) %>% 
   as.numeric()
 homegate_data$sq_m <- sapply(homegate_data$sq_m, function(x){str_remove(x, "m2")}) %>%
+  sapply(., function(x){str_remove_all(x, ",")}) %>%
+  unlist(.) %>% 
   as.numeric()
 homegate_data$zip_code <- sapply(homegate_data$location, function(x){str_extract(x, "\\d{4}")}) %>%
   as.numeric()
@@ -271,7 +274,7 @@ homegate_data$nr_rooms <- sapply(homegate_data$nr_rooms, function(x){str_remove(
   as.numeric()
 
 # Write our scraped data to a file
-save(homegate_data, file = "Homegate_scrape.RData")
+save(homegate_data, file = paste0("Homegate_scrape_clean_", Sys.Date(), ".RData"))
 
 # Close connection
 remDr$close()

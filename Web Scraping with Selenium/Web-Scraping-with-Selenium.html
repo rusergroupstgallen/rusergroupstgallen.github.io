@@ -42,7 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Ruben
-##### Last updated: _2022-10-15 15:39:36_
+##### Last updated: _2022-10-15 19:14:32_
 
 ---
 
@@ -1143,16 +1143,17 @@ Let's apply these concepts to clean the data:
 
 
 ```r
-homegate_data$price &lt;- sapply(homegate_data$price,
-                              function(x){str_remove(x, "\\.-")}) %&gt;%
-  sapply(., function(x){str_remove(x, ",")}) %&gt;%
+homegate_data$price &lt;- sapply(homegate_data$price, function(x){str_remove(x, "\\.–")}) %&gt;%
+  sapply(., function(x){str_remove_all(x, ",")}) %&gt;%
+  unlist(.) %&gt;% 
   as.numeric()
 ```
 
 
 ```r
-homegate_data$sq_m &lt;- sapply(homegate_data$sq_m,
-                              function(x){str_remove(x, "m2")}) %&gt;%
+homegate_data$sq_m &lt;- sapply(homegate_data$sq_m, function(x){str_remove(x, "m2")}) %&gt;%
+  sapply(., function(x){str_remove_all(x, ",")}) %&gt;%
+  unlist(.) %&gt;% 
   as.numeric()
 ```
 

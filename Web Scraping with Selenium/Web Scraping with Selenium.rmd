@@ -1130,15 +1130,16 @@ str_extract("St. Gallen (9000)", "\\d{4}") %>% as.numeric()
 Let's apply these concepts to clean the data:
 
 ```{r, echo=TRUE, eval=FALSE}
-homegate_data$price <- sapply(homegate_data$price,
-                              function(x){str_remove(x, "\\.-")}) %>%
-  sapply(., function(x){str_remove(x, ",")}) %>%
+homegate_data$price <- sapply(homegate_data$price, function(x){str_remove(x, "\\.–")}) %>%
+  sapply(., function(x){str_remove_all(x, ",")}) %>%
+  unlist(.) %>% 
   as.numeric()
 ```
 
 ```{r, echo=TRUE, eval=FALSE}
-homegate_data$sq_m <- sapply(homegate_data$sq_m,
-                              function(x){str_remove(x, "m2")}) %>%
+homegate_data$sq_m <- sapply(homegate_data$sq_m, function(x){str_remove(x, "m2")}) %>%
+  sapply(., function(x){str_remove_all(x, ",")}) %>%
+  unlist(.) %>% 
   as.numeric()
 ```
 
