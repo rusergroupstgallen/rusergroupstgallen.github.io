@@ -1344,6 +1344,24 @@ Just add these statements to the end of your script.
 
 ---
 
+## Appendix: Running the scraper
+
+Scraping a website can sometimes take hours, and RStudio can be a bit moody over this amount of time. We therefore highly recommend that you run your scraper from a terminal and **not within RStudio**.
+
+On Windows, open a Powershell, navigate to the directory of your script with the `cd` command and run:
+
+```{bash, echo=TRUE, eval=FALSE}
+> Rscript scraper.R
+```
+
+On Mac, open a Terminal, navigate to the correct directory with `cd` and run:
+
+```{bash, echo=TRUE, eval=FALSE}
+$ Rscript scraper.R
+```
+
+---
+
 # That's it for today!
 
 **Some closing words**
