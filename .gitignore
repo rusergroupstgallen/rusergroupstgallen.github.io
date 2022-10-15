@@ -38,5 +38,4 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
-Web Scraping with Selenium/.DS_Store
-Web Scraping with Selenium/GraphicsSlides/.DS_Store
+*/.DS_Store
