@@ -42,7 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Ruben
-##### Last updated: _2022-10-14 01:19:31_
+##### Last updated: _2022-10-15 11:36:46_
 
 ---
 
@@ -213,7 +213,7 @@ chromeDr &lt;- rsDriver(browser = "chrome", port = 4569L, chromever = "105.0.519
 remDr &lt;- chromeDr[["client"]]
 ```
 
-The extra options are used ensure that:
+The extra options are used to ensure that:
 - We don't run into graphics driver issues
 - We suppress popups
 - We have adequate permissions
@@ -346,7 +346,7 @@ Find the element with the picker tool (top left) and copy its XPATH
 
 ### Task 1: Get the text of the pink button on homegate
 
-**Tip:** Start by finding the element and then extract its *text* attribute as follows:
+**Tip:** Start by  the element and then extract its *text* attribute as follows:
 
 
 ```r
@@ -374,7 +374,7 @@ remDr$findElement(value = '//*[@id="app"]/main/div/div[2]/div/div/div[5]/button'
 
 ---
 
-## Finding multiple elements
+##  multiple elements
 
 Often it is useful to find multiple elements at once.
 
@@ -383,6 +383,8 @@ Often it is useful to find multiple elements at once.
 ]
 
 Here we could extract the links to all cantons and save them to go through later.
+
+--&gt; We need to find a common identifier.
 
 
 ```r
@@ -513,7 +515,7 @@ Less obvious but useful: **the link** of the detailed listing. At a later time w
 
 ### Solution
 
-The price is in a `&lt;span&gt;` element without a class. However, the parent of this `&lt;span&gt;` (which is another `&lt;span&gt;`) has the convenient `class='ListItemPrice_price_1o0i3'`.
+The price is in a `&lt;span&gt;` element without a class. However, the parent of this `&lt;span&gt;` (which is another `&lt;span&gt;`) conveniently has the attribute `class='ListItemPrice_price_1o0i3'`.
 
 Again, Homegate includes a random part `'1o0i3'` (this might be different for you), but we can just search for the first part of the class name:
 
@@ -526,7 +528,7 @@ So let's see what we have scraped:
 
 
 ```r
-unlist(lapply(e, function(x){x$getElementText()}))
+lapply(e, function(x){x$getElementText()}) %&gt;% unlist()
 ```
 
 
@@ -564,7 +566,7 @@ Which gives us the following values:
 
 
 ```r
-unlist(lapply(e, function(x){x$getElementText()}))
+lapply(e, function(x){x$getElementText()}) %&gt;% unlist()
 ```
 
 
@@ -591,12 +593,16 @@ Why could this be a problem?
 
 .pull-left[
 If we just fill this data into a table and assume the rest is `NA`, we get the following:&lt;br&gt;
+.center[
 &lt;img src="GraphicsSlides/screenshot_table_wrong.png" width="60%" /&gt;
+]
 ]
 
 .pull-right[
 In reality, this is the correct data:&lt;br&gt;&lt;br&gt;&lt;br&gt;
+.center[
 &lt;img src="GraphicsSlides/screenshot_table_right.png" width="60%" /&gt;
+]
 ]
 
 ---
@@ -609,7 +615,9 @@ Because `findElements` only lists all the elements that match with certain crite
 
 **Idea:** we could go listing-by-listing and extract all values that are associated with that listing.
 
---
+---
+
+## How can we deal with this?
 
 Remember that we can specify the parent(s) of a certain element we are looking for?
 
@@ -646,14 +654,30 @@ This ID is useful to scrape, as this allows us to have a time-stable identifier 
 
 ## How can we go "listing-by-listing"?
 
-Because the return of the `findElement` function returns an active binding instead of a fixed value, we can continue working with them.
+Because we were able to extract listing IDs from the href of all listing wrappers (the `&lt;a&gt;` elements), we can include them in our XPATHs.
 
-For example, we can use `findChildElement` to find its "children", such as the `&lt;span&gt;` containing the price:
+Because the parent elements are active bindings, not just static values, we can use `findChildElement` to find its "children", such as the `&lt;span&gt;` containing the price:
 
 
 ```r
-child &lt;- parents[[1]]$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
+child &lt;- parents[[1]]$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemPrice_price')]/span[2]"))
 ```
+
+---
+
+## How can we go "listing-by-listing"?
+
+Now we are looking for two conditions:
+- listing ID in the `href` of the parent element
+- `class` in the child element
+
+We obtain the ID with
+
+```r
+listing_id &lt;- unlist(strsplit(unlist(listing$getElementAttribute("href")), "/(?!.*/)", perl = TRUE))[2]
+```
+
+*Note:* The strange looking string `"/(?!.*/)"` is a regular expression looking for any "/" that is not followed by another "/", allowing us to split the URL and to extract the listing ID. We will look at regular expressions in more detail later in this presentation.
 
 ---
 
@@ -707,11 +731,11 @@ Now we can loop over all the parents:
 
 ```r
 for (parent in parents){
-  price &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemPrice_price')]/span[2]")
-  sq_m &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemLivingSpace_value')]")
-  nr_rooms &lt;- parent$findChildElement(value = "//*/span[contains(@class, 'ListItemRoomNumber_value')]")
-  location &lt;- parent$findChildElement(value = "//*/div[contains(@class, 'ListItem') and contains(@class, '_data_')]/p[2]/span")
-  description &lt;- parent$findChildElement(value = "//*/div[contains(@class, 'ListItemDescription_description')]/p")
+  price &lt;- parent$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemPrice_price')]/span[2]"))
+  sq_m &lt;- parent$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemLivingSpace_value')]"))
+  nr_rooms &lt;- parent$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemRoomNumber_value')]"))
+  location &lt;- parent$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//div[contains(@class, 'ListItem') and contains(@class, '_data_')]/p[2]/span"))
+  description &lt;- parent$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//div[contains(@class, 'ListItemDescription_description')]/p"))
 * listing_link &lt;- parent$getElementAttribute("href")
   
   data.frame("price" = price, "sq_m" = sq_m, "nr_rooms" = nr_rooms, "location" = location, "description" = description, "listing_link" = listing_link)
@@ -745,7 +769,7 @@ Error: 	 Summary: NoSuchElement
 
 ## We uncover the next problem
 
-`Summary: NoSuchElement` is pretty self-explanatory and it's about a known issue:
+`NoSuchElement` is pretty self-explanatory and it's about a known issue:
 
 __*Some listings don't have an area value*__
 
@@ -1179,7 +1203,6 @@ $ zip_code     &lt;dbl&gt; 5620, 5200, 5316, 5737, 5000, ...
 
 We now have a **clean** data set of over 45'000 real estate listings!
 
-&lt;br&gt;
 &lt;br&gt;
 
 .center[
