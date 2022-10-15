@@ -968,7 +968,7 @@ One way to do that is to look for the "next page" button, once it's disabled, we
 
 ```{r, echo=TRUE, eval=FALSE}
 tryCatch(
-      next_page_button <- remDr$findElements(value = "//*/p[contains(@class, 'HgPaginationSelector_nextPreviousArrow')]")
+      next_page_button <- remDr$findElements(value = "//*/a[contains(@aria-label, 'Go to next page')]")
     )
 ```
 

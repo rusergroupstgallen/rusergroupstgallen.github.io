@@ -42,7 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Ruben
-##### Last updated: _2022-10-15 11:36:46_
+##### Last updated: _2022-10-15 11:59:15_
 
 ---
 
@@ -952,7 +952,7 @@ One way to do that is to look for the "next page" button, once it's disabled, we
 
 ```r
 tryCatch(
-      next_page_button &lt;- remDr$findElements(value = "//*/p[contains(@class, 'HgPaginationSelector_nextPreviousArrow')]")
+      next_page_button &lt;- remDr$findElements(value = "//*/a[contains(@aria-label, 'Go to next page')]")
     )
 ```
 
