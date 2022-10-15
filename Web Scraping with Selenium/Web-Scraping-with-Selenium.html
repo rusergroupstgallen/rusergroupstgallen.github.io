@@ -42,7 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Ruben
-##### Last updated: _2022-10-15 13:36:12_
+##### Last updated: _2022-10-15 15:39:36_
 
 ---
 
@@ -1382,6 +1382,30 @@ On Mac, open a Terminal, navigate to the correct directory with `cd` and run:
 ```bash
 $ Rscript scraper.R
 ```
+
+---
+
+## Appendix: Running the scraper
+
+If you wish to preserve the environment variables from your session (which is advisable), start an R session in your terminal and then run the script.
+
+In Windows Powershell:
+
+
+```bash
+&gt; R.exe
+&gt; source("scraper.R")
+```
+
+And in Mac Terminal:
+
+
+```bash
+$ R
+&gt; source("scraper.R")
+```
+
+This way, you won't lose your data, should your scraper crash.
 
 ---
 

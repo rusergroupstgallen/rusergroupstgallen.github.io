@@ -1362,6 +1362,28 @@ $ Rscript scraper.R
 
 ---
 
+## Appendix: Running the scraper
+
+If you wish to preserve the environment variables from your session (which is advisable), start an R session in your terminal and then run the script.
+
+In Windows Powershell:
+
+```{bash, echo=TRUE, eval=FALSE}
+> R.exe
+> source("scraper.R")
+```
+
+And in Mac Terminal:
+
+```{bash, echo=TRUE, eval=FALSE}
+$ R
+> source("scraper.R")
+```
+
+This way, you won't lose your data, should your scraper crash.
+
+---
+
 # That's it for today!
 
 **Some closing words**
