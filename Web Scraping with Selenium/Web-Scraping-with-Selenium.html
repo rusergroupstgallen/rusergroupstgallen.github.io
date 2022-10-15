@@ -42,7 +42,7 @@ overflow-y: scroll;
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Ruben
-##### Last updated: _2022-10-15 12:52:37_
+##### Last updated: _2022-10-15 13:12:52_
 
 ---
 
@@ -1221,6 +1221,147 @@ We learned:
 - How to clean scraped data
 
 And most importantly: We learned how to harvest some juicy, free data!
+
+---
+
+## Appendix: Implicit wait
+
+Sometimes you have to wait until a page is loaded fully or else you won't find certain elements.
+
+A function like this can be helpful:
+
+
+```r
+implWait &lt;- function(wait_s = 30){
+  counter &lt;- 0
+  webElem &lt;- NULL
+  while(is.null(webElem) &amp; counter &lt; wait_s){
+    webElem &lt;- tryCatch(
+      expr = {
+        suppressMessages({
+          remDr$findElement(value = "//XPATH to important element")
+        })
+      },
+      error = function(err){
+        NULL
+      })
+    Sys.sleep(1)
+    counter &lt;- counter + 1
+    print("waiting")
+  }
+}
+```
+
+---
+
+## Appendix: Implicit wait
+
+We enter a `while` loop that looks for an element until found:
+
+
+```r
+implWait &lt;- function(wait_s = 30){
+  counter &lt;- 0
+  webElem &lt;- NULL
+  while(is.null(webElem) &amp; counter &lt; wait_s){
+*   webElem &lt;- tryCatch(
+*     expr = {
+*       suppressMessages({
+*         remDr$findElement(value = "//XPATH to important element")
+*       })
+*     },
+*     error = function(err){
+*       NULL
+*     })
+    Sys.sleep(1)
+    counter &lt;- counter + 1
+    print("waiting")
+  }
+}
+```
+
+---
+
+## Appendix: Implicit wait
+
+And wait for one second while it's not found:
+
+
+```r
+implWait &lt;- function(wait_s = 30){
+  counter &lt;- 0
+  webElem &lt;- NULL
+  while(is.null(webElem) &amp; counter &lt; wait_s){
+    webElem &lt;- tryCatch(
+      expr = {
+        suppressMessages({
+          remDr$findElement(value = "//XPATH to important element")
+        })
+      },
+      error = function(err){
+        NULL
+      })
+*   Sys.sleep(1)
+*   counter &lt;- counter + 1
+*   print("waiting")
+  }
+}
+```
+
+---
+
+## Appendix: Implicit wait
+
+You might want to add exit conditions as well, so you can specify what happens if the element is not found.
+
+
+```r
+implWait &lt;- function(wait_s = 30){
+  counter &lt;- 0
+  webElem &lt;- NULL
+  
+  # while loop
+  
+* if (is.null(webElem)){
+*   return(1)
+* } else {
+*   return(0)
+* }
+}
+```
+
+---
+
+## Appendix: Implicit wait
+
+For example, you could skip to the next page if the element is not found after the specified implicit wait:
+
+
+```r
+if (implWait(30) == 1){
+  remDr$navigate("URL to next page")
+}
+```
+
+---
+
+## Appendix: Exit conditions
+
+After you are done scraping a website, it is good practice to release the binding to the remote driver instance:
+
+
+```r
+remDr$close()
+```
+
+And to stop the webdriver server instance (in this case chromedriver):
+
+
+```r
+chromeDr[["server"]]$stop()
+```
+
+Just add these statements to the end of your script.
 
 ---
 
