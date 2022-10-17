@@ -71,14 +71,15 @@ gapminder <- gapminder::gapminder
 \textit{Hint:} Instead of typing out all years since 1980, try to use a suitable logical condition when filtering.
 \hfill\break
 
-(b) We have looked at data on the continent level but how do things look in Switzerland (or your home country)? Extract the GDP per capita, population and life expectancy in Switzerland for all years since 1980. To make the table more readable, display the GDP per capita in thousands, the population in millions, and the life expectancy in years past 50. Transform your result into wide format, so that there is a row per calculated value and a column per year.
+(b) We have looked at data on the continent level but how do things look in Switzerland (or your home country)? Extract the GDP per capita, population and life expectancy in Switzerland for all years since 1980. To make the table more readable, display the GDP per capita in thousands, the population in millions, and the life expectancy in years past 50. Additionally, round the population values to one decimal. Transform your result into wide format, so that there is a row per calculated value and a column per year.
 
-\textit{Hint:} You will have to transform to a "real" long format first, before transforming to wide format.
+\textit{Hint:} You can use the pipe operator within another "pipe chain", e.g., to pass a value to the `round()` function.\newline
+\textit{Hint:} To display your result in wide format, you will have to transform to a "real" long format first, before transforming to wide format.
 \hfill\break
 
-(c) Now that we have analyzed Switzerland (or your home country), let's compare it to the rest of Europe (or your home continent). Assemble a table with one column for Switzerland's GDP per capita for every year and one column with Europe's (excluding Switzerland) median GDP per capita for every year.
+(c) Now that we have analyzed Switzerland (or your home country), let's compare it to the rest of Europe (or your home continent). Assemble a table with one column for Switzerland's GDP per capita for every year in thousands and one column with Europe's (excluding Switzerland) median GDP per capita for every year in thousands.
 
-\textit{Hint:} You can pass entire "pipe chains" as arguments to functions in other pipe chains.
+\textit{Hint:} You can use the `ifelse()` function to logically fill a column, i.e., to determine if a country is Switzerland or rest of Europe. Type `?ifelse` in the console to see how it works.
 \hfill\break
 
 \textbf{If you made it this far, we commend you! That was some serious data wrangling just then. You now have some important skills to apply to your own data analyses!}
@@ -163,34 +164,29 @@ gapminder %>%
 \textit{Note:} The logical operator `>=` is equivalent to the ≥ sign. Similarly, we can use `<=` to signify ≤. We can also use the logical "not-equal-to" operator `!=` to mean ≠.
 \newpage
 
-(b) To preserve the year variable, we group by it first, even though there is only one value in each of the groups. We could also use `mutate()` to add the values back in but then we would have to type out all the different years (way too annoying!).
+(b) To preserve the year variable, we use transmutate. Of course it is perfectly fine to use `select()` first and then `mutate`. In order to achieve the rounding to one decimal, we pass the population values to `round()` with a pipe operator. Pipe in a pipe!
 ```{r}
 gapminder %>% 
-    filter(country == "Switzerland" & year >= 1980) %>% 
-    group_by(year) %>% 
-    summarize(k_gdpPercap = gdpPercap / 1e3,
-              mio_pop = pop / 1e6,
-              lifeExp_past_50 = lifeExp - 50) %>% 
-    ungroup() %>% 
-    pivot_longer(cols = c(k_gdpPercap, mio_pop, lifeExp_past_50),
-                 names_to = "variables",
-                 values_to = "values") %>% 
-    pivot_wider(names_from = year,
-                values_from = values)
+  filter(country == "Switzerland" & year >= 1980) %>% 
+  transmute(year, 
+            k_gdpPercap = gdpPercap / 1e3,
+            mio_pop = (pop / 1e6) %>% round(digits = 1),
+            lifeExp_past_50 = lifeExp - 50) %>% 
+  pivot_longer(cols = c(k_gdpPercap, mio_pop, lifeExp_past_50),
+               names_to = "variables",
+               values_to = "values") %>% 
+  pivot_wider(names_from = year,
+              values_from = values)
 ```
 \textit{Note:} The `1e3` and `1e6` are scientific notation for 1'000 and 1'000'000. By using this notation, you can avoid mistakes coming from typing too many or too few zeros.
 \newpage
 
-(c) The key to solving this task in one "pipe chain" is that you can pass pipe chains as arguments within other pipe chains as if they were just variables. If you solved this by first saving the Europe column in a separate variable, this is of course completely valid. This applies to coding in general: everyone has their own preferred way to do things and everyone will defend that approach as if their life depended on it.
+(c) We solve this task with a "helper" column called `region` which we create with the `ifelse()` function. We can then group by these different regions. If you solved this by first saving the Europe column in a separate variable, this is of course completely valid. This applies to coding in general: everyone has their own preferred way to do things and everyone will defend that approach as if their life depended on it.
 ```{r}
-gapminder %>%
-  filter(country == "Switzerland") %>%
-  group_by(year) %>%
-  summarize(k_gdpPercap_CH = gdpPercap / 1e3) %>%
-  mutate(gapminder %>%
-           filter(continent == "Europe" & country != "Switzerland") %>%
-           group_by(year) %>%
-           summarize(k_median_gdpPercap_EU = median(gdpPercap) / 1e3) %>%
-           select(k_median_gdpPercap_EU)
-         )
+gapminder %>% 
+  filter(continent == "Europe") %>% 
+  mutate(region = ifelse(country == "Switzerland", "Switzerland", "Europe")) %>% 
+  group_by(region, year) %>% 
+  summarise(k_median_GDP = median(gdpPercap) / 1e3) %>% 
+  pivot_wider(names_from = "region", values_from = "k_median_GDP")
 ```
