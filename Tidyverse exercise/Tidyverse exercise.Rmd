@@ -71,9 +71,10 @@ gapminder <- gapminder::gapminder
 \textit{Hint:} Instead of typing out all years since 1980, try to use a suitable logical condition when filtering.
 \hfill\break
 
-(b) We have looked at data on the continent level but how do things look in Switzerland (or your home country)? Extract the GDP per capita, population and life expectancy in Switzerland for all years. To make the table more readable, display the GDP per capita in thousands, the population in millions, and the life expectancy in years past 50. Transform your result into wide format, so that there is a row per calculated value and a column per year.
+(b) We have looked at data on the continent level but how do things look in Switzerland (or your home country)? Extract the GDP per capita, population and life expectancy in Switzerland for all years since 1980. To make the table more readable, display the GDP per capita in thousands, the population in millions, and the life expectancy in years past 50. Transform your result into wide format, so that there is a row per calculated value and a column per year.
 
 \textit{Hint:} You will have to transform to a "real" long format first, before transforming to wide format.
+\hfill\break
 
 (c) Now that we have analyzed Switzerland (or your home country), let's compare it to the rest of Europe (or your home continent). Assemble a table with one column for Switzerland's GDP per capita for every year and one column with Europe's (excluding Switzerland) median GDP per capita for every year.
 
@@ -165,7 +166,7 @@ gapminder %>%
 (b) To preserve the year variable, we group by it first, even though there is only one value in each of the groups. We could also use `mutate()` to add the values back in but then we would have to type out all the different years (way too annoying!),
 ```{r}
 gapminder %>% 
-    filter(country == "Switzerland") %>% 
+    filter(country == "Switzerland" & year >= 1980) %>% 
     group_by(year) %>% 
     summarize(k_gdpPercap = gdpPercap / 1e3,
               mio_pop = pop / 1e6,
