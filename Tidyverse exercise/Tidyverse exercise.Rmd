@@ -163,7 +163,7 @@ gapminder %>%
 \textit{Note:} The logical operator `>=` is equivalent to the ≥ sign. Similarly, we can use `<=` to signify ≤. We can also use the logical "not-equal-to" operator `!=` to mean ≠.
 \newpage
 
-(b) To preserve the year variable, we group by it first, even though there is only one value in each of the groups. We could also use `mutate()` to add the values back in but then we would have to type out all the different years (way too annoying!),
+(b) To preserve the year variable, we group by it first, even though there is only one value in each of the groups. We could also use `mutate()` to add the values back in but then we would have to type out all the different years (way too annoying!).
 ```{r}
 gapminder %>% 
     filter(country == "Switzerland" & year >= 1980) %>% 
@@ -178,7 +178,7 @@ gapminder %>%
     pivot_wider(names_from = year,
                 values_from = values)
 ```
-\textit{Note:} The `1e3` and `1e6` are scientific notation for 1'000 and 1'000'000. By using this, you can avoid mistakes coming from typing too many or too few zeros.
+\textit{Note:} The `1e3` and `1e6` are scientific notation for 1'000 and 1'000'000. By using this notation, you can avoid mistakes coming from typing too many or too few zeros.
 \newpage
 
 (c) The key to solving this task in one "pipe chain" is that you can pass pipe chains as arguments within other pipe chains as if they were just variables. If you solved this by first saving the Europe column in a separate variable, this is of course completely valid. This applies to coding in general: everyone has their own preferred way to do things and everyone will defend that approach as if their life depended on it.
