@@ -164,7 +164,7 @@ gapminder %>%
 \textit{Note:} The logical operator `>=` is equivalent to the ≥ sign. Similarly, we can use `<=` to signify ≤. We can also use the logical "not-equal-to" operator `!=` to mean ≠.
 \newpage
 
-(b) To preserve the year variable, we use transmutate. Of course it is perfectly fine to use `select()` first and then `mutate`. In order to achieve the rounding to one decimal, we pass the population values to `round()` with a pipe operator. Pipe in a pipe!
+(b) To preserve the year variable, we use `transmute()`. Of course it is perfectly fine to use `select()` first and then `mutate`. In order to achieve the rounding to one decimal, we pass the population values to `round()` with a pipe operator. Pipe in a pipe!
 ```{r}
 gapminder %>% 
   filter(country == "Switzerland" & year >= 1980) %>% 
