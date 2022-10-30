@@ -6,8 +6,8 @@ library(tidyverse)
 
 ## Set up ----
 # Setting up the driver
-chromeDr <- rsDriver(browser = "chrome", port = 4567L, chromever = "106.0.5249.61", # you will have to adjust this version
-                     extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1920,1080'),
+chromeDr <- rsDriver(browser = "chrome", port = 4568L, chromever = "106.0.5249.61", geckover = NULL, # you will have to adjust this version
+                     extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1920,1080', '--headless'),
                                                                    prefs = list(
                                                                      "profile.default_content_settings.popups" = 0L,
                                                                      "download.prompt_for_download" = FALSE,
@@ -186,7 +186,7 @@ for (c_link in canton_links){
 }
 
 # Write our scraped data to a file
-save(homegate_data, file = "Homegate_scrape.RData")
+save(homegate_data, file = "Web Scraping with Selenium/Homegate_scrape.RData")
 
 
 ## Listings to buy ----
@@ -254,12 +254,12 @@ for (c_link in canton_links){
 }
 
 # Write our scraped data to a file
-save(homegate_data, file = "Homegate_scrape.RData")
+# save(homegate_data, file = "Homegate_scrape.RData")
 
 
 ## Finally ----
 # Some clean-up
-homegate_data$listing_id <- sapply(homegate_data$listing_id, as.numeric)
+homegate_data$listing_id <- sapply(homegate_data$listing_url, function(x){as.numeric(str_extract(x, "\\d+"))})
 homegate_data$price <- sapply(homegate_data$price, function(x){str_remove(x, "\\.–")}) %>%
   sapply(., function(x){str_remove_all(x, ",")}) %>%
   unlist(.) %>% 
@@ -274,7 +274,8 @@ homegate_data$nr_rooms <- sapply(homegate_data$nr_rooms, function(x){str_remove(
   as.numeric()
 
 # Write our scraped data to a file
-save(homegate_data, file = paste0("Homegate_scrape_clean_", Sys.Date(), ".RData"))
+homegate_data <- unique(homegate_data)
+save(homegate_data, file = paste0("Web Scraping with Selenium/Homegate_scrape_clean_", Sys.Date(), ".RData"))
 
 # Close connection
 remDr$close()
