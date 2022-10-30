@@ -1,0 +1,69 @@
+---
+title: "Data Visualisation Task"
+author: RUG @ HSG
+output:
+  
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+header-includes:
+  \usepackage{fancyhdr}
+  \usepackage{graphicx}
+  \usepackage{eurosym}
+  \usepackage{booktabs,xcolor}
+  \pagestyle{fancy}
+  \fancyhf{}
+  \addtolength{\headheight}{1.0cm}
+  \rhead{Data Visualisation Task - Break WS2022}
+  \lhead{\includegraphics[width=3cm]{"img/RUG_HSG_Logo_shapes_transparent.png"}}
+  \rfoot{Page \thepage}
+  \fancypagestyle{plain}{\pagestyle{fancy}}
+  
+editor_options: 
+  chunk_output_type: console
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev = "cairo_pdf")
+
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+```
+
+After the introduction to _ggplot2_ by Gilbert Fontana on 27 October 2022, let's put the skills to work and come up with a chart based on the data below.
+
+You can **hand it your visualisation until the end of the break** to any of our socials. Selected **visualisations will be featured on our [instagram account](https://www.instagram.com/rusergroupstgallen/?hl=en)**!
+
+## The Data
+
+The data set was created by economist [Kate Pennington](https://www.katepennington.org/research) and is about rental listing prices in the San Francisco bay area over the period from 2000 to 2018. There is also information on the neighbourhoods, cities and counties.
+
+```{r, message=FALSE}
+library(tidyverse)
+rent <- read_csv("rent_san_francisco_download.csv")
+glimpse(rent)
+```
+
+## An Example
+
+```{r, out.width="100%", fig.height=4}
+rent %>% 
+  filter(year == "2018") %>% 
+  group_by(city) %>% 
+  summarise(median_price = median(price)) %>% 
+  slice_max(order_by = median_price, n = 10) %>% 
+  mutate(city = str_to_title(city)) %>% 
+  ggplot(aes(x = median_price,
+             y = city %>% fct_reorder(median_price))) +
+  geom_col(fill = "dodgerblue", alpha = 0.8) +
+  labs(title = "San Francisco Bay Area:\nRental Prices In The 10 Most Expensive Cities",
+       y = NULL,
+       x = "Median Price (per month)") +
+  scale_x_continuous(labels = scales::dollar_format()) +
+  theme_minimal() +
+  theme(panel.grid.major.y = element_blank(),
+        plot.title = element_text(face = "bold", size = 15))
+```
+
+Feel free to ask questions in our Q&A chat and hand in your charts. We are looking forward to your submissions!

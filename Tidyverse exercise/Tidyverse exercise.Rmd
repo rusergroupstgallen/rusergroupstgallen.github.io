@@ -1,0 +1,192 @@
+---
+title: "Intermediate tidyverse exercises"
+author: RUG @ HSG
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+  
+mainfont: "Avenir Next"
+monofont: Monaco
+header-includes:
+  \usepackage{fancyhdr}
+  \usepackage{graphicx}
+  \usepackage{eurosym}
+  \usepackage{booktabs,xcolor}
+  \pagestyle{fancy}
+  \fancyhf{}
+  \addtolength{\headheight}{1.0cm}
+  \rhead{Intermediate tidyverse exercises - 2022-10-17}
+  \lhead{\includegraphics[width=3cm]{"img/RUG_HSG_Logo_shapes_transparent.png"}}
+  \rfoot{Page \thepage}
+  \fancypagestyle{plain}{\pagestyle{fancy}}
+  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev = "cairo_pdf")
+library(tidyverse)
+library(gapminder)
+```
+
+Below, you will find some exercises to apply and improve your tidyverse skills. Generally, they increase in difficulty as you go along. Don't hesitate to ask questions in the Q&A WhatsApp group, we or your fellow students will be happy to answer them!
+
+## The data set
+
+In these exercises we will be working with the `gapminder` data set. It includes historical data on the life expectancy, population, and GDP in different countries over the past decades. You can load it directly from the `gapminder` package like this:
+
+```{r echo=TRUE, eval=FALSE}
+install.packages("gapminder")
+gapminder <- gapminder::gapminder
+```
+
+## Task 1: Getting an overview over the data
+
+(a) In `tidyverse` there are multiple functions that allow you to gain a quick overview over the data that you are working with. Use one of them to find out:
+- How many rows and columns are in the data
+- Which variable types are in the data
+\hfill\break
+
+(b) Find out for which time frame the data is available.
+\hfill\break
+
+(c) Count the number of countries represented per continent. (\textit{Hint:} the function `n_distinct()` gives you the number of unique values in a vector)
+
+## Task 2: Descriptive statistics
+
+(a) We have the GDP per capita for a lot of countries, but how do they compare per continent? Calculate the mean GDP per capita for every continent in the year 2007. The mean GDP can be misleading if the distribution over the countries is skewed. Also add the median GDP per capita.
+\hfill\break
+
+(b) The economic development of these continents seems to be quite different. Calculate the minimum, median, and maximum life expectancy per continent in 1952. Sort them from lowest to highest median life expectancy.
+\hfill\break
+
+(c) The table from task (b) is great but a bit hard to read at a glance. Calculate the distance from the minimum life expectancy to the median and from the median to the maximum in the year 1952.
+\newpage
+
+## Task 3: More in-depth analysis
+
+(a) So far we have compared certain variables in one year, now we would like to know how they developed over time. Calculate the median GDP per capita for every continent for every year since 1980. To make the resulting table easier to interpret, transform it to wide format.
+
+\textit{Hint:} Instead of typing out all years since 1980, try to use a suitable logical condition when filtering.
+\hfill\break
+
+(b) We have looked at data on the continent level but how do things look in Switzerland (or your home country)? Extract the GDP per capita, population and life expectancy in Switzerland for all years since 1980. To make the table more readable, display the GDP per capita in thousands, the population in millions, and the life expectancy in years past 50. Additionally, round the population values to one decimal. Transform your result into wide format, so that there is a row per calculated value and a column per year.
+
+\textit{Hint:} You can use the pipe operator within another "pipe chain", e.g., to pass a value to the `round()` function.\newline
+\textit{Hint:} To display your result in wide format, you will have to transform to a "real" long format first, before transforming to wide format.
+\hfill\break
+
+(c) Now that we have analyzed Switzerland (or your home country), let's compare it to the rest of Europe (or your home continent). Assemble a table with one column for Switzerland's GDP per capita for every year in thousands and one column with Europe's (excluding Switzerland) median GDP per capita for every year in thousands.
+
+\textit{Hint:} You can use the `ifelse()` function to logically fill a column, i.e., to determine if a country is Switzerland or rest of Europe. Type `?ifelse` in the console to see how it works.
+\hfill\break
+
+\textbf{If you made it this far, we commend you! That was some serious data wrangling just then. You now have some important skills to apply to your own data analyses!}
+
+
+\newpage
+
+# Solutions
+## Task 1
+
+(a) There is more than one answer to this task, however, we prefer `glimpse()` because the overview is nice and condensed.
+
+```{r}
+gapminder %>% glimpse()
+```
+
+We see that there are `1704` rows and `6` columns in the dataframe. We have `factor`, `integer` and `double` data types.
+\hfill\break
+
+(b) We can use the `summarize()` function for this:
+```{r}
+gapminder %>%
+  summarize(starting_year = min(year),
+            ending_year = max(year))
+```
+\hfill\break
+
+(c) If we group by continent first, we can use the `n_distinct()` function to give us the number of countries per continent.
+```{r}
+gapminder %>%
+  group_by(continent) %>% 
+  summarize(nr_countries = n_distinct(country))
+```
+\newpage
+
+## Task 2
+
+(a) To analyze only the year 2007 and not the entire time frame, we first filter for the year 2007 before we group the countries.
+```{r}
+gapminder %>%
+  filter(year == 2007) %>%
+  group_by(continent) %>%
+  summarize(mean_gdpPercap = mean(gdpPercap),
+            median_gdpPercap = median(gdpPercap))
+```
+\hfill\break
+
+(b) Similarly to the task before, we can calculate these values by filtering, grouping, and summarizing.
+```{r}
+gapminder %>%
+  filter(year == 1952) %>%
+  group_by(continent) %>%
+  summarize(min_lifeExp = min(lifeExp),
+            median_lifeExp = median(lifeExp),
+            max_lifeExp = max(lifeExp)) %>% 
+  arrange(median_lifeExp)
+```
+\newpage
+
+(c) We can pass more complex calculations with more than one function to `summarize`.
+```{r}
+gapminder %>%
+  filter(year == 1952) %>%
+  group_by(continent) %>%
+  summarize(neg_dev_lifeExp = median(lifeExp) - min(lifeExp),
+            pos_dev_lifeExp = max(lifeExp) - median(lifeExp))
+```
+\textit{Note:} The deviation in Oceania is so small because there are only two countries included from this continent (Australia and New Zealand). We know this from our calculation in task 1 (c).
+\hfill\break
+
+## Task 3
+
+(a) You already know how to calculate the medians from previous tasks. Additionally, we can transform the data to wide format with `pivot_wider()`.
+```{r}
+gapminder %>% 
+  filter(year >= 1980) %>% 
+  group_by(continent, year) %>% 
+  summarize(median_gdpPercap = median(gdpPercap)) %>% 
+  pivot_wider(names_from = year,
+              values_from = median_gdpPercap)
+```
+\textit{Note:} The logical operator `>=` is equivalent to the ≥ sign. Similarly, we can use `<=` to signify ≤. We can also use the logical "not-equal-to" operator `!=` to mean ≠.
+\newpage
+
+(b) To preserve the year variable, we use `transmute()`. Of course it is perfectly fine to use `select()` first and then `mutate`. In order to achieve the rounding to one decimal, we pass the population values to `round()` with a pipe operator. Pipe in a pipe!
+```{r}
+gapminder %>% 
+  filter(country == "Switzerland" & year >= 1980) %>% 
+  transmute(year, 
+            k_gdpPercap = gdpPercap / 1e3,
+            mio_pop = (pop / 1e6) %>% round(digits = 1),
+            lifeExp_past_50 = lifeExp - 50) %>% 
+  pivot_longer(cols = c(k_gdpPercap, mio_pop, lifeExp_past_50),
+               names_to = "variables",
+               values_to = "values") %>% 
+  pivot_wider(names_from = year,
+              values_from = values)
+```
+\textit{Note:} The `1e3` and `1e6` are scientific notation for 1'000 and 1'000'000. By using this notation, you can avoid mistakes coming from typing too many or too few zeros.
+\newpage
+
+(c) We solve this task with a "helper" column called `region` which we create with the `ifelse()` function. We can then group by these different regions. If you solved this by first saving the Europe column in a separate variable, this is of course completely valid. This applies to coding in general: everyone has their own preferred way to do things and everyone will defend that approach as if their life depended on it.
+```{r}
+gapminder %>% 
+  filter(continent == "Europe") %>% 
+  mutate(region = ifelse(country == "Switzerland", "Switzerland", "Europe")) %>% 
+  group_by(region, year) %>% 
+  summarise(k_median_GDP = median(gdpPercap) / 1e3) %>% 
+  pivot_wider(names_from = "region", values_from = "k_median_GDP")
+```
