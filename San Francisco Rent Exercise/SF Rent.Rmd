@@ -37,7 +37,7 @@ You can **hand it your visualisation until the end of the break** to any of our 
 
 ## The Data
 
-Get the data on the [resources](https://rusergroup-sg.ch/resources/) section of our website (Task Section -> Data visualization challenge: San Francisco housing). The data set was created by economist Kate Pennington and is about rental listing prices in the San Francisco bay area over the period from 2000 to 2018. There is also information on the neighbourhoods, cities and counties.
+Get the data in the [resources](https://rusergroup-sg.ch/resources/) section of our website (Task Section -> Data visualization challenge: San Francisco housing). The data set was created by economist Kate Pennington and is about rental listing prices in the San Francisco bay area over the period from 2000 to 2018. There is also information on the neighbourhoods, cities and counties.
 
 ```{r, message=FALSE}
 library(tidyverse)
