@@ -50,7 +50,7 @@ pre {
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Mathias Steilen
-##### Last updated: _2022-09-20 20:10:16_
+##### Last updated: _2022-11-15 13:06:11_
 
 ---
 
@@ -113,7 +113,6 @@ library(tidymodels)
 library(doParallel)
 library(vip)
 ```
-
 
 ---
 
@@ -487,7 +486,7 @@ Zeros? Likely the same as missing values, only not encoded as `NA`.
 
 ### ott (over-the-top inches)
 
-Also, let's make that metric.
+Also, let's make that metric (cm).
 
 
 ```r
@@ -511,7 +510,7 @@ Zeros? Same as with `ott`, likely need to drop them.
 
 ### est_weight
 
-Make that metric as well.
+Make that metric as well (kg).
 
 
 ```r
@@ -588,10 +587,16 @@ It's clear what to do with this one.
 
 
 ```r
-pumpkins &lt;- pumpkins %&gt;% 
+pumpkins &lt;- pumpkins %&gt;%
+  # remove vars with too many missing values or uninteresting
   select(-c(variety, pollinator_father, seed_mother, pct_chart)) %&gt;% 
-  filter(ott &gt; 0,
-         weight_kg &gt; 0)
+  # remove obs with target equal to zero, not possible
+  # remove obs with target NA values
+  filter(weight_kg &gt; 0,
+         !is.na(weight_kg)) %&gt;% 
+  # replace zero values within predictors with NA values
+  mutate(across(c(ott, est_weight),
+                ~ ifelse(.x == 0, NA, .x)))
 ```
 
 ---
@@ -605,9 +610,9 @@ colMeans(is.na(pumpkins))
 
 ```
 ##        year        type       place   weight_kg grower_name        city 
-##  0.00000000  0.00000000  0.08823184  0.00000000  0.00000000  0.09574094 
+##  0.00000000  0.00000000  0.08744969  0.00000000  0.00000000  0.11553238 
 ##  state_prov     country    gpc_site         ott  est_weight 
-##  0.00000000  0.00000000  0.00000000  0.00000000  0.03860143
+##  0.00000000  0.00000000  0.00000000  0.22036224  0.25375046
 ```
 
 There are still some `NA` values, but these are manageable with imputation.
@@ -626,15 +631,18 @@ pumpkins %&gt;% head(5)
 
 ```
 ## # A tibble: 5 × 11
-##   year  type       place weight_kg grower_name city  state_prov country gpc_site
-##   &lt;fct&gt; &lt;fct&gt;      &lt;dbl&gt;     &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt; &lt;fct&gt;      &lt;fct&gt;   &lt;fct&gt;   
-## 1 2013  Giant Pum…   356      453. Magarian, … Goff… New Hamps… United… Deerfie…
-## 2 2013  Giant Pum…   356      453. Leland, Ne… Canby Oregon     United… Baumans…
-## 3 2013  Giant Pum…   358      453. Pappas, Ed  Mars… Massachus… United… Deerfie…
-## 4 2013  Giant Pum…   359      453. Northrup, … Suss… New Bruns… Canada  Journee…
-## 5 2013  Giant Pum…   359      453. Schultz, C… Deco… Iowa       United… Ryan No…
-## # … with 2 more variables: ott &lt;dbl&gt;, est_weight &lt;dbl&gt;
+##   year  type   place weigh…¹ growe…² city  state…³ country gpc_s…⁴   ott est_w…⁵
+##   &lt;fct&gt; &lt;fct&gt;  &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt;   &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt;   &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 2013  Giant…   356    453. Magari… Goff… New Ha… United… Deerfi…  940.     NA 
+## 2 2013  Giant…   356    453. Leland… Canby Oregon  United… Bauman…  904.    451.
+## 3 2013  Giant…   358    453. Pappas… Mars… Massac… United… Deerfi…  917.     NA 
+## 4 2013  Giant…   359    453. Northr… Suss… New Br… Canada  Journe…  884.    423.
+## 5 2013  Giant…   359    453. Schult… Deco… Iowa    United… Ryan N…  892.    434.
+## # … with abbreviated variable names ¹​weight_kg, ²​grower_name, ³​state_prov,
+## #   ⁴​gpc_site, ⁵​est_weight
 ```
+
+
 
 ---
 
@@ -660,7 +668,7 @@ dt_split
 
 ```
 ## &lt;Training/Testing/Total&gt;
-## &lt;6390/2133/8523&gt;
+## &lt;8198/2734/10932&gt;
 ```
 
 ---
@@ -676,7 +684,7 @@ dim(dt_train)
 ```
 
 ```
-## [1] 6390   11
+## [1] 8198   11
 ```
 
 ```r
@@ -684,7 +692,7 @@ dim(dt_test)
 ```
 
 ```
-## [1] 2133   11
+## [1] 2734   11
 ```
 
 ```r
@@ -693,7 +701,7 @@ dt_split
 
 ```
 ## &lt;Training/Testing/Total&gt;
-## &lt;6390/2133/8523&gt;
+## &lt;8198/2734/10932&gt;
 ```
 
 ---
@@ -712,11 +720,11 @@ folds
 ## # A tibble: 5 × 2
 ##   splits              id   
 ##   &lt;list&gt;              &lt;chr&gt;
-## 1 &lt;split [5110/1280]&gt; Fold1
-## 2 &lt;split [5111/1279]&gt; Fold2
-## 3 &lt;split [5112/1278]&gt; Fold3
-## 4 &lt;split [5113/1277]&gt; Fold4
-## 5 &lt;split [5114/1276]&gt; Fold5
+## 1 &lt;split [6557/1641]&gt; Fold1
+## 2 &lt;split [6558/1640]&gt; Fold2
+## 3 &lt;split [6559/1639]&gt; Fold3
+## 4 &lt;split [6559/1639]&gt; Fold4
+## 5 &lt;split [6559/1639]&gt; Fold5
 ```
 
 When tuning hyperparameters, these folds can be passed into the tuning function.
@@ -781,19 +789,19 @@ glimpse(pumpkins)
 ```
 
 ```
-## Rows: 8,523
+## Rows: 10,932
 ## Columns: 11
 ## $ year        &lt;fct&gt; 2013, 2013, 2013, 2013, 2013, 2013, 2013, 2013, 2013, 2013…
 ## $ type        &lt;fct&gt; Giant Pumpkin, Giant Pumpkin, Giant Pumpkin, Giant Pumpkin…
-## $ place       &lt;dbl&gt; 356, 356, 358, 359, 359, 361, 362, 363, 363, 366, 366, 370…
+## $ place       &lt;dbl&gt; 356, 356, 358, 359, 359, 361, 362, 363, 363, 363, 366, 366…
 ## $ weight_kg   &lt;dbl&gt; 453.2880, 453.2880, 453.0612, 452.8345, 452.8345, 452.6077…
 ## $ grower_name &lt;fct&gt; "Magarian, Marc", "Leland, Neal", "Pappas, Ed", "Northrup,…
 ## $ city        &lt;fct&gt; "Goffstown", "Canby", "Marshfield", "Sussex", "Decorah", "…
 ## $ state_prov  &lt;fct&gt; New Hampshire, Oregon, Massachusetts, New Brunswick, Iowa,…
 ## $ country     &lt;fct&gt; United States, United States, United States, Canada, Unite…
 ## $ gpc_site    &lt;fct&gt; Deerfield Fair, Baumans Farm Giant Pumpkin Weigh-off, Deer…
-## $ ott         &lt;dbl&gt; 939.80, 904.24, 916.94, 883.92, 891.54, 916.94, 939.80, 87…
-## $ est_weight  &lt;dbl&gt; NA, 450.7937, NA, 423.1293, 433.5601, NA, NA, 407.7098, NA…
+## $ ott         &lt;dbl&gt; 939.80, 904.24, 916.94, 883.92, 891.54, 916.94, 939.80, NA…
+## $ est_weight  &lt;dbl&gt; NA, 450.7937, NA, 423.1293, 433.5601, NA, NA, NA, 407.7098…
 ```
 
 - Factors: allow for new factor levels
@@ -818,14 +826,15 @@ xg_rec %&gt;% prep() %&gt;% juice() %&gt;% head(5)
 
 ```
 ## # A tibble: 5 × 10
-##   year  place grower_name     city  state_prov country gpc_site   ott est_weight
-##   &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt;           &lt;fct&gt; &lt;fct&gt;      &lt;fct&gt;   &lt;fct&gt;    &lt;dbl&gt;      &lt;dbl&gt;
-## 1 2013   1175 Caleb, Dillion  Arva… Colorado   United… The Flo…  655.       175.
-## 2 2013   1177 Gienger, Perry  &lt;NA&gt;  Minnesota  United… Stillwa…  615.       145.
-## 3 2013   1180 Klug, Christian Berl… Other      Germany Wiegeme…  658.       178.
-## 4 2013   1182 Mullen, Rich    Taun… Massachus… United… SNGPG F…  612.       143.
-## 5 2013   1187 Mike Rohrdiek   Brot… Other      Germany Tharing…  625.       151.
-## # … with 1 more variable: weight_kg &lt;dbl&gt;
+##   year  place grower_name    city  state…¹ country gpc_s…²   ott est_w…³ weigh…⁴
+##   &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt;          &lt;fct&gt; &lt;fct&gt;   &lt;fct&gt;   &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 2013   1229 Offermann, Ir… Koeln Other   Germany XXL-Ku…  605.    137.    125.
+## 2 2013   1230 Zimmermann, A… &lt;NA&gt;  Other   Austria Austri…   NA      NA     125.
+## 3 2013   1231 Giovanni, Riva &lt;NA&gt;  Other   Italy   Festa …  607.    139.    125.
+## 4 2013   1232 Martel Junior… Beca… Quebec  Canada  Potiro…   NA      NA     125.
+## 5 2013   1232 Strange, Mike  Dorv… Quebec  Canada  Vermon…  574.    119.    125.
+## # … with abbreviated variable names ¹​state_prov, ²​gpc_site, ³​est_weight,
+## #   ⁴​weight_kg
 ```
 
 ---
@@ -879,15 +888,16 @@ xg_rec %&gt;% prep() %&gt;% juice() %&gt;% head()
 
 ```
 ## # A tibble: 6 × 10
-##   year  place grower_name city    state_prov   country gpc_site   ott est_weight
-##   &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;   &lt;fct&gt;        &lt;fct&gt;   &lt;fct&gt;    &lt;dbl&gt;      &lt;dbl&gt;
-## 1 2013   1175 Other       Other   Colorado     United… Other     655.       175.
-## 2 2013   1177 Other       Paredes Minnesota    United… Stillwa…  615.       145.
-## 3 2013   1180 Other       Other   Other        Germany Wiegeme…  658.       178.
-## 4 2013   1182 Other       Other   Massachuset… United… SNGPG F…  612.       143.
-## 5 2013   1187 Other       Other   Other        Germany Tharing…  625.       151.
-## 6 2013   1188 Other       Other   Ohio         United… Operati…  582.       122.
-## # … with 1 more variable: weight_kg &lt;dbl&gt;
+##   year  place grower_name city    state_…¹ country gpc_s…²   ott est_w…³ weigh…⁴
+##   &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;   &lt;fct&gt;    &lt;fct&gt;   &lt;fct&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 2013   1229 Other       Other   Other    Germany Other    605.    137.    125.
+## 2 2013   1230 Other       Paredes Other    Austria Austri…  734.    243.    125.
+## 3 2013   1231 Other       Paredes Other    Italy   Other    607.    139.    125.
+## 4 2013   1232 Other       Other   Quebec   Canada  Potiro…  734.    243.    125.
+## 5 2013   1232 Other       Other   Quebec   Canada  Vermon…  574.    119.    125.
+## 6 2013   1234 Other       Other   Other    Germany Other    577.    120.    124.
+## # … with abbreviated variable names ¹​state_prov, ²​gpc_site, ³​est_weight,
+## #   ⁴​weight_kg
 ```
 ]
 
@@ -919,15 +929,16 @@ xg_rec %&gt;% prep() %&gt;% juice() %&gt;% head()
 
 ```
 ## # A tibble: 6 × 10
-##   year  place grower_name city    state_prov  country gpc_site    ott est_weight
-##   &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;   &lt;fct&gt;       &lt;fct&gt;   &lt;fct&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1 2013  0.474 Other       Other   Colorado    United… Other    -0.335     -0.561
-## 2 2013  0.480 Other       Paredes Minnesota   United… Stillwa… -0.602     -0.825
-## 3 2013  0.490 Other       Other   Other       Germany Wiegeme… -0.318     -0.537
-## 4 2013  0.496 Other       Other   Massachuse… United… SNGPG F… -0.619     -0.841
-## 5 2013  0.512 Other       Other   Other       Germany Tharing… -0.535     -0.766
-## 6 2013  0.515 Other       Other   Ohio        United… Operati… -0.819     -1.02 
-## # … with 1 more variable: weight_kg &lt;dbl&gt;
+##   year  place grower_name city    state…¹ country gpc_s…²    ott est_w…³ weigh…⁴
+##   &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt;       &lt;fct&gt;   &lt;fct&gt;   &lt;fct&gt;   &lt;fct&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 2013  0.474 Other       Other   Other   Germany Other   -0.817 -1.04      125.
+## 2 2013  0.477 Other       Paredes Other   Austria Austri…  0.156  0.0143    125.
+## 3 2013  0.480 Other       Paredes Other   Italy   Other   -0.798 -1.03      125.
+## 4 2013  0.483 Other       Other   Quebec  Canada  Potiro…  0.156  0.0143    125.
+## 5 2013  0.483 Other       Other   Quebec  Canada  Vermon… -1.05  -1.23      125.
+## 6 2013  0.489 Other       Other   Other   Germany Other   -1.03  -1.21      124.
+## # … with abbreviated variable names ¹​state_prov, ²​gpc_site, ³​est_weight,
+## #   ⁴​weight_kg
 ```
 
 ]
@@ -970,22 +981,22 @@ xg_rec %&gt;% prep() %&gt;% bake(dt_train) %&gt;% head()
 ```
 
 ```
-## # A tibble: 6 × 105
-##   place    ott est_weight weight_kg year_X2013 year_X2014 year_X2015 year_X2016
-##   &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
-## 1 0.474 -0.335     -0.561      146.          1          0          0          0
-## 2 0.480 -0.602     -0.825      146.          1          0          0          0
-## 3 0.490 -0.318     -0.537      145.          1          0          0          0
-## 4 0.496 -0.619     -0.841      143.          1          0          0          0
-## 5 0.512 -0.535     -0.766      142.          1          0          0          0
-## 6 0.515 -0.819     -1.02       142.          1          0          0          0
-## # … with 97 more variables: year_X2017 &lt;dbl&gt;, year_X2018 &lt;dbl&gt;,
-## #   year_X2019 &lt;dbl&gt;, year_X2020 &lt;dbl&gt;, year_X2021 &lt;dbl&gt;, year_new &lt;dbl&gt;,
-## #   grower_name_Karkos..Udo &lt;dbl&gt;, grower_name_Other &lt;dbl&gt;,
-## #   grower_name_new &lt;dbl&gt;, city_Paredes &lt;dbl&gt;, city_Other &lt;dbl&gt;,
-## #   city_new &lt;dbl&gt;, state_prov_Antwerp &lt;dbl&gt;, state_prov_Brandenburg &lt;dbl&gt;,
-## #   state_prov_British.Columbia &lt;dbl&gt;, state_prov_California &lt;dbl&gt;,
-## #   state_prov_Colorado &lt;dbl&gt;, state_prov_Connecticut &lt;dbl&gt;, …
+## # A tibble: 6 × 95
+##   place    ott est_wei…¹ weigh…² year_…³ year_…⁴ year_…⁵ year_…⁶ year_…⁷ year_…⁸
+##   &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1 0.474 -0.817   -1.04      125.       1       0       0       0       0       0
+## 2 0.477  0.156    0.0143    125.       1       0       0       0       0       0
+## 3 0.480 -0.798   -1.03      125.       1       0       0       0       0       0
+## 4 0.483  0.156    0.0143    125.       1       0       0       0       0       0
+## 5 0.483 -1.05    -1.23      125.       1       0       0       0       0       0
+## 6 0.489 -1.03    -1.21      124.       1       0       0       0       0       0
+## # … with 85 more variables: year_X2019 &lt;dbl&gt;, year_X2020 &lt;dbl&gt;,
+## #   year_X2021 &lt;dbl&gt;, year_new &lt;dbl&gt;, grower_name_Karkos..Udo &lt;dbl&gt;,
+## #   grower_name_Other &lt;dbl&gt;, grower_name_new &lt;dbl&gt;, city_Paredes &lt;dbl&gt;,
+## #   city_Other &lt;dbl&gt;, city_new &lt;dbl&gt;, state_prov_Alberta &lt;dbl&gt;,
+## #   state_prov_Antwerp &lt;dbl&gt;, state_prov_Brandenburg &lt;dbl&gt;,
+## #   state_prov_California &lt;dbl&gt;, state_prov_Colorado &lt;dbl&gt;,
+## #   state_prov_Connecticut &lt;dbl&gt;, state_prov_Indiana &lt;dbl&gt;, …
 ```
 ]
 
@@ -1121,16 +1132,16 @@ xg_grid
 ## # A tibble: 10 × 6
 ##    tree_depth min_n loss_reduction sample_size  mtry learn_rate
 ##         &lt;int&gt; &lt;int&gt;          &lt;dbl&gt;       &lt;dbl&gt; &lt;int&gt;      &lt;dbl&gt;
-##  1         15    40       3.48e- 2       0.710    10   3.52e- 7
-##  2          8     4       3.96e- 4       0.910     7   6.27e- 7
-##  3         13    33       6.15e-10       0.212     5   8.18e- 6
-##  4          6    26       8.21e+ 0       0.564     2   8.06e-10
-##  5          3    24       4.06e- 1       0.306    11   1.28e- 3
-##  6          4    12       1.45e- 9       0.421     2   1.04e- 4
-##  7          2    30       3.64e- 7       0.149     4   3.27e- 2
-##  8         12    15       5.86e- 3       0.844     7   5.18e-10
-##  9          9    19       7.86e- 8       0.809     9   1.04e- 8
-## 10         10     6       4.50e- 6       0.498     6   6.60e- 3
+##  1         10    26       3.64e- 4       0.811    10   2.13e- 2
+##  2          9    29       1.40e- 8       0.202     5   3.03e- 3
+##  3          4     9       1.89e- 3       0.835    10   7.75e- 9
+##  4          7    23       3.35e-10       0.930     6   8.11e-10
+##  5         11     3       2.39e- 8       0.562     2   2.22e- 7
+##  6          2    21       1.16e- 1       0.106     7   3.45e-10
+##  7          4    16       5.24e- 1       0.282     4   4.81e- 5
+##  8         14    13       2.32e+ 0       0.665     8   1.42e- 3
+##  9         13    36       2.02e- 6       0.535     8   1.23e- 5
+## 10          6    37       4.58e- 6       0.432     1   2.80e- 6
 ```
 ]
 
@@ -1169,7 +1180,7 @@ end_time - start_time
 ```
 
 ```
-## Time difference of 54.07324 secs
+## Time difference of 1.136629 mins
 ```
 ]
 ---
@@ -1187,18 +1198,18 @@ xg_tune %&gt;%
 ```
 ## Rows: 5
 ## Columns: 12
-## $ mtry           &lt;int&gt; 6, 4, 11, 9, 10
-## $ min_n          &lt;int&gt; 6, 30, 24, 19, 40
-## $ tree_depth     &lt;int&gt; 10, 2, 3, 9, 15
-## $ learn_rate     &lt;dbl&gt; 6.602829e-03, 3.270575e-02, 1.284201e-03, 1.043070e-08,…
-## $ loss_reduction &lt;dbl&gt; 4.497811e-06, 3.635111e-07, 4.063414e-01, 7.860511e-08,…
-## $ sample_size    &lt;dbl&gt; 0.4977973, 0.1493809, 0.3062435, 0.8093266, 0.7095596
+## $ mtry           &lt;int&gt; 2, 9, 8, 10, 6
+## $ min_n          &lt;int&gt; 7, 3, 24, 34, 13
+## $ tree_depth     &lt;int&gt; 7, 11, 12, 6, 14
+## $ learn_rate     &lt;dbl&gt; 1.545806e-02, 1.194447e-07, 3.635109e-05, 4.436419e-06,…
+## $ loss_reduction &lt;dbl&gt; 1.125698e-09, 9.118926e-05, 1.658851e-09, 1.123321e+01,…
+## $ sample_size    &lt;dbl&gt; 0.7507816, 0.6794007, 0.9374669, 0.4770123, 0.2252345
 ## $ .metric        &lt;chr&gt; "rsq", "rsq", "rsq", "rsq", "rsq"
 ## $ .estimator     &lt;chr&gt; "standard", "standard", "standard", "standard", "standa…
-## $ mean           &lt;dbl&gt; 0.9626525, 0.9533486, 0.8932569, 0.8626859, 0.8559496
+## $ mean           &lt;dbl&gt; 0.8665343, 0.8370460, 0.8226847, 0.8031926, 0.7912635
 ## $ n              &lt;int&gt; 5, 5, 5, 5, 5
-## $ std_err        &lt;dbl&gt; 0.0006145968, 0.0012910054, 0.0019249093, 0.0049333918,…
-## $ .config        &lt;chr&gt; "Preprocessor1_Model10", "Preprocessor1_Model07", "Prep…
+## $ std_err        &lt;dbl&gt; 0.010287916, 0.004288253, 0.004602997, 0.004568200, 0.0…
+## $ .config        &lt;chr&gt; "Preprocessor1_Model01", "Preprocessor1_Model03", "Prep…
 ```
 ]
 
@@ -1236,13 +1247,13 @@ xg_final_wflow
 ## Boosted Tree Model Specification (regression)
 ## 
 ## Main Arguments:
-##   mtry = 6
+##   mtry = 2
 ##   trees = 750
-##   min_n = 6
-##   tree_depth = 10
-##   learn_rate = 0.0066028292004434
-##   loss_reduction = 4.49781096923403e-06
-##   sample_size = 0.497797313781921
+##   min_n = 7
+##   tree_depth = 7
+##   learn_rate = 0.0154580616226708
+##   loss_reduction = 1.12569835788786e-09
+##   sample_size = 0.750781629404519
 ## 
 ## Engine-Specific Arguments:
 ##   importance = impurity
@@ -1269,7 +1280,7 @@ xg_final_fit
 ## # A tibble: 1 × 6
 ##   splits              id               .metrics .notes   .predictions .workflow 
 ##   &lt;list&gt;              &lt;chr&gt;            &lt;list&gt;   &lt;list&gt;   &lt;list&gt;       &lt;list&gt;    
-## 1 &lt;split [6390/2133]&gt; train/test split &lt;tibble&gt; &lt;tibble&gt; &lt;tibble&gt;     &lt;workflow&gt;
+## 1 &lt;split [8198/2734]&gt; train/test split &lt;tibble&gt; &lt;tibble&gt; &lt;tibble&gt;     &lt;workflow&gt;
 ```
 
 Let's inspect what's in there.
@@ -1288,8 +1299,8 @@ xg_final_fit %&gt;%
 ## # A tibble: 2 × 4
 ##   .metric .estimator .estimate .config             
 ##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
-## 1 rmse    standard      23.3   Preprocessor1_Model1
-## 2 rsq     standard       0.967 Preprocessor1_Model1
+## 1 rmse    standard      44.1   Preprocessor1_Model1
+## 2 rsq     standard       0.890 Preprocessor1_Model1
 ```
 
 ---
@@ -1303,20 +1314,20 @@ xg_final_fit %&gt;%
 ```
 
 ```
-## # A tibble: 2,133 × 5
+## # A tibble: 2,734 × 5
 ##    id               .pred  .row weight_kg .config             
 ##    &lt;chr&gt;            &lt;dbl&gt; &lt;int&gt;     &lt;dbl&gt; &lt;chr&gt;               
-##  1 train/test split  395.     6      453. Preprocessor1_Model1
-##  2 train/test split  391.    14      449. Preprocessor1_Model1
-##  3 train/test split  406.    15      449. Preprocessor1_Model1
-##  4 train/test split  390.    21      446. Preprocessor1_Model1
-##  5 train/test split  411.    29      443. Preprocessor1_Model1
-##  6 train/test split  342.    32      441. Preprocessor1_Model1
-##  7 train/test split  410.    36      439. Preprocessor1_Model1
-##  8 train/test split  399.    42      435. Preprocessor1_Model1
-##  9 train/test split  407.    45      434. Preprocessor1_Model1
-## 10 train/test split  334.    47      433. Preprocessor1_Model1
-## # … with 2,123 more rows
+##  1 train/test split  367.     1      453. Preprocessor1_Model1
+##  2 train/test split  345.     6      453. Preprocessor1_Model1
+##  3 train/test split  379.    18      449. Preprocessor1_Model1
+##  4 train/test split  371.    22      447. Preprocessor1_Model1
+##  5 train/test split  400.    26      445. Preprocessor1_Model1
+##  6 train/test split  393.    30      444. Preprocessor1_Model1
+##  7 train/test split  385.    31      444. Preprocessor1_Model1
+##  8 train/test split  372.    33      442. Preprocessor1_Model1
+##  9 train/test split  382.    40      439. Preprocessor1_Model1
+## 10 train/test split  389.    41      438. Preprocessor1_Model1
+## # … with 2,724 more rows
 ```
 
 With this, we can make a useful plot.
@@ -1337,7 +1348,7 @@ xg_final_fit %&gt;%
   labs(title = "Predictions vs. Actuals of Holdout")
 ```
 
-&lt;img src="Intro-to-Tidymodels_files/figure-html/unnamed-chunk-58-1.png" width="100%" /&gt;
+&lt;img src="Intro-to-Tidymodels_files/figure-html/unnamed-chunk-59-1.png" width="100%" /&gt;
 ]
 
 ---
@@ -1363,7 +1374,7 @@ xg_final_fit %&gt;%
         plot.subtitle = element_text(face = "italic", colour = "grey50"))
 ```
 
-&lt;img src="Intro-to-Tidymodels_files/figure-html/unnamed-chunk-59-1.png" width="100%" /&gt;
+&lt;img src="Intro-to-Tidymodels_files/figure-html/unnamed-chunk-60-1.png" width="100%" /&gt;
 ]
 ---
 
@@ -1383,16 +1394,16 @@ one_pumpkin %&gt;% glimpse()
 ```
 ## Rows: 1
 ## Columns: 10
-## $ year        &lt;fct&gt; 2020
+## $ year        &lt;fct&gt; 2016
 ## $ type        &lt;fct&gt; Giant Pumpkin
-## $ place       &lt;dbl&gt; 514
-## $ grower_name &lt;fct&gt; "De Wever, Johan"
-## $ city        &lt;fct&gt; "Ternat"
-## $ state_prov  &lt;fct&gt; Flemish Brabant
-## $ country     &lt;fct&gt; Belgium
-## $ gpc_site    &lt;fct&gt; Belgisch Kampioenschap pompoenwegen
-## $ ott         &lt;dbl&gt; 904.24
-## $ est_weight  &lt;dbl&gt; NA
+## $ place       &lt;dbl&gt; 1188
+## $ grower_name &lt;fct&gt; "Marin, Courant"
+## $ city        &lt;fct&gt; NA
+## $ state_prov  &lt;fct&gt; Quebec
+## $ country     &lt;fct&gt; Canada
+## $ gpc_site    &lt;fct&gt; Potirothon de Gentilly
+## $ ott         &lt;dbl&gt; 657.86
+## $ est_weight  &lt;dbl&gt; 176.8707
 ```
 
 ]
@@ -1413,7 +1424,7 @@ xg_final_fit %&gt;%
 ## # A tibble: 1 × 1
 ##   .pred
 ##   &lt;dbl&gt;
-## 1  416.
+## 1  180.
 ```
 
 ---
@@ -1435,17 +1446,17 @@ xg_final_fit %&gt;%
 ```
 ## Rows: 1
 ## Columns: 11
-## $ year        &lt;fct&gt; 2020
+## $ year        &lt;fct&gt; 2016
 ## $ type        &lt;fct&gt; Giant Pumpkin
-## $ place       &lt;dbl&gt; 514
-## $ grower_name &lt;fct&gt; "De Wever, Johan"
-## $ city        &lt;fct&gt; "Ternat"
-## $ state_prov  &lt;fct&gt; Flemish Brabant
-## $ country     &lt;fct&gt; Belgium
-## $ gpc_site    &lt;fct&gt; Belgisch Kampioenschap pompoenwegen
-## $ ott         &lt;dbl&gt; 904.24
-## $ est_weight  &lt;dbl&gt; NA
-## $ .pred       &lt;dbl&gt; 416.1439
+## $ place       &lt;dbl&gt; 1188
+## $ grower_name &lt;fct&gt; "Marin, Courant"
+## $ city        &lt;fct&gt; NA
+## $ state_prov  &lt;fct&gt; Quebec
+## $ country     &lt;fct&gt; Canada
+## $ gpc_site    &lt;fct&gt; Potirothon de Gentilly
+## $ ott         &lt;dbl&gt; 657.86
+## $ est_weight  &lt;dbl&gt; 176.8707
+## $ .pred       &lt;dbl&gt; 180.2735
 ```
 
 ]
