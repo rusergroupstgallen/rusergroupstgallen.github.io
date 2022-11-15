@@ -278,5 +278,15 @@ homegate_data <- unique(homegate_data)
 save(homegate_data, file = paste0("Web Scraping with Selenium/Homegate_scrape_clean_", Sys.Date(), ".RData"))
 
 # Close connection
+print("Scrape complete. Shutdown.")
 remDr$close()
 chromeDr[["server"]]$stop()
+
+# while (TRUE){
+#   if (weekdays(Sys.Date()) == "Saturday" & lubridate::hour(Sys.time()) == 12){
+#     source("Web Scraping with Selenium/scraper.R")
+#   } else {
+#     print(paste0("It is ", weekdays(Sys.Date()), " at ", lubridate::hour(Sys.time())))
+#     Sys.sleep(3600)
+#   }
+# }
