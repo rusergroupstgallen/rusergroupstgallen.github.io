@@ -125,7 +125,6 @@ library(doParallel)
 library(vip)
 ```
 
-
 ---
 
 ### Inspecting the data
@@ -300,7 +299,7 @@ Zeros? Likely the same as missing values, only not encoded as `NA`.
 
 ### ott (over-the-top inches)
 
-Also, let's make that metric.
+Also, let's make that metric (cm).
 
 ```{r}
 pumpkins <- pumpkins %>% 
@@ -329,7 +328,7 @@ Zeros? Same as with `ott`, likely need to drop them.
 
 ### est_weight
 
-Make that metric as well.
+Make that metric as well (kg).
 
 ```{r}
 pumpkins <- pumpkins %>% 
@@ -383,10 +382,16 @@ colMeans(is.na(pumpkins)) %>% #<<
 ### Dealing with `NA` and zeros
 
 ```{r}
-pumpkins <- pumpkins %>% 
+pumpkins <- pumpkins %>%
+  # remove vars with too many missing values or uninteresting
   select(-c(variety, pollinator_father, seed_mother, pct_chart)) %>% 
-  filter(ott > 0,
-         weight_kg > 0)
+  # remove obs with target equal to zero, not possible
+  # remove obs with target NA values
+  filter(weight_kg > 0,
+         !is.na(weight_kg)) %>% 
+  # replace zero values within predictors with NA values
+  mutate(across(c(ott, est_weight),
+                ~ ifelse(.x == 0, NA, .x)))
 ```
 
 ---
@@ -408,6 +413,24 @@ pumpkins <- pumpkins %>%
   mutate(across(where(is.character), as.factor))
 
 pumpkins %>% head(5)
+```
+
+```{r, echo=FALSE}
+# pumpkins <- pumpkins %>% 
+#   mutate(id = sample(x = 1:nrow(.), size = nrow(.), replace = F))
+# 
+# train <- pumpkins %>% 
+#   filter(id <= floor(nrow(pumpkins)*0.8))
+# 
+# holdout <- pumpkins %>% 
+#   filter(id > floor(nrow(pumpkins)*0.8))
+# 
+# sample_submission <- holdout %>% 
+#   transmute(id, weight_kg = rnorm(n = nrow(.), mean = 350, sd = 100))
+# 
+# write_csv(holdout, "C:/Users/mathi/Downloads/holdout.csv")
+# write_csv(train, "C:/Users/mathi/Downloads/train.csv")
+# write_csv(sample_submission, "C:/Users/mathi/Downloads/sample_submission.csv")
 ```
 
 ---
