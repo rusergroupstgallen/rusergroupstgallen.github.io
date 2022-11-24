@@ -393,7 +393,7 @@ Spend as long as you need modelling.
 
 # That's it for today!
 
-After our session: Watch videos from Julia Silge, Andrew Couch and David Robinson. Most importantly, have fun while learning.
+After our session: Watch videos from Julia Silge, Andrew Couch and David Robinson. Most importantly, have fun while learning.   
 
 For further questions, feel free to reach out to us. Make sure to stay updated on our socials and via our website where all resources and dates are also published.
 
