@@ -6,7 +6,7 @@ library(tidyverse)
 
 ## Set up ----
 # Setting up the driver
-chromeDr <- rsDriver(browser = "chrome", port = 4568L, chromever = "106.0.5249.61", geckover = NULL, # you will have to adjust this version
+chromeDr <- rsDriver(browser = "chrome", port = 4569L, chromever = "106.0.5249.61", geckover = NULL, # you will have to adjust this version
                      extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1920,1080', '--headless'),
                                                                    prefs = list(
                                                                      "profile.default_content_settings.popups" = 0L,
@@ -281,12 +281,3 @@ save(homegate_data, file = paste0("Web Scraping with Selenium/Homegate_scrape_cl
 print("Scrape complete. Shutdown.")
 remDr$close()
 chromeDr[["server"]]$stop()
-
-# while (TRUE){
-#   if (weekdays(Sys.Date()) == "Saturday" & lubridate::hour(Sys.time()) == 12){
-#     source("Web Scraping with Selenium/scraper.R")
-#   } else {
-#     print(paste0("It is ", weekdays(Sys.Date()), " at ", lubridate::hour(Sys.time())))
-#     Sys.sleep(3600)
-#   }
-# }
