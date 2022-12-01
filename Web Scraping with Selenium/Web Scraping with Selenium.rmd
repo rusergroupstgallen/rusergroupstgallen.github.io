@@ -69,13 +69,14 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 ## Goals for today's session
 
-Obvious ones:
-- Learn about commonly used approaches to web scraping
-- Know how to scrape websites using Selenium with R
+Main goals:
+- Learn what websites are made of and how that helps us
+- Get to know HTML elements and their attributes
+- Learn how to conceptualize a web scraper and build it
 
 Less obvious ones:
-- Learn how to go about scraping "complex" websites
-- Get a more intuitive understanding of the make-up of websites
+- Get to know tools and crutches to help scrape complex websites
+- Learn about potential pitfalls and hurdles when scraping
 
 ---
 ## The basic idea behind web scraping
@@ -95,7 +96,7 @@ knitr::include_graphics("GraphicsSlides/free-real-estate.gif")
 ## The basic idea behind web scraping
 
 Just a couple of possible roadblocks:
-- It's spread across a lot of sites
+- Data is spread across a lot of sites
 - It's unstructured
 
 And most importantly: why do something by hand when you can write code for hours to do it for you?
@@ -153,6 +154,7 @@ are mainly used to
 
 First we need to install the RSelenium package (and tidyverse of course):
 ```{r, echo=TRUE, eval=FALSE}
+install.packages("RSelenium")
 library(RSelenium)
 library(tidyverse)
 ```
@@ -168,7 +170,35 @@ knitr::include_graphics("GraphicsSlides/chrome.jpg")
 
 ---
 
-## Download chromedriver
+## Download chromedriver via RSelenium
+
+If you've never used chromedriver before:
+
+```{r, echo=TRUE, eval=FALSE}
+chromeDr <- rsDriver(browser = "chrome", port = 4569L, chromever = "105.0.5195.52")
+```
+
+If you get this error:
+```{r, echo=TRUE, eval=FALSE}
+'Error in chrome_ver(chromecheck[["platform"]], chromever) : 
+  version requested doesnt match versions available = 101.0.4951.15,101.0.4951.41,102.0.5005.27,105.0.5195.19,105.0.5195.52,106.0.5249.21,106.0.5249.61,107.0.5304.18,107.0.5304.62,108.0.5359.22,108.0.5359.71'
+```
+
+Choose the highest available that matches the major version of your Chrome browser (e.g., 107.xyz...)
+
+---
+
+## Download chromedriver via RSelenium
+
+If everything worked, close the chromedriver for now, as we need some more settings.
+
+```{r, echo=TRUE, eval=FALSE}
+chromeDr[["server"]]$stop()
+```
+
+---
+
+### If that didn't work: Download chromedriver manually
 
 Chromedriver is a development tool. You can download it here:
 https://chromedriver.chromium.org/downloads
@@ -181,7 +211,7 @@ On Windows put the file in<br>
 .pull-right[
 On MacOS put the file in<br>
 `/usr/bin/` <br>
-(you get there by pressing `cmd + G` and pasting the path above)
+(you get there by pressing `cmd + ⇧ + G` and pasting the path above)
 ]
 
 .center[
