@@ -6,7 +6,7 @@ library(tidyverse)
 
 ## Set up ----
 # Setting up the driver
-chromeDr <- rsDriver(browser = "chrome", port = 4569L, chromever = "106.0.5249.61", geckover = NULL, # you will have to adjust this version
+chromeDr <- rsDriver(browser = "chrome", port = 4569L, chromever = "107.0.5304.62", geckover = NULL, # you will have to adjust this version
                      extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1920,1080', '--headless'),
                                                                    prefs = list(
                                                                      "profile.default_content_settings.popups" = 0L,
