@@ -42,21 +42,11 @@ pre {
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
 ##### Author/Presenter: Ruben Ernst/Mathias Steilen
-##### Last updated: _2022-09-20 20:15:39_
+##### Last updated: _2022-11-24 11:47:23_
 
 ---
 
-# Goals for today's session
-
-&lt;br&gt;
-&lt;br&gt;
-&lt;br&gt;
-
-&lt;img src="GraphicsSlides/structure.png" width="100%" /&gt;
-
----
-
-### Today's Task
+### Today's Mission
 
 &lt;br&gt;
 &lt;br&gt;
@@ -93,12 +83,11 @@ training &lt;- read_csv("./Data/training.csv")
 ```
 
 ```
-## Rows: 9292 Columns: 16
+## Rows: 8745 Columns: 12
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: ","
-## chr (8): type, grower_name, city, state_prov, country, gpc_site, seed_mother...
-## dbl (7): year, place, weight_lbs, ott, est_weight, pct_chart, id
-## lgl (1): variety
+## chr (6): type, grower_name, city, state_prov, country, gpc_site
+## dbl (6): year, place, weight_kg, ott, est_weight, id
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
@@ -116,12 +105,11 @@ holdout &lt;- read_csv("./Data/holdout.csv")
 ```
 
 ```
-## Rows: 1640 Columns: 15
+## Rows: 2187 Columns: 11
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: ","
-## chr (8): type, grower_name, city, state_prov, country, gpc_site, seed_mother...
-## dbl (6): year, place, ott, est_weight, pct_chart, id
-## lgl (1): variety
+## chr (6): type, grower_name, city, state_prov, country, gpc_site
+## dbl (5): year, place, ott, est_weight, id
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
@@ -139,10 +127,10 @@ sample_submission &lt;- read_csv("./Data/sample_submission.csv")
 ```
 
 ```
-## Rows: 1640 Columns: 2
+## Rows: 2187 Columns: 2
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: ","
-## dbl (2): id, weight_lbs
+## dbl (2): id, weight_kg
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
@@ -188,22 +176,48 @@ The learning curve is always steep when looking at it from the bottom. Use the t
 
 ---
 
-#### Our Basic Example: The ol' reliable
+#### Our Basic Example: The ol' reliable$
 
-Let's fit a basic, linear regression.
+Make splits from the training first:
 
 
 ```r
-lin_spec &lt;- linear_reg() %&gt;%
-  set_mode("regression") %&gt;%
-  set_engine("lm")
+dt_split &lt;- initial_split(training)
+dt_train &lt;- training(dt_split)
+dt_test &lt;- testing(dt_split)
+
+folds &lt;- vfold_cv(dt_train, v = 5) # resampling for tuning
 ```
 
 
 ```r
-lin_rec &lt;- recipe(weight_lbs ~ year + place + ott + est_weight + country,
+dt_split
+```
+
+```
+## &lt;Training/Testing/Total&gt;
+## &lt;6558/2187/8745&gt;
+```
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+Let's fit a basic, linear regression with a penalty.
+
+
+```r
+lin_spec &lt;- linear_reg(mixture = tune(), penalty = tune()) %&gt;%
+  set_mode("regression") %&gt;%
+  set_engine("glmnet")
+```
+
+
+```r
+lin_rec &lt;- recipe(weight_kg ~ year + place + ott + est_weight + country,
                   data = training) %&gt;%
   step_impute_mean(all_numeric_predictors()) %&gt;%
+  step_novel(all_nominal_predictors()) %&gt;% 
   step_unknown(all_nominal_predictors(), new_level = "not specified") %&gt;%    
   step_other(country, threshold = 0.03) %&gt;%
   step_dummy(all_nominal_predictors(), one_hot = T) %&gt;% 
@@ -220,26 +234,29 @@ lin_rec %&gt;% prep() %&gt;% juice()
 ```
 
 ```
-## # A tibble: 9,292 × 10
-##     year place   ott est_weight weight_lbs country_Austria country_Canada
-##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;           &lt;dbl&gt;          &lt;dbl&gt;
-##  1  2014   633   348        933       880                0              0
-##  2  2013  1203   230        275       296                0              0
-##  3  2015   955   321        740       718                0              0
-##  4  2020   852   295        590       606.               0              0
-##  5  2016   851   325        767       752.               0              1
-##  6  2014  1011   309        662       608                0              0
-##  7  2019   822     0          0       685                0              1
-##  8  2017  1116     0          0       475.               1              0
-##  9  2013  1532    97         38        29                0              0
-## 10  2014  1253     0          0       431                0              0
-## # … with 9,282 more rows, and 3 more variables: country_Germany &lt;dbl&gt;,
-## #   country_Italy &lt;dbl&gt;, country_United.States &lt;dbl&gt;
+## # A tibble: 8,745 × 11
+##     year place   ott est_weight weight…¹ count…² count…³ count…⁴ count…⁵ count…⁶
+##    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+##  1  2013   356  940.       241.     453.       0       0       0       0       0
+##  2  2013   356  904.       451.     453.       0       0       0       0       0
+##  3  2013   358  917.       241.     453.       0       0       0       0       0
+##  4  2013   359  892.       434.     453.       0       0       0       0       0
+##  5  2013   361  917.       241.     453.       0       1       0       0       0
+##  6  2013   363  706.       241.     452.       0       0       0       0       0
+##  7  2013   363  874.       408.     452.       0       0       0       0       0
+##  8  2013   363  963.       241.     452.       0       1       0       0       0
+##  9  2013   366  879.       416.     451.       0       1       0       0       0
+## 10  2013   368  706.       241.     451.       0       0       0       0       0
+## # … with 8,735 more rows, 1 more variable: country_United.States &lt;dbl&gt;, and
+## #   abbreviated variable names ¹​weight_kg, ²​country_Austria, ³​country_Canada,
+## #   ⁴​country_Germany, ⁵​country_Italy, ⁶​country_Japan
 ```
 
 ---
 
 #### Our Basic Example: The ol' reliable
+
+.scroll-output[
 
 
 ```r
@@ -256,9 +273,10 @@ lin_wf
 ## Model: linear_reg()
 ## 
 ## ── Preprocessor ────────────────────────────────────────────────────────────────
-## 5 Recipe Steps
+## 6 Recipe Steps
 ## 
 ## • step_impute_mean()
+## • step_novel()
 ## • step_unknown()
 ## • step_other()
 ## • step_dummy()
@@ -267,91 +285,30 @@ lin_wf
 ## ── Model ───────────────────────────────────────────────────────────────────────
 ## Linear Regression Model Specification (regression)
 ## 
-## Computational engine: lm
+## Main Arguments:
+##   penalty = tune()
+##   mixture = tune()
+## 
+## Computational engine: glmnet
 ```
+
+]
 
 ---
 
 #### Our Basic Example: The ol' reliable
 
-
-```r
-lin_fit &lt;- lin_wf %&gt;% 
-  fit(training)
-```
-
----
-
-#### Our Basic Example: The ol' reliable
+Let's tune the penalty:
 
 
 ```r
-lin_fit %&gt;% 
-  predict(holdout)
-```
-
-```
-## # A tibble: 1,640 × 1
-##    .pred
-##    &lt;dbl&gt;
-##  1  956.
-##  2  930.
-##  3  900.
-##  4  631.
-##  5  931.
-##  6 1094.
-##  7 1056.
-##  8 1079.
-##  9 1076.
-## 10 1041.
-## # … with 1,630 more rows
-```
-
----
-
-#### Our Basic Example: The ol' reliable
-
-
-```r
-lin_fit %&gt;% 
-  augment(holdout)
-```
-
-```
-## # A tibble: 1,640 × 16
-##     year type    place grower_name city  state_prov country gpc_site seed_mother
-##    &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;    &lt;chr&gt;      
-##  1  2013 Giant …   362 Ansems, Fr… Nort… Nova Scot… Canada  AVGVG G… 993 Frank …
-##  2  2013 Giant …   370 Slade, Jack Morr… Colorado   United… Jareds … 932 Grande 
-##  3  2013 Giant …   378 Zobel, Man… Ange… Brandenbu… Germany Wiegeme… 1179 Eckar…
-##  4  2013 Giant …    NA Courson, J… Eyota Minnesota  United… Stillwa… 778 Courson
-##  5  2013 Giant …   405 Kenneally,… New … Nova Scot… Canada  The Gre… 1140 Finder
-##  6  2013 Giant …   408 Bordsen, B… Yuba… California United… Nationa… 1634 Werner
-##  7  2013 Giant …   425 Berard, Al  Sanf… Maine      United… Topsfie… 590 Berard 
-##  8  2013 Giant …   425 Barenie, J… Grif… Indiana    United… Indiana… 170 Barenie
-##  9  2013 Giant …   428 Fry, Arden… West… Pennsylva… United… PGPGA G… &lt;NA&gt;       
-## 10  2013 Giant …   430 Kemp, Kyle  Peta… California United… Nationa… 1421 Stelts
-## # … with 1,630 more rows, and 7 more variables: pollinator_father &lt;chr&gt;,
-## #   ott &lt;dbl&gt;, est_weight &lt;dbl&gt;, pct_chart &lt;dbl&gt;, variety &lt;lgl&gt;, id &lt;dbl&gt;,
-## #   .pred &lt;dbl&gt;
-```
-
----
-
-#### Our Basic Example: The ol' reliable
-
-
-```r
-lin_fit %&gt;% 
-  augment(read_csv("./Data/holdout_with_target.csv", show_col_types = F)) %&gt;% 
-  rsq(truth = weight_lbs, estimate = .pred)
-```
-
-```
-## # A tibble: 1 × 3
-##   .metric .estimator .estimate
-##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-## 1 rsq     standard       0.857
+lin_tune_results &lt;- tune_grid(
+  lin_wf,
+  resamples = folds,
+  grid = grid_regular(penalty(),
+                      mixture(),
+                      levels = 10)
+)
 ```
 
 ---
@@ -360,15 +317,149 @@ lin_fit %&gt;%
 
 .scroll-output[
 
+Let's look at the results:
+
+
+```r
+lin_tune_results %&gt;% 
+  show_best(metric = "rsq")
+```
+
+```
+## # A tibble: 5 × 8
+##         penalty mixture .metric .estimator  mean     n std_err .config          
+##           &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;            
+## 1 0.0000000001    0.111 rsq     standard   0.870     5 0.00374 Preprocessor1_Mo…
+## 2 0.00000000129   0.111 rsq     standard   0.870     5 0.00374 Preprocessor1_Mo…
+## 3 0.0000000167    0.111 rsq     standard   0.870     5 0.00374 Preprocessor1_Mo…
+## 4 0.000000215     0.111 rsq     standard   0.870     5 0.00374 Preprocessor1_Mo…
+## 5 0.00000278      0.111 rsq     standard   0.870     5 0.00374 Preprocessor1_Mo…
+```
+
+]
+---
+
+#### Our Basic Example: The ol' reliable
+
+Let's finalise the model with the best parameters from tuning:
+
+
+```r
+lin_fit &lt;- lin_wf %&gt;% 
+  finalize_workflow(select_best(lin_tune_results, metric = "rsq")) %&gt;% 
+  fit(dt_train)
+```
+
+Fitting onto the training split.
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+
 ```r
 lin_fit %&gt;% 
+  predict(dt_test)
+```
+
+```
+## # A tibble: 2,187 × 1
+##    .pred
+##    &lt;dbl&gt;
+##  1  424.
+##  2  488.
+##  3  423.
+##  4  424.
+##  5  494.
+##  6  441.
+##  7  439.
+##  8  439.
+##  9  307.
+## 10  484.
+## # … with 2,177 more rows
+```
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+
+```r
+lin_fit %&gt;% 
+  augment(dt_test) %&gt;% 
+  rsq(truth = weight_kg, estimate = .pred)
+```
+
+```
+## # A tibble: 1 × 3
+##   .metric .estimator .estimate
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+## 1 rsq     standard       0.860
+```
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+Happy with that? Fit it on the entire training data provided and then make predictions for your final submission:
+
+
+```r
+final_model &lt;- lin_wf %&gt;% 
+  finalize_workflow(select_best(lin_tune_results, metric = "rsq")) %&gt;% 
+* fit(training)
+```
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+.scroll-output[
+
+Make predictions and save the results as _.csv_. Then submit your predictions to us and we will score them. You can submit as often as you like, and we'll give you information about your performance on the holdout, as we have the target values.
+
+
+```r
+final_model %&gt;% 
+  augment(holdout) %&gt;% 
+  select(id, .pred) %&gt;% 
+  rename(weight_kg = .pred)
+```
+
+```
+## # A tibble: 2,187 × 2
+##       id weight_kg
+##    &lt;dbl&gt;     &lt;dbl&gt;
+##  1 10194      491.
+##  2  9228      451.
+##  3 10361      487.
+##  4 10033      469.
+##  5 10369      490.
+##  6  8875      489.
+##  7 10203      487.
+##  8  9466      441.
+##  9  9850      483.
+## 10  9931      439.
+## # … with 2,177 more rows
+```
+
+]
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+.scroll-output[
+
+```r
+final_model %&gt;% 
   augment(read_csv("./Data/holdout_with_target.csv", show_col_types = F)) %&gt;% 
-  ggplot(aes(weight_lbs, .pred)) +
+  ggplot(aes(weight_kg, .pred)) +
   geom_point(alpha = 0.2) +
   geom_abline(lty = "dashed", colour = "red")
 ```
 
-&lt;img src="Giant-Pumpkins_files/figure-html/unnamed-chunk-20-1.png" width="100%" /&gt;
+&lt;img src="Giant-Pumpkins_files/figure-html/unnamed-chunk-24-1.png" width="100%" /&gt;
 ]
 
 ---
@@ -411,17 +502,17 @@ There's something to win here - so play fair.
 
 ### Off you go
 
-Have a look at our example for dealing with splits and hyperparameter tuning in the Tidymodels tutoring session. Copying and pasting the code in the slides is **allowed**!
+Have a look at our example for dealing with splits and hyperparameter tuning in the Tidymodels tutoring session. We'll be here for you to ask questions, once you get to it. Copying and pasting the code in the slides is **allowed**!
 
-Spend 30-45 min on getting started with your model. Ask your peers (that includes us) questions. 
+Spend as long as you need modelling.
 
-#### 🕒 30-45 min
+#### 🕒 20:00
 
 ---
 
 # That's it for today!
 
-After our session: Read up documentation on the internet. Watch videos from Julia Silge, Andrew Couch and David Robinson. Submit your entries before the deadline to our email. And most importantly, have fun while learning.
+After our session: Watch videos from Julia Silge, Andrew Couch and David Robinson. Most importantly, have fun while learning.
 
 For further questions, feel free to reach out to us. Make sure to stay updated on our socials and via our website where all resources and dates are also published.
 

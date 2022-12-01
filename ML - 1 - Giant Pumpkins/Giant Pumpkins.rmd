@@ -48,6 +48,8 @@ xaringanExtra::use_panelset()
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 
+setwd(dirname(rstudioapi::getActiveDocumentContext()[[2]]))
+
 library(tidyverse)
 library(tidymodels)
 ```
@@ -65,19 +67,7 @@ knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 
 ---
 
-# Goals for today's session
-
-<br>
-<br>
-<br>
-
-```{r, echo=FALSE, out.width="100%"}
-knitr::include_graphics("GraphicsSlides/structure.png")
-```
-
----
-
-### Today's Task
+### Today's Mission
 
 <br>
 <br>
@@ -180,20 +170,39 @@ The learning curve is always steep when looking at it from the bottom. Use the t
 
 ---
 
-#### Our Basic Example: The ol' reliable
+#### Our Basic Example: The ol' reliable$
 
-Let's fit a basic, linear regression.
+Make splits from the training first:
 
 ```{r}
-lin_spec <- linear_reg() %>%
-  set_mode("regression") %>%
-  set_engine("lm")
+dt_split <- initial_split(training)
+dt_train <- training(dt_split)
+dt_test <- testing(dt_split)
+
+folds <- vfold_cv(dt_train, v = 5) # resampling for tuning
 ```
 
 ```{r}
-lin_rec <- recipe(weight_lbs ~ year + place + ott + est_weight + country,
+dt_split
+```
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+Let's fit a basic, linear regression with a penalty.
+
+```{r}
+lin_spec <- linear_reg(mixture = tune(), penalty = tune()) %>%
+  set_mode("regression") %>%
+  set_engine("glmnet")
+```
+
+```{r}
+lin_rec <- recipe(weight_kg ~ year + place + ott + est_weight + country,
                   data = training) %>%
   step_impute_mean(all_numeric_predictors()) %>%
+  step_novel(all_nominal_predictors()) %>% 
   step_unknown(all_nominal_predictors(), new_level = "not specified") %>%    
   step_other(country, threshold = 0.03) %>%
   step_dummy(all_nominal_predictors(), one_hot = T) %>% 
@@ -212,6 +221,8 @@ lin_rec %>% prep() %>% juice()
 
 #### Our Basic Example: The ol' reliable
 
+.scroll-output[
+
 ```{r}
 lin_wf <- workflow() %>%
   add_recipe(lin_rec) %>%
@@ -220,41 +231,22 @@ lin_wf <- workflow() %>%
 lin_wf
 ```
 
----
-
-#### Our Basic Example: The ol' reliable
-
-```{r}
-lin_fit <- lin_wf %>% 
-  fit(training)
-```
+]
 
 ---
 
 #### Our Basic Example: The ol' reliable
 
-```{r}
-lin_fit %>% 
-  predict(holdout)
-```
-
----
-
-#### Our Basic Example: The ol' reliable
+Let's tune the penalty:
 
 ```{r}
-lin_fit %>% 
-  augment(holdout)
-```
-
----
-
-#### Our Basic Example: The ol' reliable
-
-```{r}
-lin_fit %>% 
-  augment(read_csv("./Data/holdout_with_target.csv", show_col_types = F)) %>% 
-  rsq(truth = weight_lbs, estimate = .pred)
+lin_tune_results <- tune_grid(
+  lin_wf,
+  resamples = folds,
+  grid = grid_regular(penalty(),
+                      mixture(),
+                      levels = 10)
+)
 ```
 
 ---
@@ -262,10 +254,86 @@ lin_fit %>%
 #### Our Basic Example: The ol' reliable
 
 .scroll-output[
-```{r, dpi=300, out.width="100%", fig.height=4}
+
+Let's look at the results:
+
+```{r}
+lin_tune_results %>% 
+  show_best(metric = "rsq")
+```
+
+]
+---
+
+#### Our Basic Example: The ol' reliable
+
+Let's finalise the model with the best parameters from tuning:
+
+```{r}
+lin_fit <- lin_wf %>% 
+  finalize_workflow(select_best(lin_tune_results, metric = "rsq")) %>% 
+  fit(dt_train)
+```
+
+Fitting onto the training split.
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+```{r}
 lin_fit %>% 
+  predict(dt_test)
+```
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+```{r}
+lin_fit %>% 
+  augment(dt_test) %>% 
+  rsq(truth = weight_kg, estimate = .pred)
+```
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+Happy with that? Fit it on the entire training data provided and then make predictions for your final submission:
+
+```{r}
+final_model <- lin_wf %>% 
+  finalize_workflow(select_best(lin_tune_results, metric = "rsq")) %>% 
+  fit(training) #<<
+```
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+.scroll-output[
+
+Make predictions and save the results as _.csv_. Then submit your predictions to us and we will score them. You can submit as often as you like, and we'll give you information about your performance on the holdout, as we have the target values.
+
+```{r}
+final_model %>% 
+  augment(holdout) %>% 
+  select(id, .pred) %>% 
+  rename(weight_kg = .pred)
+```
+
+]
+
+---
+
+#### Our Basic Example: The ol' reliable
+
+.scroll-output[
+```{r, dpi=300, out.width="100%", fig.height=4}
+final_model %>% 
   augment(read_csv("./Data/holdout_with_target.csv", show_col_types = F)) %>% 
-  ggplot(aes(weight_lbs, .pred)) +
+  ggplot(aes(weight_kg, .pred)) +
   geom_point(alpha = 0.2) +
   geom_abline(lty = "dashed", colour = "red")
 ```
@@ -315,17 +383,17 @@ There's something to win here - so play fair.
 
 ### Off you go
 
-Have a look at our example for dealing with splits and hyperparameter tuning in the Tidymodels tutoring session. Copying and pasting the code in the slides is **allowed**!
+Have a look at our example for dealing with splits and hyperparameter tuning in the Tidymodels tutoring session. We'll be here for you to ask questions, once you get to it. Copying and pasting the code in the slides is **allowed**!
 
-Spend 30-45 min on getting started with your model. Ask your peers (that includes us) questions. 
+Spend as long as you need modelling.
 
-#### 🕒 30-45 min
+#### 🕒 20:00
 
 ---
 
 # That's it for today!
 
-After our session: Read up documentation on the internet. Watch videos from Julia Silge, Andrew Couch and David Robinson. Submit your entries before the deadline to our email. And most importantly, have fun while learning.
+After our session: Watch videos from Julia Silge, Andrew Couch and David Robinson. Most importantly, have fun while learning.   
 
 For further questions, feel free to reach out to us. Make sure to stay updated on our socials and via our website where all resources and dates are also published.
 
