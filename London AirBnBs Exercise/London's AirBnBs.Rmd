@@ -63,7 +63,7 @@ listings <- read_csv("listings.csv")
 (b) Check for missing and duplicated values.
 \hfill\break
 
-(c) Count all nominal values and print summary information on all numerical values. (\textit{Hint:} The function `count()` gives you the value counts for the specified variables. Can you additionally to sort the results?)
+(c) Count all nominal values and print summary information on all numerical values. (\textit{Hint:} The function `count()` gives you the value counts for the specified variables. Can you additionally try to sort the results?)
 
 ## Task 2: Handling/Wrangling/Munging/Massaging and visualising the data
 
