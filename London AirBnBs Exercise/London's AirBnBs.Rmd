@@ -1,0 +1,245 @@
+---
+title: "Data Wrangling and Visualisation Exercises"
+author: RUG @ HSG
+output:
+  
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+# mainfont: "Avenir Next"
+# monofont: Monaco
+header-includes:
+  \usepackage{fancyhdr}
+  \usepackage{graphicx}
+  \usepackage{eurosym}
+  \usepackage{booktabs,xcolor}
+  \pagestyle{fancy}
+  \fancyhf{}
+  \addtolength{\headheight}{1.0cm}
+  \rhead{Intermediate tidyverse exercises - 2023-03-16}
+  \lhead{\includegraphics[width=3cm]{"img/RUG_HSG_Logo_shapes_transparent.png"}}
+  \rfoot{Page \thepage}
+  \fancypagestyle{plain}{\pagestyle{fancy}}
+  
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, dev = "cairo_pdf")
+library(tidyverse)
+library(tidymodels)
+```
+
+Below, you will find some exercises to apply and improve your data wrangling and visualisation skills. Generally, they increase in difficulty as you go along. Don't hesitate to ask questions in the Q&A WhatsApp group, we or your fellow students will be happy to answer them!
+
+The packages we loaded for this exercise:
+
+```{r, eval=F}
+library(tidyverse)
+library(tidymodels)
+```
+
+## The data set
+
+In these exercises we will be working with data on **London AirBnBs** ([Download on Kaggle](https://www.kaggle.com/datasets/thedevastator/learning-about-airbnb-in-london-through-this-dat?resource=download)). Each row represents one listing, and there are a variety of columns with information on the listing, such as the name, host, price and more. This dataset could be used to study patterns in Airbnb pricing, to understand how Airbnbs are being used in London, or to compare different neighbourhoods in London.
+
+Download the data from Kaggle, store it in the same folder as your RScript or Notebook and read in the `listings.csv` file.
+
+```{r}
+listings <- read_csv("listings.csv")
+```
+
+\newpage
+
+## Task 1: Getting an overview over the data
+
+(a) In the `tidyverse` there are multiple functions that allow you to gain a quick overview over the data that you are working with. (\textit{Tip:} Try out the function `glimpse()` to get all of the information in one step.)
+\hfill\break
+
+(b) Check for missing and duplicated values.
+\hfill\break
+
+(c) Count all nominal values and print summary information on all numerical values. (\textit{Hint:} The function `count()` gives you the value counts for the specified variables. Can you additionally to sort the results?)
+
+## Task 2: Handling/Wrangling/Munging/Massaging and visualising the data
+
+Now that you have an idea about the data, this part will get interesting. The bread and butter of data analysis is visualisation, it is always wise to take a look at some charts before you do any modelling or inference. In the spirit of the data visualisation godfather Edward Tufte: 
+
+> "Above all else show the data."
+
+If you feel like you don't know how to do it all yet, just have a look at the solution and try to understand every step (see what happens if you run the code line by line).
+
+(a) Calculate the median price for each neighbourhood and plot it in a sorted bar plot like below.
+\hfill\break
+
+```{r, fig.height=4, out.width="85%", echo=F, fig.align='center'}
+listings %>% 
+  group_by(neighbourhood) %>% 
+  summarise(median_price = median(price)) %>% 
+  ggplot(aes(x = median_price, 
+             y = neighbourhood %>% fct_reorder(median_price))) +
+  geom_col(fill = "#33678A") +
+  labs(title = "Median Price per Night by Neigbourhood",
+       x = NULL, y = NULL) +
+  scale_x_continuous(labels = scales::comma_format(suffix = " GBP")) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+(b) Count the room types for the eight most frequent neighbourhoods, normalise their frequency to a percentage and plot them into a bar chart. (\textit{Hint:} The function `reorder_within()` from the `tidytext` package can be used for ordering the bars in the different facets. Make sure to also add `scales='free'` in the `facet_wrap` line and to add a `scale_y_reordered`, should you decide to order it.).
+\hfill\break
+
+```{r, fig.height=4, out.width="85%", echo=F, fig.align='center'}
+five_nh <- listings %>% 
+  count(neighbourhood, sort = T) %>% 
+  head(8) %>% 
+  pull(neighbourhood)
+
+listings %>% 
+  filter(neighbourhood %in% five_nh) %>% 
+  count(neighbourhood, room_type) %>% 
+  group_by(neighbourhood) %>% 
+  mutate(n = n/sum(n)) %>% 
+  ungroup() %>% 
+  ggplot(aes(x = n,
+             y = room_type)) +
+  geom_col(fill = "#33678A") +
+  labs(title = "Room Type by Neighbourhood (in %)",
+       y = NULL, x = "Relative Frequency") +
+  facet_wrap(~ neighbourhood) +
+  scale_x_continuous(labels = scales::percent_format(),
+                     limits = c(0,1)) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+(c) Plot the boxplots by neighbourhood of the price per night. There is no preparation of the data required for this step, you can pipe the dataset straight into the `ggplot` call. In any price data, the distribution often has a long right tail, therefore using a log scale can make the chart more legible. In this example, use `coord_cartesian()` to zoom into the chart instead. As opposed to the `scale_`, `coord_cartesian()` does not drop the observations and shift the axis and does exactly what we want: merely zoom in.
+\hfill\break
+
+```{r, fig.height=4, out.width="85%", echo=F, fig.align='center'}
+listings %>% 
+  ggplot(aes(x = price, 
+             y = neighbourhood %>% fct_reorder(price))) +
+  geom_boxplot(outlier.colour = NA) +
+  labs(title = "Price Distribution by Neighbourhood",
+       subtitle = "Outliers removed", x = NULL, y = NULL) +
+  scale_x_continuous(labels = scales::comma_format(suffix = " GBP")) +
+  coord_cartesian(xlim = c(0, 450)) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+
+## Task 3: A basic model
+
+So far we have only analysed some aspects of the data. Let's get to the next step of making a basic model for predictions. We will show the `tidymodels` package, which makes data preparation really easy.
+
+The first step is always splitting the data into a training and testing set. The training data set will be where we let the model learn patterns in the data. The testing data set will be where we want to see if the model can make predictions on previously unseen data. Testing the model on the dataset it has learned from doesn't make sense, as the goal is to take the model and use it on new data.
+
+```{r}
+set.seed(1) # setting random seed to make results reproducible
+split <- initial_split(listings, frac = 0.75)
+
+train_data <- training(split)
+test_data <- testing(split)
+```
+
+What the above code did was randomly sampling 75% from the total data and storing it in `train_data`. Then, filtering out the observations from the dataset that are now in the training set and taking the rest and storing it in `test_data`.
+
+```{r}
+split
+```
+
+We can see in the split object how many rows were used for training and testing.
+
+Now we can select a few variables, that we will use in a linear regression, let's say these three to predict the price:
+
+```{r}
+listings %>% 
+  select(neighbourhood, room_type, number_of_reviews, price ) %>% 
+  glimpse()
+```
+
+We will use a linear regression. As linear regressions require numeric predictors, we cannot use `neighbourhood` and `room_type` in their current form. We can use dummy encoding, i.e. represent them in binary form with zeros and ones. `Tidymodels` makes this preprocessing step very easy:
+
+```{r}
+preprocessing_recipe <- recipe(price ~ neighbourhood + room_type +
+                                 number_of_reviews,
+                               data = train_data) %>% 
+  step_dummy(all_nominal_predictors())
+```
+
+We can apply the preprocessing steps to the testing data like such and see what comes out the other side:
+
+```{r}
+preprocessing_recipe %>% 
+  prep() %>% 
+  juice()
+```
+
+Perfect, now we can fit the model:
+
+```{r}
+trained_model <- workflow() %>% 
+  add_model(linear_reg()) %>% 
+  add_recipe(preprocessing_recipe) %>% 
+  fit(train_data)
+```
+
+Let's look at the coefficients:
+
+```{r, fig.height=4, out.width="85%", echo=F, fig.align='center'}
+trained_model %>% 
+  extract_fit_parsnip() %>% 
+  tidy() %>% 
+  filter(p.value < 0.05) %>% 
+  ggplot(aes(x = estimate, y = term)) +
+  geom_col(fill = "#33678A") +
+  labs(title = "Regression coefficients",
+       subtitle = "with p-value < 0.05",
+       y = NULL, x = "GBP") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+\textit{Careful:} We can't interpret these intercepts causally without further assumptions, however we can see that with the given variables, the model picked up on some signal from more expensive neighbourhoods (like Westminster and Kensington and Chelsea). Additionally, the dummy variables have to be interpreted relative to the level which has been left out. For example: The share room and private room are less expensive compared to a full house, which is the level left out by the dummy encoding to avoid multicollinearity.
+
+Now, we can make predictions on the testing data to see if the model is any good:
+
+```{r}
+trained_model %>% 
+  # This means: stick predictions for each line to the right
+  augment(test_data) %>% 
+  rsq(truth = price, estimate = .pred)
+```
+
+```{r}
+trained_model %>% 
+  # This means: stick predictions for each line to the right
+  augment(test_data) %>% 
+  mae(truth = price, estimate = .pred)
+```
+
+As you can see, the $R^2$ of the predictions is only about 9%, so not very impressive. The mean average error is about 60 pounds - also not impressive.
+
+(a) Your task: Can you create a model (include more variables, other transformations, other model, ...) that performs better than that? Let us know on our socials (Instagram)!
+
+\newpage
+
+# Solutions
+
+## Task 1
+
+(a) There is more than one answer to this task, however, we prefer `glimpse()` because the overview is nice and condensed.
+
+\hfill\break
+
+\newpage
+
+## Task 2
+
+(a)
+
+\hfill\break
