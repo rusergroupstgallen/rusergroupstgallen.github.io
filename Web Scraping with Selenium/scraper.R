@@ -6,13 +6,17 @@ library(tidyverse)
 
 ## Set up ----
 # Setting up the driver
-chromeDr <- rsDriver(browser = "chrome", port = 4569L, chromever = "107.0.5304.62", geckover = NULL, # you will have to adjust this version
-                     extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1920,1080', '--headless'),
-                                                                   prefs = list(
-                                                                     "profile.default_content_settings.popups" = 0L,
-                                                                     "download.prompt_for_download" = FALSE,
-                                                                     "directory_upgrade" = TRUE
-                                                                   ))))
+# chromeDr_ver <- data.frame("version" = unname(unlist(binman::list_versions("chromedriver")))) %>% mutate("major" = sapply(version, function(x){as.numeric(unlist(str_split(x, "\\."))[1])})) %>% arrange(desc(major))
+# chromeDr_ver <- as.character(chromeDr_ver$version[3])
+chromeDr_ver <- "111.0.5563.64"
+
+chromeDr <- RSelenium::rsDriver(browser = "chrome", port = 4569L, chromever = chromeDr_ver, geckover = NULL, # you will have to adjust this version
+                                extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1920,1080', '--headless'),
+                                                                              prefs = list(
+                                                                                "profile.default_content_settings.popups" = 0L,
+                                                                                "download.prompt_for_download" = FALSE,
+                                                                                "directory_upgrade" = TRUE
+                                                                              ))))
 
 remDr <- chromeDr[["client"]]
 
@@ -35,7 +39,7 @@ find_homegate_elements <- function(listing){
   tryCatch(
     expr = {
       suppressMessages({
-        price <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemPrice_price')]/span[2]"))
+        price <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//div[contains(@class, 'HgListingCard_price')]"))
         price <- unlist(price$getElementText())
       })
     },
@@ -46,7 +50,7 @@ find_homegate_elements <- function(listing){
   tryCatch(
     expr = {
       suppressMessages({
-        sq_m <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemLivingSpace_value')]"))
+        sq_m <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//div[contains(@class, 'HgListingRoomsLivingSpace_rooms')]/span[2]"))
         sq_m <- unlist(sq_m$getElementText())
       })
     },
@@ -57,7 +61,7 @@ find_homegate_elements <- function(listing){
   tryCatch(
     expr = {
       suppressMessages({
-        nr_rooms <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'ListItemRoomNumber_value')]"))
+        nr_rooms <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//div[contains(@class, 'HgListingRoomsLivingSpace_rooms')]/span[1]"))
         nr_rooms <- unlist(nr_rooms$getElementText())
       })
     },
@@ -68,7 +72,7 @@ find_homegate_elements <- function(listing){
   tryCatch(
     expr = {
       suppressMessages({
-        location <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//div[contains(@class, 'ListItem') and contains(@class, '_data_')]/p[2]/span"))
+        location <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//div[contains(@class, 'HgListingCard_address')]"))
         location <- unlist(location$getElementText())
       })
     },
@@ -79,7 +83,7 @@ find_homegate_elements <- function(listing){
   tryCatch(
     expr = {
       suppressMessages({
-        description <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//div[contains(@class, 'ListItemDescription_description')]/p"))
+        description <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//p[contains(@class, 'HgListingDescription_large') or contains(@class, 'HgListingDescription_medium') or contains(@class, 'HgListingDescription_small')]"))
         description <- unlist(description$getElementText())
       })
     },
@@ -93,7 +97,9 @@ find_homegate_elements <- function(listing){
                     "location" = location,
                     "description" = description,
                     "listing_id" = listing_id,
-                    "listing_url" = unlist(listing$getElementAttribute("href"))))
+                    "listing_url" = unlist(listing$getElementAttribute("href"))
+  )
+  )
 }
 
 ## Implicit wait
@@ -122,6 +128,21 @@ implWait <- function(wait_s = 30){
 # Moving to the target page
 remDr$navigate("https://www.homegate.ch/rent/real-estate/switzerland")
 
+Sys.sleep(20)
+
+tryCatch(
+  cookie_button <- remDr$findElements(value = "//*/button[contains(@id, 'onetrust-accept-btn-handler')]")
+)
+
+Sys.sleep(2)
+
+if (length(cookie_button) > 0){
+  cookie_button <- remDr$findElement(value = "//*/button[contains(@id, 'onetrust-accept-btn-handler')]")
+  Sys.sleep(2)
+  cookie_button$clickElement()
+  Sys.sleep(2)
+}
+
 # Extract all the canton links
 e <- remDr$findElements(value = "//*/div[contains(@class, 'GeoDrillDownSRPLink')]/a")
 canton_links <- unlist(lapply(e, function(x){x$getElementAttribute("href")}))[2:27]
@@ -140,7 +161,7 @@ for (c_link in canton_links){
   while (last_page == FALSE){
     
     # Get all the listing wrappers on the page
-    parents <- remDr$findElements(value = "//*/a[contains(@class, 'ListItem')]")
+    parents <- remDr$findElements(value = "//*/a[contains(@class, 'HgCardElevated_link')]")
     
     # Get the values from the child elements
     page_result <- lapply(parents, find_homegate_elements)
@@ -208,7 +229,7 @@ for (c_link in canton_links){
   while (last_page == FALSE){
     
     # Get all the listing wrappers on the page
-    parents <- remDr$findElements(value = "//*/a[contains(@class, 'ListItem')]")
+    parents <- remDr$findElements(value = "//*/a[contains(@class, 'HgCardElevated_link')]")
     
     # Get the values from the child elements
     page_result <- lapply(parents, find_homegate_elements)
@@ -260,17 +281,17 @@ for (c_link in canton_links){
 ## Finally ----
 # Some clean-up
 homegate_data$listing_id <- sapply(homegate_data$listing_url, function(x){as.numeric(str_extract(x, "\\d+"))})
-homegate_data$price <- sapply(homegate_data$price, function(x){str_remove(x, "\\.–")}) %>%
-  sapply(., function(x){str_remove_all(x, ",")}) %>%
+homegate_data$price <- sapply(homegate_data$price, function(x){str_remove(str_remove(str_remove(x, "CHF "), ".– / month"), ",")}) %>%
   unlist(.) %>% 
   as.numeric()
-homegate_data$sq_m <- sapply(homegate_data$sq_m, function(x){str_remove(x, "m2")}) %>%
+homegate_data$sq_m <- sapply(homegate_data$sq_m, function(x){str_remove(x, "m² living space")}) %>%
   sapply(., function(x){str_remove_all(x, ",")}) %>%
   unlist(.) %>% 
   as.numeric()
 homegate_data$zip_code <- sapply(homegate_data$location, function(x){str_extract(x, "\\d{4}")}) %>%
   as.numeric()
-homegate_data$nr_rooms <- sapply(homegate_data$nr_rooms, function(x){str_remove(x, "rm")}) %>%
+homegate_data$nr_rooms <- sapply(homegate_data$nr_rooms, function(x){str_remove(x, " room")}) %>%
+  sapply(., function(x){str_remove_all(x, "s")}) %>%
   as.numeric()
 
 # Write our scraped data to a file
@@ -281,3 +302,14 @@ save(homegate_data, file = paste0("Web Scraping with Selenium/Homegate_scrape_cl
 print("Scrape complete. Shutdown.")
 remDr$close()
 chromeDr[["server"]]$stop()
+
+# source("Web Scraping with Selenium/scraper.R")
+# while(TRUE){
+#   if (weekdays(Sys.Date()) == "Saturday" & lubridate::hour(Sys.time()) == 12){
+#     source("Web Scraping with Selenium/scraper.R")
+#   } else {
+#     print(paste0("It is ", weekdays(Sys.Date()), " at ", lubridate::hour(Sys.time())))
+#   }
+#   Sys.sleep(3599)
+# }
+
