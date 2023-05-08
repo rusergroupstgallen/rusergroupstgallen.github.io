@@ -8,10 +8,12 @@ library(tidyverse)
 # Setting up the driver
 # chromeDr_ver <- data.frame("version" = unname(unlist(binman::list_versions("chromedriver")))) %>% mutate("major" = sapply(version, function(x){as.numeric(unlist(str_split(x, "\\."))[1])})) %>% arrange(desc(major))
 # chromeDr_ver <- as.character(chromeDr_ver$version[3])
-chromeDr_ver <- "112.0.5615.49"
+system("find ~/.local/share/ -name LICENSE.chromedriver -print | xargs -r rm")
 
-chromeDr <- RSelenium::rsDriver(browser = "chrome", port = 4569L, chromever = chromeDr_ver, geckover = NULL, # you will have to adjust this version
-                                extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1920,1080'),
+# chromeDr_ver <- "113.0.5672.24"
+
+chromeDr <- RSelenium::rsDriver(browser = "chrome", port = 4569L, chromever = "latest", geckover = NULL, # you will have to adjust this version
+                                extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1920,1080', '--headless'),
                                                                               prefs = list(
                                                                                 "profile.default_content_settings.popups" = 0L,
                                                                                 "download.prompt_for_download" = FALSE,
@@ -124,104 +126,11 @@ implWait <- function(wait_s = 30){
 
 
 
-# ## Listings for rent ----
-# # Moving to the target page
-# remDr$navigate("https://www.homegate.ch/rent/real-estate/switzerland")
-# 
-# Sys.sleep(20)
-# 
-# tryCatch(
-#   cookie_button <- remDr$findElements(value = "//*/button[contains(@id, 'onetrust-accept-btn-handler')]")
-# )
-# 
-# Sys.sleep(2)
-# 
-# if (length(cookie_button) > 0){
-#   cookie_button <- remDr$findElement(value = "//*/button[contains(@id, 'onetrust-accept-btn-handler')]")
-#   Sys.sleep(2)
-#   cookie_button$clickElement()
-#   Sys.sleep(2)
-# }
-# 
-# # Extract all the canton links
-# e <- remDr$findElements(value = "//*/div[contains(@class, 'GeoDrillDownSRPLink')]/a")
-# canton_links <- unlist(lapply(e, function(x){x$getElementAttribute("href")}))[2:27]
-# 
-# # Prepare a table for the output
-# homegate_data <- data.frame()
-# 
-# # Go through the listings by canton
-# last_page <- FALSE
-# for (c_link in canton_links){
-#   
-#   # Navigate to the page
-#   remDr$navigate(c_link)
-#   
-#   # Go through all the pages per canton
-#   while (last_page == FALSE){
-#     
-#     # Get all the listing wrappers on the page
-#     parents <- remDr$findElements(value = "//*/a[contains(@class, 'HgCardElevated_link')]")
-#     
-#     # Get the values from the child elements
-#     page_result <- lapply(parents, find_homegate_elements)
-#     
-#     # Coerce the results into a data frame
-#     page_result <- as.data.frame(do.call(rbind, page_result))
-#     
-#     # Add a column for the listing type
-#     page_result$listing_type <- "rent"
-#     
-#     # Add column for the current canton
-#     page_result$canton <- str_remove(c_link, "/matching-list") %>%
-#       str_split(., "/(?!.*/)") %>%
-#       unlist(.) %>% .[2] %>%
-#       str_split(., "-") %>%
-#       unlist(.) %>% .[2]
-#     
-#     # Join with the rest of the scraped data
-#     homegate_data <- rbind(homegate_data, page_result)
-#     
-#     # Check if we're on the last page, otherwise go to next page
-#     tryCatch(
-#       next_page_button <- remDr$findElements(value = "//*/a[contains(@aria-label, 'Go to next page')]")
-#     )
-#     
-#     if (length(next_page_button) < 1){
-#       last_page <- TRUE
-#     } else {
-#       e <- remDr$findElement(value = "//*/a[contains(@aria-label, 'Go to next page')]")
-#       e$clickElement()
-#       
-#       # Wait for page to load before continuing
-#       implWait(30)
-#       
-#       print("Next page")
-#     }
-#   }
-#   
-#   # Reset the last page indicator
-#   last_page <- FALSE
-#   
-#   print("Finished canton page")
-# }
-# 
-# # Write our scraped data to a file
-# save(homegate_data, file = "Web Scraping with Selenium/Homegate_scrape.RData")
-
-
-## Listings to buy ----
+## Listings for rent ----
 # Moving to the target page
-remDr$navigate("https://www.homegate.ch/buy/real-estate/switzerland")
+remDr$navigate("https://www.homegate.ch/rent/real-estate/switzerland")
 
-# Extract all the canton links
-e <- remDr$findElements(value = "//*/div[contains(@class, 'GeoDrillDownSRPLink')]/a")
-canton_links <- unlist(lapply(e, function(x){x$getElementAttribute("href")}))[2:27]
-
-####################################################
-#####################TEMP###########################
-load("Web Scraping with Selenium/homegate_data_temp_20230503_5.RData")
-canton_links <- canton_links[22:26]
+Sys.sleep(20)
 
 tryCatch(
   cookie_button <- remDr$findElements(value = "//*/button[contains(@id, 'onetrust-accept-btn-handler')]")
@@ -235,7 +144,83 @@ if (length(cookie_button) > 0){
   cookie_button$clickElement()
   Sys.sleep(2)
 }
-####################################################
+
+# Extract all the canton links
+e <- remDr$findElements(value = "//*/div[contains(@class, 'GeoDrillDownSRPLink')]/a")
+canton_links <- unlist(lapply(e, function(x){x$getElementAttribute("href")}))[2:27]
+
+# Prepare a table for the output
+homegate_data <- data.frame()
+
+# Go through the listings by canton
+last_page <- FALSE
+for (c_link in canton_links){
+
+  # Navigate to the page
+  remDr$navigate(c_link)
+  
+  pg_cntr <- 1
+
+  # Go through all the pages per canton
+  while (last_page == FALSE){
+
+    # Get all the listing wrappers on the page
+    parents <- remDr$findElements(value = "//*/a[contains(@class, 'HgCardElevated_link')]")
+
+    # Get the values from the child elements
+    page_result <- lapply(parents, find_homegate_elements)
+
+    # Coerce the results into a data frame
+    page_result <- as.data.frame(do.call(rbind, page_result))
+
+    # Add a column for the listing type
+    page_result$listing_type <- "rent"
+
+    # Add column for the current canton
+    page_result$canton <- str_remove(c_link, "/matching-list") %>%
+      str_split(., "/(?!.*/)") %>%
+      unlist(.) %>% .[2] %>%
+      str_split(., "-") %>%
+      unlist(.) %>% .[2]
+
+    # Join with the rest of the scraped data
+    homegate_data <- rbind(homegate_data, page_result)
+    save(homegate_data, file = "Web Scraping with Selenium/homegate_data_inter_temp.RData")
+
+    # Check if we're on the last page, otherwise go to next page
+    tryCatch(
+      next_page_button <- remDr$findElements(value = "//*/a[contains(@aria-label, 'Go to next page')]")
+    )
+
+    if (length(next_page_button) < 1){
+      last_page <- TRUE
+    } else {
+      e <- remDr$findElement(value = "//*/a[contains(@aria-label, 'Go to next page')]")
+      e$clickElement()
+
+      # Wait for page to load before continuing
+      implWait(30)
+
+      print(paste0("Canton: ", page_result$canton[1], " (rent), page: ", pg_cntr))
+      print("Next page")
+      pg_cntr <- pg_cntr + 1
+    }
+  }
+
+  # Reset the last page indicator
+  last_page <- FALSE
+
+  print("Finished canton page")
+}
+
+
+## Listings to buy ----
+# Moving to the target page
+remDr$navigate("https://www.homegate.ch/buy/real-estate/switzerland")
+
+# Extract all the canton links
+e <- remDr$findElements(value = "//*/div[contains(@class, 'GeoDrillDownSRPLink')]/a")
+canton_links <- unlist(lapply(e, function(x){x$getElementAttribute("href")}))[2:27]
 
 # Go through the listings by canton
 last_page <- FALSE
@@ -243,6 +228,8 @@ for (c_link in canton_links){
   
   # Navigate to the page
   remDr$navigate(c_link)
+  
+  pg_cntr <- 1
   
   # Go through all the pages per canton
   while (last_page == FALSE){
@@ -284,7 +271,9 @@ for (c_link in canton_links){
       # Wait for page to load before continuing
       implWait(30)
       
+      print(paste0("Canton: ", page_result$canton[1], " (buy), page: ", pg_cntr))
       print("Next page")
+      pg_cntr <- pg_cntr + 1
     }
   }
   
@@ -302,24 +291,24 @@ save(homegate_data, file = "Homegate_scrape.RData")
 # Some clean-up
 homegate_data$listing_id <- sapply(homegate_data$listing_url, function(x){as.numeric(str_extract(x, "\\d+"))})
 homegate_data$price <- sapply(homegate_data$price, function(x){str_remove(x, "CHF ")}) %>%
-  sapply(function(x){str_remove(x, ".–")}) |> 
-  sapply(function(x){str_remove(x, "/ month")}) |> 
-  sapply(function(x){str_remove(x, "/ one time")}) |> 
-  sapply(function(x){str_remove_all(x, ",")}) |> 
-  sapply(function(x){trimws(x, "both")}) |> 
-  unlist() |> 
+  sapply(function(x){str_remove(x, "\\.–")}) %>%
+  sapply(function(x){str_remove(x, "/ month")}) %>% 
+  sapply(function(x){str_remove(x, "/ one time")}) %>% 
+  sapply(function(x){str_remove_all(x, ",")}) %>% 
+  sapply(function(x){trimws(x, "both")}) %>% 
+  unlist() %>% 
   as.numeric()
-homegate_data$sq_m <- sapply(homegate_data$sq_m, function(x){str_remove(x, "m² living space")}) |> 
-  sapply(function(x){str_remove_all(x, ",")}) |> 
-  unlist() |> 
-  sapply(function(x){trimws(x, "both")}) |> 
+homegate_data$sq_m <- sapply(homegate_data$sq_m, function(x){str_remove(x, "m² living space")}) %>% 
+  sapply(function(x){str_remove_all(x, ",")}) %>% 
+  unlist() %>% 
+  sapply(function(x){trimws(x, "both")}) %>% 
   as.numeric()
 homegate_data$zip_code <- sapply(homegate_data$location, function(x){str_extract(x, "\\d{4}")}) %>%
   as.numeric()
 homegate_data$nr_rooms <- sapply(homegate_data$nr_rooms, function(x){str_remove(x, " room")}) %>%
   sapply(function(x){str_remove_all(x, "s")}) %>%
-  unlist() |> 
-  sapply(function(x){trimws(x, "both")}) |> 
+  unlist() %>% 
+  sapply(function(x){trimws(x, "both")}) %>% 
   as.numeric()
 
 # Write our scraped data to a file
@@ -340,4 +329,4 @@ chromeDr[["server"]]$stop()
 #   }
 #   Sys.sleep(3599)
 # }
-
+# 
