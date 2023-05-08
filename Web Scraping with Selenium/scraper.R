@@ -10,10 +10,11 @@ library(tidyverse)
 # chromeDr_ver <- as.character(chromeDr_ver$version[3])
 system("find ~/.local/share/ -name LICENSE.chromedriver -print | xargs -r rm")
 
-# chromeDr_ver <- "113.0.5672.24"
+chromeDr_ver <- "113.0.5672.24"
 
-chromeDr <- RSelenium::rsDriver(browser = "chrome", port = 4569L, chromever = "latest", geckover = NULL, # you will have to adjust this version
-                                extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1920,1080', '--headless'),
+chromeDr <- RSelenium::rsDriver(browser = "chrome", port = 4569L, chromever = chromeDr_ver, geckover = NULL, # you will have to adjust this version
+                                extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1920,1080', '--headless',
+                                                                                       '--enable-features=NetworkService,NetworkServiceInProcess'),
                                                                               prefs = list(
                                                                                 "profile.default_content_settings.popups" = 0L,
                                                                                 "download.prompt_for_download" = FALSE,
@@ -105,14 +106,14 @@ find_homegate_elements <- function(listing){
 }
 
 ## Implicit wait
-implWait <- function(wait_s = 30){
+implWait <- function(wait_s = 30, driver = remDr){
   counter <- 0
   webElem <- NULL
   while(is.null(webElem) & counter < wait_s){
     webElem <- tryCatch(
       expr = {
         suppressMessages({
-          remDr$findElement(value = "//*/a[contains(@class, 'ListItem')]")
+          driver$findElement(value = "//*/a[contains(@class, 'HgCardElevated_link')]")
         })
       },
       error = function(err){
@@ -120,7 +121,10 @@ implWait <- function(wait_s = 30){
       })
     Sys.sleep(1)
     counter <- counter + 1
-    print("waiting")
+    print(paste0("waiting..", counter))
+  }
+  if (counter == wait_s){
+    print("timed out")
   }
 }
 
@@ -200,6 +204,7 @@ for (c_link in canton_links){
 
       # Wait for page to load before continuing
       implWait(30)
+      Sys.sleep(sample(1:10, 1))
 
       print(paste0("Canton: ", page_result$canton[1], " (rent), page: ", pg_cntr))
       print("Next page")
@@ -270,7 +275,8 @@ for (c_link in canton_links){
       
       # Wait for page to load before continuing
       implWait(30)
-      
+      Sys.sleep(sample(1:10, 1))      
+
       print(paste0("Canton: ", page_result$canton[1], " (buy), page: ", pg_cntr))
       print("Next page")
       pg_cntr <- pg_cntr + 1
