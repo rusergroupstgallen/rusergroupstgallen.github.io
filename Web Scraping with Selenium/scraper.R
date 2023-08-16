@@ -10,11 +10,12 @@ library(tidyverse)
 # chromeDr_ver <- as.character(chromeDr_ver$version[3])
 system("find ~/.local/share/ -name LICENSE.chromedriver -print | xargs -r rm")
 
-chromeDr_ver <- "113.0.5672.24"
+chromeDr_ver <- "114.0.5735.90"
 
 chromeDr <- RSelenium::rsDriver(browser = "chrome", port = 4569L, chromever = chromeDr_ver, geckover = NULL, # you will have to adjust this version
                                 extraCapabilities = list(chromeOptions = list(args = c('--disable-gpu', '--window-size=1920,1080', '--headless',
-                                                                                       '--enable-features=NetworkService,NetworkServiceInProcess'),
+                                                                                       '--enable-features=NetworkService,NetworkServiceInProcess',
+                                                                                       '--disable-dev-shm-usage', '--no-sandbox', 'enable-automation', 'start-maximized', '--disable-browser-side-navigation'),
                                                                               prefs = list(
                                                                                 "profile.default_content_settings.popups" = 0L,
                                                                                 "download.prompt_for_download" = FALSE,
@@ -125,6 +126,7 @@ implWait <- function(wait_s = 30, driver = remDr){
   }
   if (counter == wait_s){
     print("timed out")
+    return(1)
   }
 }
 
@@ -157,7 +159,7 @@ canton_links <- unlist(lapply(e, function(x){x$getElementAttribute("href")}))[2:
 homegate_data <- data.frame()
 
 # Record keeping
-failed_cantons <- data.frame()
+failed_links <- data.frame()
 
 # Go through the listings by canton
 for (c_link in canton_links){
@@ -166,48 +168,81 @@ for (c_link in canton_links){
   remDr$navigate(c_link)
   
   # Find last page
-  last_page <- as.numeric(str_extract(unlist(remDr$findElement(value = "//*/nav[contains(@class, 'HgPaginationSelector')]/a[3]")$getElementText()), "\\d+"))
+  last_page <- 1
+  
+  tryCatch(
+    expr = {
+      suppressMessages({
+        last_page <- as.numeric(str_extract(unlist(remDr$findElement(value = "//*/nav[contains(@class, 'HgPaginationSelector')]/a[2]")$getElementText()), "\\d+"))
+      })
+    },
+    error = function(err){
+    })
+  
+  tryCatch(
+    expr = {
+      suppressMessages({
+        last_page <- as.numeric(str_extract(unlist(remDr$findElement(value = "//*/nav[contains(@class, 'HgPaginationSelector')]/a[3]")$getElementText()), "\\d+"))
+      })
+    },
+    error = function(err){
+    })
   
   if (!is.na(last_page)){
     current_pages <- paste(c_link, "?ep=", 1:last_page, sep = "")
     
     for (c_page in current_pages){
       remDr$navigate(c_page)
-      implWait()
+      
+      if(!is.null(implWait())){
+        Sys.sleep(sample(1:5, 1))
+        remDr$navigate(c_page)
+      }
+      
       Sys.sleep(sample(1:5, 1))
       
-      # Get all the listing wrappers on the page
-      parents <- remDr$findElements(value = "//*/a[contains(@class, 'HgCardElevated_link')]")
-      
-      # Get the values from the child elements
-      page_result <- lapply(parents, find_homegate_elements)
-      
-      # Coerce the results into a data frame
-      page_result <- as.data.frame(do.call(rbind, page_result))
-      
-      # Add a column for the listing type
-      page_result$listing_type <- "rent"
-      
-      # Add column for the current canton
-      page_result$canton <- str_remove(c_link, "/matching-list") %>%
-        str_split(., "/(?!.*/)") %>%
-        unlist(.) %>% .[2] %>%
-        str_split(., "-") %>%
-        unlist(.) %>% .[2]
-      
-      # Join with the rest of the scraped data
-      homegate_data <- rbind(homegate_data, page_result)
-      save(homegate_data, file = "Web Scraping with Selenium/homegate_data_inter_temp.RData")
-      
-      # Wait for page to load before continuing
-      implWait(30)
-      Sys.sleep(sample(1:10, 1))
-      
-      print(paste0("Canton: ", page_result$canton[1], " (rent), page: ", str_extract(c_page, "\\d+"), "/", last_page))
+      if(is.null(implWait())){
+        # Get all the listing wrappers on the page
+        parents <- remDr$findElements(value = "//*/a[contains(@class, 'HgCardElevated_link')]")
+        
+        # Get the values from the child elements
+        page_result <- lapply(parents, find_homegate_elements)
+        
+        # Coerce the results into a data frame
+        page_result <- as.data.frame(do.call(rbind, page_result))
+        
+        # Add a column for the listing type
+        page_result$listing_type <- "rent"
+        
+        # # Add datetime
+        # page_result$date_time <- Sys.time()
+        
+        # Add column for the current canton
+        page_result$canton <- str_remove(c_link, "/matching-list") %>%
+          str_split(., "/(?!.*/)") %>%
+          unlist(.) %>% .[2] %>%
+          str_split(., "-") %>%
+          unlist(.) %>% .[2]
+        
+        # Join with the rest of the scraped data
+        homegate_data <- rbind(homegate_data, page_result)
+        save(homegate_data, file = "Web Scraping with Selenium/homegate_data_inter_temp.RData")
+        
+        # Wait for page to load before continuing
+        implWait(30)
+        Sys.sleep(sample(1:10, 1))
+        
+        print(paste0("Canton: ", page_result$canton[1], " (rent), page: ", str_extract(c_page, "\\d+"), "/", last_page))
+      } else {
+        # Add link to failed
+        failed_links <- rbind(failed_links, data.frame("datetime" = Sys.time(), "link" = c_page))
+        
+        print(paste0("Skipped -> Canton: ", page_result$canton[1], " (rent), page: ", str_extract(c_page, "\\d+"), "/", last_page))
+      }
     }
   } else {
-    # Add canton link to failed
-    failed_cantons <- rbind(failed_cantons, data.frame("type" = "rent", "canton_link" = c_link))
+    # Add link to failed
+    failed_links <- rbind(failed_links, data.frame("datetime" = Sys.time(), "link" = c_link))
   }
   print("Finished canton page")
 }
@@ -228,54 +263,87 @@ for (c_link in canton_links){
   remDr$navigate(c_link)
   
   # Find last page
-  last_page <- as.numeric(str_extract(unlist(remDr$findElement(value = "//*/nav[contains(@class, 'HgPaginationSelector')]/a[3]")$getElementText()), "\\d+"))
+  last_page <- 1
+  
+  tryCatch(
+    expr = {
+      suppressMessages({
+        last_page <- as.numeric(str_extract(unlist(remDr$findElement(value = "//*/nav[contains(@class, 'HgPaginationSelector')]/a[2]")$getElementText()), "\\d+"))
+      })
+    },
+    error = function(err){
+    })
+  
+  tryCatch(
+    expr = {
+      suppressMessages({
+        last_page <- as.numeric(str_extract(unlist(remDr$findElement(value = "//*/nav[contains(@class, 'HgPaginationSelector')]/a[3]")$getElementText()), "\\d+"))
+      })
+    },
+    error = function(err){
+    })
   
   if (!is.na(last_page)){
     current_pages <- paste(c_link, "?ep=", 1:last_page, sep = "")
     
     for (c_page in current_pages){
       remDr$navigate(c_page)
-      implWait()
+      
+      if(!is.null(implWait())){
+        Sys.sleep(sample(1:5, 1))
+        remDr$navigate(c_page)
+      }
+      
       Sys.sleep(sample(1:5, 1))
       
-      # Get all the listing wrappers on the page
-      parents <- remDr$findElements(value = "//*/a[contains(@class, 'HgCardElevated_link')]")
-      
-      # Get the values from the child elements
-      page_result <- lapply(parents, find_homegate_elements)
-      
-      # Coerce the results into a data frame
-      page_result <- as.data.frame(do.call(rbind, page_result))
-      
-      # Add a column for the listing type
-      page_result$listing_type <- "buy"
-      
-      # Add column for the current canton
-      page_result$canton <- str_remove(c_link, "/matching-list") %>%
-        str_split(., "/(?!.*/)") %>%
-        unlist(.) %>% .[2] %>%
-        str_split(., "-") %>%
-        unlist(.) %>% .[2]
-      
-      # Join with the rest of the scraped data
-      homegate_data <- rbind(homegate_data, page_result)
-      save(homegate_data, file = "Web Scraping with Selenium/homegate_data_inter_temp.RData")
-      
-      # Wait for page to load before continuing
-      implWait(30)
-      Sys.sleep(sample(1:10, 1))
-      
-      print(paste0("Canton: ", page_result$canton[1], " (buy), page: ", str_extract(c_page, "\\d+"), "/", last_page))
+      if(is.null(implWait())){
+        # Get all the listing wrappers on the page
+        parents <- remDr$findElements(value = "//*/a[contains(@class, 'HgCardElevated_link')]")
+        
+        # Get the values from the child elements
+        page_result <- lapply(parents, find_homegate_elements)
+        
+        # Coerce the results into a data frame
+        page_result <- as.data.frame(do.call(rbind, page_result))
+        
+        # Add a column for the listing type
+        page_result$listing_type <- "buy"
+        
+        # # Add datetime
+        # page_result$date_time <- Sys.time()
+        
+        # Add column for the current canton
+        page_result$canton <- str_remove(c_link, "/matching-list") %>%
+          str_split(., "/(?!.*/)") %>%
+          unlist(.) %>% .[2] %>%
+          str_split(., "-") %>%
+          unlist(.) %>% .[2]
+        
+        # Join with the rest of the scraped data
+        homegate_data <- rbind(homegate_data, page_result)
+        save(homegate_data, file = "Web Scraping with Selenium/homegate_data_inter_temp.RData")
+        
+        # Wait for page to load before continuing
+        implWait(30)
+        Sys.sleep(sample(1:10, 1))
+        
+        print(paste0("Canton: ", page_result$canton[1], " (buy), page: ", str_extract(c_page, "\\d+"), "/", last_page))
+      } else {
+        # Add link to failed
+        failed_links <- rbind(failed_links, data.frame("datetime" = Sys.time(), "link" = c_page))
+        
+        print(paste0("Skipped -> Canton: ", page_result$canton[1], " (buy), page: ", str_extract(c_page, "\\d+"), "/", last_page))
+      }
     }
   } else {
-    # Add canton link to failed
-    failed_cantons <- rbind(failed_cantons, data.frame("type" = "buy", "canton_link" = c_link))
+    # Add link to failed
+    failed_links <- rbind(failed_links, data.frame("datetime" = Sys.time(), "link" = c_link))
   }
   print("Finished canton page")
 }
 
 # Write our scraped data to a file
-save(homegate_data, file = paste0("Web Scraping with Selenium/Homegate_scrape_raw_", Sys.Date(), ".RData"))
+save(homegate_data, failed_links, file = paste0("Web Scraping with Selenium/Homegate_scrape_raw_", Sys.Date(), ".RData"))
 
 
 ## Finally ----
@@ -320,4 +388,4 @@ chromeDr[["server"]]$stop()
 #   }
 #   Sys.sleep(3599)
 # }
-# 
+
