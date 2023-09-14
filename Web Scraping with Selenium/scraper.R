@@ -43,7 +43,7 @@ find_homegate_elements <- function(listing){
   tryCatch(
     expr = {
       suppressMessages({
-        price <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//div[contains(@class, 'HgListingCard_price')]"))
+        price <- listing$findChildElement(value = paste0("//*/a[contains(@href, '", listing_id, "')]//span[contains(@class, 'HgListingCard_price')]"))
         price <- unlist(price$getElementText())
       })
     },
@@ -125,7 +125,7 @@ implWait <- function(wait_s = 30, driver = remDr){
     print(paste0("waiting..", counter))
   }
   if (counter == wait_s){
-    print("timed out")
+    print(paste0(Sys.time(), " - timed out"))
     return(1)
   }
 }
@@ -214,8 +214,8 @@ for (c_link in canton_links){
         # Add a column for the listing type
         page_result$listing_type <- "rent"
         
-        # # Add datetime
-        # page_result$date_time <- Sys.time()
+        # Add datetime
+        page_result$datetime <- Sys.time()
         
         # Add column for the current canton
         page_result$canton <- str_remove(c_link, "/matching-list") %>%
@@ -232,19 +232,19 @@ for (c_link in canton_links){
         implWait(30)
         Sys.sleep(sample(1:10, 1))
         
-        print(paste0("Canton: ", page_result$canton[1], " (rent), page: ", str_extract(c_page, "\\d+"), "/", last_page))
+        print(paste0(Sys.time(), " - Canton: ", page_result$canton[1], " (rent), page: ", str_extract(c_page, "\\d+"), "/", last_page))
       } else {
         # Add link to failed
         failed_links <- rbind(failed_links, data.frame("datetime" = Sys.time(), "link" = c_page))
         
-        print(paste0("Skipped -> Canton: ", page_result$canton[1], " (rent), page: ", str_extract(c_page, "\\d+"), "/", last_page))
+        print(paste0(Sys.time(), " - Skipped -> Canton: ", page_result$canton[1], " (rent), page: ", str_extract(c_page, "\\d+"), "/", last_page))
       }
     }
   } else {
     # Add link to failed
     failed_links <- rbind(failed_links, data.frame("datetime" = Sys.time(), "link" = c_link))
   }
-  print("Finished canton page")
+  print(paste0(Sys.time(), " - Finished canton page"))
 }
 
 
@@ -309,8 +309,8 @@ for (c_link in canton_links){
         # Add a column for the listing type
         page_result$listing_type <- "buy"
         
-        # # Add datetime
-        # page_result$date_time <- Sys.time()
+        # Add datetime
+        page_result$datetime <- Sys.time()
         
         # Add column for the current canton
         page_result$canton <- str_remove(c_link, "/matching-list") %>%
@@ -327,55 +327,58 @@ for (c_link in canton_links){
         implWait(30)
         Sys.sleep(sample(1:10, 1))
         
-        print(paste0("Canton: ", page_result$canton[1], " (buy), page: ", str_extract(c_page, "\\d+"), "/", last_page))
+        print(paste0(Sys.time(), " - Canton: ", page_result$canton[1], " (buy), page: ", str_extract(c_page, "\\d+"), "/", last_page))
       } else {
         # Add link to failed
         failed_links <- rbind(failed_links, data.frame("datetime" = Sys.time(), "link" = c_page))
         
-        print(paste0("Skipped -> Canton: ", page_result$canton[1], " (buy), page: ", str_extract(c_page, "\\d+"), "/", last_page))
+        print(paste0(Sys.time(), " - Skipped -> Canton: ", page_result$canton[1], " (buy), page: ", str_extract(c_page, "\\d+"), "/", last_page))
       }
     }
   } else {
     # Add link to failed
     failed_links <- rbind(failed_links, data.frame("datetime" = Sys.time(), "link" = c_link))
   }
-  print("Finished canton page")
+  print(paste0(Sys.time(), " - Finished canton page"))
 }
 
 # Write our scraped data to a file
+homegate_data_2 <- homegate_data
+load("Web Scraping with Selenium/homegate_data_inter_temp.RData")
+homegate_data <- unique(rbind(homegate_data, homegate_data_2))
 save(homegate_data, failed_links, file = paste0("Web Scraping with Selenium/Homegate_scrape_raw_", Sys.Date(), ".RData"))
 
 
-## Finally ----
-# Some clean-up
-homegate_data$listing_id <- sapply(homegate_data$listing_url, function(x){as.numeric(str_extract(x, "\\d+"))})
-homegate_data$price <- sapply(homegate_data$price, function(x){str_remove(x, "CHF ")}) %>%
-  sapply(function(x){str_remove(x, "\\.–")}) %>%
-  sapply(function(x){str_remove(x, "/ month")}) %>% 
-  sapply(function(x){str_remove(x, "/ one time")}) %>% 
-  sapply(function(x){str_remove_all(x, ",")}) %>% 
-  sapply(function(x){trimws(x, "both")}) %>% 
-  unlist() %>% 
-  as.numeric()
-homegate_data$sq_m <- sapply(homegate_data$sq_m, function(x){str_remove(x, "m² living space")}) %>% 
-  sapply(function(x){str_remove_all(x, ",")}) %>% 
-  unlist() %>% 
-  sapply(function(x){trimws(x, "both")}) %>% 
-  as.numeric()
-homegate_data$zip_code <- sapply(homegate_data$location, function(x){str_extract(x, "\\d{4}")}) %>%
-  as.numeric()
-homegate_data$nr_rooms <- sapply(homegate_data$nr_rooms, function(x){str_remove(x, " room")}) %>%
-  sapply(function(x){str_remove_all(x, "s")}) %>%
-  unlist() %>% 
-  sapply(function(x){trimws(x, "both")}) %>% 
-  as.numeric()
-
-# Write our scraped data to a file
-homegate_data <- unique(homegate_data)
-save(homegate_data, file = paste0("Web Scraping with Selenium/Homegate_scrape_clean_", Sys.Date(), ".RData"))
+# ## Finally ----
+# # Some clean-up
+# homegate_data$listing_id <- sapply(homegate_data$listing_url, function(x){as.numeric(str_extract(x, "\\d+"))})
+# homegate_data$price <- sapply(homegate_data$price, function(x){str_remove(x, "CHF ")}) %>%
+#   sapply(function(x){str_remove(x, "\\.–")}) %>%
+#   sapply(function(x){str_remove(x, "/ month")}) %>% 
+#   sapply(function(x){str_remove(x, "/ one time")}) %>% 
+#   sapply(function(x){str_remove_all(x, ",")}) %>% 
+#   sapply(function(x){trimws(x, "both")}) %>% 
+#   unlist() %>% 
+#   as.numeric()
+# homegate_data$sq_m <- sapply(homegate_data$sq_m, function(x){str_remove(x, "m² living space")}) %>% 
+#   sapply(function(x){str_remove_all(x, ",")}) %>% 
+#   unlist() %>% 
+#   sapply(function(x){trimws(x, "both")}) %>% 
+#   as.numeric()
+# homegate_data$zip_code <- sapply(homegate_data$location, function(x){str_extract(x, "\\d{4}")}) %>%
+#   as.numeric()
+# homegate_data$nr_rooms <- sapply(homegate_data$nr_rooms, function(x){str_remove(x, " room")}) %>%
+#   sapply(function(x){str_remove_all(x, "s")}) %>%
+#   unlist() %>% 
+#   sapply(function(x){trimws(x, "both")}) %>% 
+#   as.numeric()
+# 
+# # Write our scraped data to a file
+# homegate_data <- unique(homegate_data)
+# save(homegate_data, file = paste0("Web Scraping with Selenium/Homegate_scrape_clean_", Sys.Date(), ".RData"))
 
 # Close connection
-print("Scrape complete. Shutdown.")
+print(paste0(Sys.time(), " - Scrape complete. Shutdown."))
 remDr$close()
 chromeDr[["server"]]$stop()
 
