@@ -41,8 +41,9 @@ overflow-y: scroll;
 
 &lt;img src="GraphicsSlides/Logo RUG hell.png" width="50%" /&gt;
 
-##### Authors/Presenters: Sven, Mathias
-##### Last updated: _2022-09-29 10:37:20_
+##### Authors: Sven, Mathias
+##### Presenters: Sven, Ruben
+##### Last updated: _2023-10-09 16:51:33_
 
 ---
 
@@ -78,6 +79,13 @@ background-size: contain
 
 &lt;img src="GraphicsSlides/palmer.png" width="35%" /&gt;
 
+---
+
+### Resources
+
+You can find these slides and additional resources on our website: https://rusergroup-sg.ch/resources
+
+&lt;img src="GraphicsSlides/rug_resources.png" width="100%" /&gt;
 
 ---
 
@@ -158,14 +166,14 @@ out_plot &lt;- trade_data |&gt;
 &lt;br&gt;
 &lt;br&gt;
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-10-1.png" width="100%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-11-1.png" width="100%" /&gt;
 ]
 ---
 
 ### Why should you learn R? 
 
 .pull-left[
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-11-1.png" width="100%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-12-1.png" width="100%" /&gt;
 ]
 
 .pull-right[
@@ -369,13 +377,13 @@ head(penguins, 4)
 
 ```
 ## # A tibble: 4 × 8
-##   species island bill_length_mm bill_depth_mm flipper_length_… body_mass_g sex  
-##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt; &lt;fct&gt;
-## 1 Adelie  Torge…           39.1          18.7              181        3750 male 
-## 2 Adelie  Torge…           39.5          17.4              186        3800 fema…
-## 3 Adelie  Torge…           40.3          18                195        3250 fema…
-## 4 Adelie  Torge…           NA            NA                 NA          NA &lt;NA&gt; 
-## # … with 1 more variable: year &lt;int&gt;
+##   species island    bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##   &lt;fct&gt;   &lt;fct&gt;              &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+## 1 Adelie  Torgersen           39.1          18.7               181        3750
+## 2 Adelie  Torgersen           39.5          17.4               186        3800
+## 3 Adelie  Torgersen           40.3          18                 195        3250
+## 4 Adelie  Torgersen           NA            NA                  NA          NA
+## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
 ```
 
 ---
@@ -432,14 +440,14 @@ penguins[penguins$sex == "male" &amp; penguins$island == "Biscoe",]
 
 ```
 ## # A tibble: 5 × 8
-##   species island bill_length_mm bill_depth_mm flipper_length_… body_mass_g sex  
-##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt; &lt;fct&gt;
-## 1 Adelie  Biscoe           37.7          18.7              180        3600 male 
-## 2 Adelie  Biscoe           38.2          18.1              185        3950 male 
-## 3 Adelie  Biscoe           38.8          17.2              180        3800 male 
-## 4 Adelie  Biscoe           40.6          18.6              183        3550 male 
-## 5 Adelie  Biscoe           40.5          18.9              180        3950 male 
-## # … with 1 more variable: year &lt;int&gt;
+##   species island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##   &lt;fct&gt;   &lt;fct&gt;           &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+## 1 Adelie  Biscoe           37.7          18.7               180        3600
+## 2 Adelie  Biscoe           38.2          18.1               185        3950
+## 3 Adelie  Biscoe           38.8          17.2               180        3800
+## 4 Adelie  Biscoe           40.6          18.6               183        3550
+## 5 Adelie  Biscoe           40.5          18.9               180        3950
+## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
 ```
 
 ---
@@ -467,7 +475,7 @@ penguins[,"island"]
 ##  8 Torgersen
 ##  9 Torgersen
 ## 10 Torgersen
-## # … with 334 more rows
+## # ℹ 334 more rows
 ```
 
 ---
@@ -490,11 +498,12 @@ penguins[penguins$island == "Dream", "island"] &lt;- "Unknown"
 .pull-right[
 
 ```
-## Error:
+## Error in `[&lt;-`:
 ## ! Assigned data `"Unknown"` must be compatible with existing data.
 ## ℹ Error occurred for column `island`.
-## ✖ Can't convert from &lt;character&gt; to &lt;factor&lt;ccf33&gt;&gt; due to loss of generality.
-## • Locations: 1.
+## Caused by error in `vec_assign()`:
+## ! Can't convert from &lt;character&gt; to &lt;factor&lt;ccf33&gt;&gt; due to loss of generality.
+## • Locations: 1
 ```
 ]
 ---
@@ -547,12 +556,12 @@ penguins[penguins$island == "Unknown",]
 
 ```
 ## # A tibble: 3 × 8
-##   species island bill_length_mm bill_depth_mm flipper_length_… body_mass_g sex  
-##   &lt;fct&gt;   &lt;chr&gt;           &lt;dbl&gt;         &lt;dbl&gt;            &lt;int&gt;       &lt;int&gt; &lt;fct&gt;
-## 1 Adelie  Unkno…           39.5          16.7              178        3250 fema…
-## 2 Adelie  Unkno…           37.2          18.1              178        3900 male 
-## 3 Adelie  Unkno…           39.5          17.8              188        3300 fema…
-## # … with 1 more variable: year &lt;int&gt;
+##   species island  bill_length_mm bill_depth_mm flipper_length_mm body_mass_g
+##   &lt;fct&gt;   &lt;chr&gt;            &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;
+## 1 Adelie  Unknown           39.5          16.7               178        3250
+## 2 Adelie  Unknown           37.2          18.1               178        3900
+## 3 Adelie  Unknown           39.5          17.8               188        3300
+## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
 ```
 
 --
@@ -612,7 +621,8 @@ penguins[penguins$sex == "male",]
 ##  8 &lt;NA&gt;    &lt;NA&gt;                NA            NA                  NA          NA
 ##  9 Adelie  Torgersen           38.6          21.2               191        3800
 ## 10 Adelie  Torgersen           34.6          21.1               198        4400
-## # … with 169 more rows, and 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
+## # ℹ 169 more rows
+## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
 ```
 ---
 
@@ -1012,7 +1022,8 @@ penguins[penguins$island == "Biscoe",]
 ##  8 Adelie  Biscoe           40.5          17.9               187        3200
 ##  9 Adelie  Biscoe           37.9          18.6               172        3150
 ## 10 Adelie  Biscoe           40.5          18.9               180        3950
-## # … with 158 more rows, and 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
+## # ℹ 158 more rows
+## # ℹ 2 more variables: sex &lt;fct&gt;, year &lt;int&gt;
 ```
 
 ---
@@ -1142,12 +1153,8 @@ head(methods(as_tibble))
 ```
 
 ```
-## [1] "as_tibble.data.frame"                         
-## [2] "as_tibble.default"                            
-## [3] "as_tibble.dribble"                            
-## [4] "as_tibble.googlesheets4_schema_GridRange"     
-## [5] "as_tibble.googlesheets4_schema_NamedRange"    
-## [6] "as_tibble.googlesheets4_schema_ProtectedRange"
+## [1] "as_tibble.data.frame" "as_tibble.default"    "as_tibble.grouped_df"
+## [4] "as_tibble.list"       "as_tibble.matrix"     "as_tibble.NULL"
 ```
 ]
 
@@ -1158,8 +1165,8 @@ methods(as.data.frame)[29:32]
 ```
 
 ```
-## [1] "as.data.frame.resample"    "as.data.frame.spec_tbl_df"
-## [3] "as.data.frame.table"       "as.data.frame.tbl_df"
+## [1] "as.data.frame.table"      "as.data.frame.tbl_df"    
+## [3] "as.data.frame.ts"         "as.data.frame.vctrs_sclr"
 ```
 [**Class Tibble Documentation**](https://tibble.tidyverse.org/reference/as_tibble.html)
 ]
@@ -1263,7 +1270,7 @@ penguins[, c("body_mass_g", "bill_length_mm")]
 plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-72-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-73-1.png" width="75%" /&gt;
 
 ---
 
@@ -1276,7 +1283,7 @@ plot(x = penguins$bill_length_mm, y = penguins$body_mass_g)
 *      col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-73-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-74-1.png" width="75%" /&gt;
 
 
 ---
@@ -1294,7 +1301,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-74-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-75-1.png" width="75%" /&gt;
 
 ---
 
@@ -1307,7 +1314,7 @@ abline(lm(penguins$body_mass_g ~ penguins$bill_depth_mm),
        col = "blue", lwd = 2, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-75-1.png" width="75%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-76-1.png" width="75%" /&gt;
 
 ---
 
@@ -1321,7 +1328,7 @@ penguins %&gt;%
   geom_smooth(method = "lm", se = F, lty = 2)
 ```
 
-&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-76-1.png" width="90%" /&gt;
+&lt;img src="Intro_to_R_files/figure-html/unnamed-chunk-77-1.png" width="90%" /&gt;
 ---
 
 # That's it for today!

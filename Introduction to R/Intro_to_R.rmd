@@ -69,7 +69,8 @@ library(rstudioapi)
 knitr::include_graphics("GraphicsSlides/Logo RUG hell.png")
 ```
 
-##### Authors/Presenters: Sven, Mathias
+##### Authors: Sven, Mathias
+##### Presenters: Sven, Ruben
 ##### Last updated: _`r Sys.time()`_
 
 ---
@@ -110,6 +111,15 @@ background-size: contain
 knitr::include_graphics("GraphicsSlides/palmer.png")
 ```
 
+---
+
+### Resources
+
+You can find these slides and additional resources on our website: https://rusergroup-sg.ch/resources
+
+```{r, echo=FALSE, out.width="100%"}
+knitr::include_graphics("GraphicsSlides/rug_resources.png")
+```
 
 ---
 
